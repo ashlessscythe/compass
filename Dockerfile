@@ -1,5 +1,5 @@
-# Prefer the root Dockerfile when deploying.
-# Kept for convenience when building with: docker build -f apps/web/Dockerfile .
+# Deploy from the repository root (Koyeb / Docker).
+# Do not set a work directory to apps/web — the monorepo lockfile lives at the root.
 FROM node:22-alpine AS base
 RUN corepack enable && corepack prepare pnpm@10.33.3 --activate
 WORKDIR /app

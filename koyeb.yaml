@@ -1,3 +1,5 @@
+# Compass web — deploy from the repository ROOT with the Docker builder.
+# Do NOT set Work directory to apps/web (buildpacks cannot see pnpm-lock.yaml).
 name: compass-web
 services:
   - name: web
@@ -9,6 +11,8 @@ services:
         value: production
       - key: NEXT_PUBLIC_SITE_URL
         value: https://getcompass.space
+      - key: PORT
+        value: "3000"
     instance_types:
       - type: free
     ports:
@@ -26,5 +30,5 @@ services:
         port: 3000
         protocol: http
     docker:
-      dockerfile: ./apps/web/Dockerfile
+      dockerfile: Dockerfile
       docker_context: .

@@ -104,28 +104,43 @@ Site: [getcompass.space](https://getcompass.space)
 
 ## Deployment
 
-### Vercel
+This is a **pnpm monorepo**. The lockfile (`pnpm-lock.yaml`) lives at the **repository root**. Deployments must build from the root (or install from the root) so the lockfile is visible.
 
-1. Import the GitHub repository in Vercel.
-2. Set **Root Directory** to `apps/web`.
-3. Framework preset: **Next.js**.
-4. Install command: `pnpm install` (from repo root — Vercel detects pnpm via `packageManager`).
-5. Build command: `pnpm build` (or leave default for Next.js in `apps/web`).
+### Vercel (recommended)
+
+1. Import the GitHub repository (`public` branch).
+2. Keep **Root Directory** as the repository root (`.`) — do **not** set it to `apps/web` alone unless you also install from the monorepo root.
+3. Framework preset: **Next.js** (or Other + custom commands).
+4. Install command: `pnpm install`
+5. Build command: `pnpm --filter @compass/web build`
 6. Set env `NEXT_PUBLIC_SITE_URL` to `https://getcompass.space`.
 
-Root `vercel.json` is provided for monorepo-aware installs when deploying from the repository root.
+Root `vercel.json` already encodes these commands.
+
+If you prefer Root Directory `apps/web`, enable including files outside the root directory and use:
+
+- Install: `cd ../.. && pnpm install`
+- Build: `cd ../.. && pnpm --filter @compass/web build`
 
 ### Koyeb
 
-1. Create a new app from this repository.
-2. Use the Dockerfile at `apps/web/Dockerfile` with Docker context `.` (repo root).
-3. Or apply `koyeb.yaml`.
-4. Expose port `3000`.
-5. Set `NEXT_PUBLIC_SITE_URL` to `https://getcompass.space` (or your Koyeb preview URL).
+The “Missing lockfile” error happens when **Work directory** is set to `apps/web` with the buildpack builder — Koyeb then hides the root `pnpm-lock.yaml`.
+
+**Use the Docker builder from the repo root:**
+
+1. Create/update the service from this repository (`public` branch).
+2. Builder: **Dockerfile** (not buildpack).
+3. Dockerfile path: `Dockerfile` (repo root).
+4. Docker context: `.` (repo root).
+5. **Leave Work directory empty / unset** (must be the repository root).
+6. Port: `3000`.
+7. Env: `NEXT_PUBLIC_SITE_URL=https://getcompass.space`.
+
+`koyeb.yaml` matches this setup.
 
 ```bash
 # Local Docker smoke test
-docker build -f apps/web/Dockerfile -t compass-web .
+docker build -t compass-web .
 docker run --rm -p 3000:3000 compass-web
 ```
 

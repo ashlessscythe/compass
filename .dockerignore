@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+.next
+**/.next
+.turbo
+**/.turbo
+*.log
+.env*
+.git
+.github
+.vscode
+coverage
+apps/mobile
+**/tsconfig.tsbuildinfo
