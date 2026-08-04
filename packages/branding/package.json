@@ -1,0 +1,22 @@
+{
+  "name": "@compass/branding",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Compass brand tokens, copy, and assets",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens": "./src/tokens.ts",
+    "./copy": "./src/copy.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"No lint configured for @compass/branding\"",
+    "clean": "rm -rf dist .turbo"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
