@@ -24,11 +24,15 @@ export function Vision() {
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <ul className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-3 md:gap-4">
+          <ul className="mx-auto grid max-w-3xl grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
             {siteCopy.vision.items.map((item, index) => (
               <li key={item}>
                 <FadeIn delay={0.05 * index}>
-                  <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 font-display text-sm font-medium tracking-tight text-foreground/90 transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:text-foreground md:text-base">
+                  <span className="group flex items-baseline gap-3 font-display text-lg tracking-tight text-foreground/85 transition-colors duration-300 hover:text-foreground md:text-xl">
+                    <span
+                      aria-hidden
+                      className="inline-block size-1.5 shrink-0 rounded-full bg-primary/70 transition-transform duration-300 group-hover:scale-125"
+                    />
                     {item}
                   </span>
                 </FadeIn>

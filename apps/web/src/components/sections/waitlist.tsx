@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Check, Loader2 } from "lucide-react";
 import { CompassApiClient } from "@compass/api";
@@ -8,8 +8,6 @@ import { siteCopy } from "@compass/branding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FadeIn } from "@/components/motion/fade-in";
-
-const client = new CompassApiClient();
 
 export function Waitlist() {
   const [email, setEmail] = useState("");
@@ -26,6 +24,10 @@ export function Waitlist() {
     setMessage("");
 
     try {
+      const client = new CompassApiClient({
+        baseUrl: "",
+        fetchImpl: globalThis.fetch.bind(globalThis),
+      });
       const result = await client.joinWaitlist({
         email: email.trim(),
         source: "landing",
