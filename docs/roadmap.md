@@ -33,8 +33,9 @@
 
 | Branch   | Purpose                                      |
 |----------|----------------------------------------------|
-| `main`   | Stable integration / default                 |
-| `dev`    | Active development integration               |
-| `public` | Public-facing release candidate / production |
+| `dev`    | Active development integration (CI)          |
+| `public` | Default / production-facing release          |
 
-Feature work lands via PRs into `dev`, then promotes to `main` / `public` for release.
+Feature work lands via PRs into `dev`, then promotes to `public` for release.
+
+Production site: [getcompass.space](https://getcompass.space)

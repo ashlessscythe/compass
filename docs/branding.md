@@ -10,6 +10,12 @@ Primary product name. Hero-level signal on marketing surfaces — never demoted 
 
 **Know where everything is.**
 
+## Domain
+
+**getcompass.space**
+
+Canonical production URL: `https://getcompass.space`
+
 ## Icon
 
 A modern, geometric compass mark:

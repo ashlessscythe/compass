@@ -41,4 +41,4 @@ jobs:
       - name: Build
         run: pnpm build
         env:
-          NEXT_PUBLIC_SITE_URL: https://compass.app
+          NEXT_PUBLIC_SITE_URL: https://getcompass.space

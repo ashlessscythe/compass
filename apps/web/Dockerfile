@@ -16,12 +16,14 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/packages ./packages
 COPY . .
+ENV NEXT_PUBLIC_SITE_URL=https://getcompass.space
 RUN pnpm --filter @compass/web build
 
 FROM base AS runner
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ENV NEXT_PUBLIC_SITE_URL=https://getcompass.space
 WORKDIR /app
 
 COPY --from=builder /app/apps/web/public ./apps/web/public

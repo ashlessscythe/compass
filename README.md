@@ -95,9 +95,10 @@ Details: [docs/roadmap.md](./docs/roadmap.md)
 
 | Branch   | Role                                         |
 |----------|----------------------------------------------|
-| `main`   | Default / stable                             |
-| `dev`    | Active development                           |
-| `public` | Public release / production-facing           |
+| `dev`    | Active development (CI runs here)            |
+| `public` | Default / production-facing                  |
+
+Site: [getcompass.space](https://getcompass.space)
 
 ---
 
@@ -110,7 +111,7 @@ Details: [docs/roadmap.md](./docs/roadmap.md)
 3. Framework preset: **Next.js**.
 4. Install command: `pnpm install` (from repo root — Vercel detects pnpm via `packageManager`).
 5. Build command: `pnpm build` (or leave default for Next.js in `apps/web`).
-6. Set env `NEXT_PUBLIC_SITE_URL` to your production URL.
+6. Set env `NEXT_PUBLIC_SITE_URL` to `https://getcompass.space`.
 
 Root `vercel.json` is provided for monorepo-aware installs when deploying from the repository root.
 
@@ -120,7 +121,7 @@ Root `vercel.json` is provided for monorepo-aware installs when deploying from t
 2. Use the Dockerfile at `apps/web/Dockerfile` with Docker context `.` (repo root).
 3. Or apply `koyeb.yaml`.
 4. Expose port `3000`.
-5. Set `NEXT_PUBLIC_SITE_URL` to your Koyeb URL.
+5. Set `NEXT_PUBLIC_SITE_URL` to `https://getcompass.space` (or your Koyeb preview URL).
 
 ```bash
 # Local Docker smoke test
@@ -141,10 +142,11 @@ docker run --rm -p 3000:3000 compass-web
 
 ## Contributing
 
-1. Branch from `dev` (or `main` if `dev` is unavailable).
+1. Branch from `dev`.
 2. Use focused commits and descriptive PR titles.
 3. Ensure `pnpm lint`, `pnpm typecheck`, and `pnpm build` pass.
-4. Open a PR using the template in `.github/`.
+4. Open a PR into `dev` using the template in `.github/`.
+5. Promote stable work from `dev` to `public` for production.
 
 Bug reports welcome via GitHub Issues.
 

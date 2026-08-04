@@ -5,7 +5,7 @@
 export const brand = {
   name: "Compass",
   tagline: "Know where everything is.",
-  domain: "compass.app",
+  domain: "getcompass.space",
   github: "https://github.com/ashlessscythe/compass",
 } as const;
 
