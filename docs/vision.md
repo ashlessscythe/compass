@@ -54,4 +54,5 @@ The architecture is module-based so additional verticals can share the same loca
 
 - **Name:** Compass
 - **Tagline:** Know where everything is.
+- **Domain:** getcompass.space
 - **Tone:** Minimal, elegant, modern — premium software startup, not fantasy.

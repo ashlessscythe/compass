@@ -2,5 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @compass/web build"
+  "buildCommand": "pnpm --filter @compass/web build",
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": "https://getcompass.space"
+  }
 }

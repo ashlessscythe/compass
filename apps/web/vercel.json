@@ -3,5 +3,8 @@
   "framework": "nextjs",
   "installCommand": "cd ../.. && pnpm install",
   "buildCommand": "cd ../.. && pnpm --filter @compass/web build",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": "https://getcompass.space"
+  }
 }
