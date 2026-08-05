@@ -74,10 +74,15 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-8px)" },
         },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "gradient-shift": "gradient-shift 12s ease infinite",
         float: "float 6s ease-in-out infinite",
+        marquee: "marquee 55s linear infinite",
       },
     },
   },

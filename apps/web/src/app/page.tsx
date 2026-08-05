@@ -11,8 +11,8 @@ export default function HomePage() {
       <SiteHeader />
       <main id="main">
         <Hero />
-        <Features />
         <Vision />
+        <Features />
         <Waitlist />
       </main>
       <SiteFooter />
