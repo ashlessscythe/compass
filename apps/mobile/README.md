@@ -137,7 +137,17 @@ flutter test
 
 ## UI captures
 
-Foundation layout stills (desktop run) live in
-[`docs/images/mobile/`](../../docs/images/mobile/) — useful for tracking shell
-iterations. They are not polished device-frame marketing shots; capture those
-locally on a phone/emulator when you want README preview images.
+Foundation layout stills from a Linux desktop run (iteration references, not
+marketing heroes). Full set: [`docs/images/mobile/`](../../docs/images/mobile/).
+
+### Home
+
+![Home dashboard](../../docs/images/mobile/01-home-dashboard.png)
+
+### Settings
+
+![Settings appearance](../../docs/images/mobile/02-settings-appearance.png)
+
+### About
+
+![About](../../docs/images/mobile/03-about.png)
