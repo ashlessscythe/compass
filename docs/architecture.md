@@ -6,7 +6,7 @@
 compass/
 ├── apps/
 │   ├── web/          # Next.js marketing site (+ future web app surfaces)
-│   └── mobile/       # Flutter client (scaffold)
+│   └── mobile/       # Flutter client (Clean Architecture foundation)
 ├── packages/
 │   ├── api/          # Shared domain types + API client contracts
 │   ├── branding/     # Brand tokens, copy, module list
@@ -81,7 +81,14 @@ Future web surfaces (account, collection browser) can grow in the same app or as
 
 ## Mobile application
 
-`apps/mobile` is reserved for Flutter. It will consume `@compass/api` contracts and brand guidance from `@compass/branding`.
+`apps/mobile` is a Flutter client built with Clean Architecture (feature-first):
+
+- **presentation / application / domain / infrastructure** layers
+- Core domain: Asset, Container, Location, AssetType, Movement, Relationship, History, Tag, Metadata, Photo
+- Drift (SQLite) with migration infrastructure; Riverpod DI; GoRouter; Material 3 (dark-first)
+- Module-specific fields stay in Metadata — the core app is not MTG-specific
+
+See `apps/mobile/README.md` for setup and run instructions.
 
 ## Tooling
 

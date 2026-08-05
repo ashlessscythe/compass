@@ -22,7 +22,7 @@ Bridge digital inventories and physical storage with an offline-first, NFC-aware
 compass/
 ├── apps/
 │   ├── web/                 # Next.js 15 marketing site
-│   └── mobile/              # Flutter app (scaffold)
+│   └── mobile/              # Flutter app (Clean Architecture foundation)
 ├── packages/
 │   ├── api/                 # Shared types + API client
 │   ├── branding/            # Brand tokens & copy
@@ -44,7 +44,7 @@ compass/
 | Styling      | Tailwind CSS, shadcn/ui, Framer Motion      |
 | Icons        | Lucide                                      |
 | Fonts        | Geist, Inter, Space Grotesk                 |
-| Mobile       | Flutter (scaffold)                          |
+| Mobile       | Flutter (foundation)                        |
 | Deploy       | Vercel, Koyeb (Docker)                      |
 
 ---
