@@ -134,3 +134,10 @@ flutter test
 - Database schema ships empty in this foundation milestone; migration hooks are ready.
 - Repository interfaces are wired to in-memory implementations until tables land.
 - Do not put business logic in widgets.
+
+## UI captures
+
+Foundation layout stills (desktop run) live in
+[`docs/images/mobile/`](../../docs/images/mobile/) — useful for tracking shell
+iterations. They are not polished device-frame marketing shots; capture those
+locally on a phone/emulator when you want README preview images.
