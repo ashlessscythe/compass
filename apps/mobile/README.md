@@ -1,30 +1,136 @@
 # Compass Mobile
 
-Flutter application for Compass — offline-first asset management.
+Offline-first asset management for iOS, Android, and desktop.
 
-## Status
+**Compass** — *Know where everything is.*
 
-Scaffold only. The mobile app will be initialized with Flutter in a future milestone.
+## Prerequisites
 
-## Planned stack
+### Install Flutter (stable)
 
-- Flutter (iOS + Android)
-- Offline-first local database
-- NFC tag scanning for containers
-- Shared contracts from `@compass/api`
-- Shared brand tokens from `@compass/branding`
+```bash
+# macOS (Homebrew)
+brew install --cask flutter
 
-## Directory
-
-```
-apps/mobile/
-├── README.md          ← you are here
-└── .gitkeep
+# Or clone the SDK
+git clone https://github.com/flutter/flutter.git -b stable
+export PATH="$PATH:`pwd`/flutter/bin"
 ```
 
-When ready:
+Verify:
+
+```bash
+flutter doctor
+```
+
+Use the **stable** channel. This project targets Dart 3.12+ / Flutter 3.44+.
+
+## Setup
 
 ```bash
 cd apps/mobile
-flutter create . --org app.compass --project-name compass
+flutter pub get
 ```
+
+Generate Freezed / Drift / JSON code after changing annotated models:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+## Run
+
+```bash
+flutter run
+```
+
+Pick a device when prompted, or target one explicitly:
+
+```bash
+flutter run -d chrome      # web
+flutter run -d macos      # macOS
+flutter run -d linux      # Linux
+flutter run -d <deviceId> # iOS / Android
+```
+
+## Supported platforms
+
+| Platform | Status |
+|----------|--------|
+| iOS      | Supported |
+| Android  | Supported |
+| macOS    | Supported |
+| Linux    | Supported |
+| Windows  | Supported |
+| Web      | Supported (dev / preview; requires `web/sqlite3.wasm` + `web/drift_worker.js`) |
+
+## Architecture overview
+
+Clean Architecture, feature-first:
+
+```
+lib/
+├── core/                 # Shared kernel
+│   ├── constants/
+│   ├── domain/           # Entities + repository contracts
+│   ├── errors/
+│   └── utils/
+├── features/             # Vertical slices
+│   ├── assets/
+│   ├── containers/
+│   ├── locations/
+│   ├── home/
+│   ├── splash/
+│   ├── settings/
+│   └── about/
+│       ├── presentation/
+│       ├── application/
+│       ├── domain/
+│       └── infrastructure/
+├── database/             # Drift SQLite + migrations
+├── routing/              # GoRouter
+├── theme/                # Material 3 tokens (dark-first)
+├── services/             # Cross-cutting services
+├── shared/               # Providers, shared infrastructure
+└── widgets/              # Reusable UI primitives
+```
+
+### Layers
+
+| Layer | Responsibility |
+|-------|----------------|
+| **presentation** | Widgets, pages — no business logic |
+| **application** | Use cases / services, Riverpod notifiers |
+| **domain** | Entities, value objects, repository interfaces |
+| **infrastructure** | Drift DAOs, repository implementations |
+
+### Core domain
+
+The platform is built around generic concepts — never module-specific fields:
+
+`Asset` · `Container` · `Location` · `AssetType` · `Movement` · `Relationship` · `History` · `Tag` · `Metadata` · `Photo`
+
+Module-specific data (MTG, jewelry, tools, …) belongs in `Metadata`, not the core schema.
+
+### Stack
+
+- **Flutter** + Material 3
+- **Riverpod** / **hooks_riverpod** + **flutter_hooks**
+- **GoRouter**
+- **Drift** (SQLite)
+- **Freezed** + **json_serializable** + **build_runner**
+- **uuid**
+- **very_good_analysis**
+
+### Quality
+
+```bash
+flutter analyze
+flutter test
+```
+
+## Notes
+
+- Database schema ships empty in this foundation milestone; migration hooks are ready.
+- Repository interfaces are wired to in-memory implementations until tables land.
+- Do not put business logic in widgets.
