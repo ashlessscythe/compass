@@ -152,6 +152,7 @@ docker run --rm -p 3000:3000 compass-web
 - [Architecture](./docs/architecture.md)
 - [Roadmap](./docs/roadmap.md)
 - [Branding](./docs/branding.md)
+- [Flutter / mobile setup](./docs/mobile-setup.md)
 
 ---
 

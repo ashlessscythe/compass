@@ -47,6 +47,7 @@ apps/mobile/.pub-cache
 apps/mobile/.pub-cache/
 **/ios/Pods
 **/android/.gradle
+**/xcshareddata/swiftpm/
 
 # Misc
 *.pem

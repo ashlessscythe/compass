@@ -6,24 +6,14 @@ Offline-first asset management for iOS, Android, and desktop.
 
 ## Prerequisites
 
-### Install Flutter (stable)
+Use the **stable** channel. This project targets Dart 3.12+ / Flutter 3.44+.
+
+Full new-Mac walkthrough (Xcode, DeviceHub, iOS simulator, what not to commit): [docs/mobile-setup.md](../../docs/mobile-setup.md).
 
 ```bash
-# macOS (Homebrew)
 brew install --cask flutter
-
-# Or clone the SDK
-git clone https://github.com/flutter/flutter.git -b stable
-export PATH="$PATH:`pwd`/flutter/bin"
-```
-
-Verify:
-
-```bash
 flutter doctor
 ```
-
-Use the **stable** channel. This project targets Dart 3.12+ / Flutter 3.44+.
 
 ## Setup
 
@@ -47,10 +37,10 @@ flutter run
 Pick a device when prompted, or target one explicitly:
 
 ```bash
-flutter run -d chrome      # web
-flutter run -d macos      # macOS
-flutter run -d linux      # Linux
-flutter run -d <deviceId> # iOS / Android
+flutter run -d chrome           # web (needs Chrome)
+flutter run -d macos            # macOS
+flutter run -d linux            # Linux
+flutter run -d "iPhone 17 Pro"  # booted iOS simulator (see docs/mobile-setup.md)
 ```
 
 ## Supported platforms
