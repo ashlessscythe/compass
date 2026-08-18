@@ -30,6 +30,13 @@ WORKDIR /app
 COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/prisma ./apps/web/prisma
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/web/node_modules ./apps/web/node_modules
+COPY apps/web/scripts/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 3000
-CMD ["node", "apps/web/server.js"]
+ENTRYPOINT ["/docker-entrypoint.sh"]

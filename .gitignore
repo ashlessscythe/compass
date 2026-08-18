@@ -10,9 +10,10 @@ out
 .turbo
 *.tsbuildinfo
 
-# Env
+# Env — keep *.example, ignore secrets
 .env
-.env*.local
+.env.*
+!.env.example
 
 # IDE / OS
 .DS_Store

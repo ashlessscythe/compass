@@ -42,3 +42,5 @@ jobs:
         run: pnpm build
         env:
           NEXT_PUBLIC_SITE_URL: https://getcompass.space
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          DIRECT_URL: postgresql://ci:ci@localhost:5432/ci

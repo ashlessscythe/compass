@@ -7,18 +7,23 @@
 - [x] Shared packages (`api`, `branding`, `ui`)
 - [x] Waitlist capture endpoint
 - [x] Documentation (vision, architecture, branding)
-- [ ] Flutter mobile scaffold initialization
-- [ ] Persist waitlist to a durable store
+- [x] Flutter mobile scaffold initialization
+- [x] Persist waitlist to a durable store
+
+The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and Drift connection/migration hooks. Schema tables are still empty; repositories are in-memory until the MTG MVP data model lands.
 
 ## Next — MTG MVP
 
-- [ ] Local asset + location data model
-- [ ] Nested containers (room / shelf / box / binder)
+- [ ] Local asset + location data model (on-device SQLite; see architecture)
+- [ ] Nested containers (location = place, container = vessel)
 - [ ] Search: item → location path
 - [ ] NFC tag association for containers
 - [ ] Import from CSV
 - [ ] Import adapters for Deckbox and Moxfield
+- [ ] Scryfall catalog for MTG images/stats (configurable; cache locally)
 - [ ] Offline-first sync protocol (v0)
+
+Pricing / entitlements (free local vs paid sync) are **undecided** — see [architecture.md](./architecture.md). Do not block the local iOS MVP on billing.
 
 ## Later — Platform
 

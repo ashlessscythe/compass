@@ -26,6 +26,8 @@ Compass makes physical location a first-class dimension of inventory.
 
 Collectors often know they own a card. They struggle to find which binder page, deck box, or storage bin contains it. Compass maps catalog entries to nested real-world containers, optionally identified by NFC tags.
 
+Card images and stats (mana, type, oracle text, set) come from **Scryfall** by default. That lookup is configurable and optional: Compass still answers *where it is* if the catalog is off or the device is offline. Fetched art/stats are cached locally. Other modules will use their own catalog providers the same way.
+
 ## Future modules
 
 The architecture is module-based so additional verticals can share the same location graph:

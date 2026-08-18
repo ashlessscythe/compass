@@ -60,7 +60,10 @@ compass/
 
 ```bash
 pnpm install
+cp apps/web/.env.example apps/web/.env.local
 ```
+
+Edit `apps/web/.env.local` (gitignored) with `DATABASE_URL` and `DIRECT_URL`. Website schema is Prisma (`apps/web/prisma/schema.prisma`). Create a migration with `pnpm --filter @compass/web db:migrate`. Inventory does not use this — it stays on-device SQLite.
 
 ### Develop
 
@@ -85,8 +88,8 @@ pnpm format       # Prettier
 
 High level:
 
-1. **Foundation** — monorepo, marketing site, shared packages
-2. **MTG MVP** — locations, search, NFC, imports
+1. **Foundation** — monorepo, marketing site, shared packages, Flutter scaffold
+2. **MTG MVP** — locations, search, NFC, imports, Scryfall catalog
 3. **Platform** — additional modules, sync, web app surfaces
 
 Details: [docs/roadmap.md](./docs/roadmap.md)
@@ -112,15 +115,15 @@ This is a **pnpm monorepo**. The lockfile (`pnpm-lock.yaml`) lives at the **repo
 2. Keep **Root Directory** as the repository root (`.`) — do **not** set it to `apps/web` alone unless you also install from the monorepo root.
 3. Framework preset: **Next.js** (or Other + custom commands).
 4. Install command: `pnpm install`
-5. Build command: `pnpm --filter @compass/web build`
-6. Set env `NEXT_PUBLIC_SITE_URL` to `https://getcompass.space`.
+5. Build command: `pnpm --filter @compass/web db:deploy && pnpm --filter @compass/web build`
+6. Set env `NEXT_PUBLIC_SITE_URL` to `https://getcompass.space`. Set `DATABASE_URL` and `DIRECT_URL` in the Vercel dashboard — required for `migrate deploy` at build. Do not put them in git.
 
 Root `vercel.json` already encodes these commands.
 
 If you prefer Root Directory `apps/web`, enable including files outside the root directory and use:
 
 - Install: `cd ../.. && pnpm install`
-- Build: `cd ../.. && pnpm --filter @compass/web build`
+- Build: `cd ../.. && pnpm --filter @compass/web db:deploy && pnpm --filter @compass/web build`
 
 ### Koyeb
 
@@ -134,7 +137,7 @@ The “Missing lockfile” error happens when **Work directory** is set to `apps
 4. Docker context: `.` (repo root).
 5. **Leave Work directory empty / unset** (must be the repository root).
 6. Port: `3000`.
-7. Env: `NEXT_PUBLIC_SITE_URL=https://getcompass.space`.
+7. Env: `NEXT_PUBLIC_SITE_URL=https://getcompass.space`. Add `DATABASE_URL` and `DIRECT_URL` in the Koyeb dashboard — the container runs `prisma migrate deploy` on start.
 
 `koyeb.yaml` matches this setup.
 
