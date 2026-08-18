@@ -7,9 +7,12 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
 COPY apps/web/package.json ./apps/web/
+COPY apps/web/scripts/prisma-generate.sh ./apps/web/scripts/prisma-generate.sh
+COPY apps/web/prisma ./apps/web/prisma/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/branding/package.json ./packages/branding/
 COPY packages/api/package.json ./packages/api/
+# postinstall runs `prisma generate` and needs schema + the generate script.
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder

@@ -4,6 +4,12 @@
 set -e
 cd "$(dirname "$0")/.."
 
+# Docker deps copies package.json first; skip if schema is not in this layer yet.
+if [ ! -f prisma/schema.prisma ]; then
+  echo "prisma-generate: no schema.prisma yet, skipping"
+  exit 0
+fi
+
 if [ -f .env.local ]; then
   exec dotenv -e .env.local -- prisma generate "$@"
 fi
