@@ -53,3 +53,4 @@ apps/mobile/.pub-cache/
 # Misc
 *.pem
 .cache
+apps/mobile/analysis_options.yaml
