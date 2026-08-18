@@ -54,7 +54,7 @@ compass/
 ### Prerequisites
 
 - Node.js 20+
-- [pnpm](https://pnpm.io) 9+
+- [pnpm](https://pnpm.io) 10 (`npm install -g pnpm@10.33.3` — Homebrew Node 25+ does not ship Corepack)
 
 ### Install
 

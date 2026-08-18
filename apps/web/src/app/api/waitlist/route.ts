@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { WaitlistResponse } from "@compass/api";
 
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { hasDatabase } from "@/lib/env";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await prisma.waitlistEntry.upsert({
+    await getPrisma().waitlistEntry.upsert({
       where: { email },
       create: { email, source: source || undefined },
       update: {},

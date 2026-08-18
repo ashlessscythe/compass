@@ -18,6 +18,9 @@ COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/packages ./packages
 COPY . .
 ENV NEXT_PUBLIC_SITE_URL=https://getcompass.space
+# Dummy URLs for `prisma generate` only — no connection during image build.
+ENV DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/compass
+ENV DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:5432/compass
 RUN pnpm --filter @compass/web build
 
 FROM base AS runner
