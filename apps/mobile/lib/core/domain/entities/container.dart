@@ -14,6 +14,7 @@ abstract class Container with _$Container {
     required DateTime updatedAt,
     String? parentContainerId,
     String? locationId,
+    String? nfcTagId,
     String? notes,
     @Default(Metadata.empty) Metadata metadata,
   }) = _Container;

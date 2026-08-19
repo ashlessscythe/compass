@@ -10,13 +10,13 @@
 - [x] Flutter mobile scaffold initialization
 - [x] Persist waitlist to a durable store
 
-The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and Drift connection/migration hooks. Schema tables are still empty; repositories are in-memory until the MTG MVP data model lands.
+The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
 ## Next — MTG MVP
 
-- [ ] Local asset + location data model (on-device SQLite; see architecture)
-- [ ] Nested containers (location = place, container = vessel)
-- [ ] Search: item → location path
+- [x] Local asset + location data model (on-device SQLite; see architecture)
+- [x] Nested containers (location = place, container = vessel)
+- [x] Search: item → location path
 - [ ] NFC tag association for containers
 - [ ] Import from CSV
 - [ ] Import adapters for Deckbox and Moxfield

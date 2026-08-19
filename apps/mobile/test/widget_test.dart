@@ -12,7 +12,6 @@ void main() {
 
   testWidgets('shows brand name and tagline on home', (tester) async {
     final database = AppDatabase.forTesting(NativeDatabase.memory());
-    addTearDown(database.close);
 
     await tester.pumpWidget(
       ProviderScope(
@@ -35,5 +34,9 @@ void main() {
     expect(find.text(AppConstants.tagline), findsWidgets);
     expect(find.text('Dashboard'), findsOneWidget);
     expect(find.byType(MaterialApp), findsOneWidget);
+
+    await database.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
   });
 }

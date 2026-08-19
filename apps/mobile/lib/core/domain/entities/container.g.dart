@@ -13,6 +13,7 @@ _Container _$ContainerFromJson(Map<String, dynamic> json) => _Container(
   updatedAt: DateTime.parse(json['updatedAt'] as String),
   parentContainerId: json['parentContainerId'] as String?,
   locationId: json['locationId'] as String?,
+  nfcTagId: json['nfcTagId'] as String?,
   notes: json['notes'] as String?,
   metadata: json['metadata'] == null
       ? Metadata.empty
@@ -27,6 +28,7 @@ Map<String, dynamic> _$ContainerToJson(_Container instance) =>
       'updatedAt': instance.updatedAt.toIso8601String(),
       'parentContainerId': instance.parentContainerId,
       'locationId': instance.locationId,
+      'nfcTagId': instance.nfcTagId,
       'notes': instance.notes,
       'metadata': instance.metadata,
     };

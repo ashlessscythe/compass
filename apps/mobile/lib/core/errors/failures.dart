@@ -24,3 +24,12 @@ sealed class Failure with _$Failure {
     Object? cause,
   }) = DatabaseFailure;
 }
+
+extension FailureMessage on Failure {
+  String get message => switch (this) {
+        UnexpectedFailure(:final message) => message,
+        ValidationFailure(:final message) => message,
+        DatabaseFailure(:final message) => message,
+        NotFoundFailure(:final entity, :final id) => '$entity $id not found',
+      };
+}

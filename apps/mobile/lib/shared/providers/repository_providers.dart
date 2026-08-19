@@ -1,37 +1,30 @@
 import 'package:compass/core/domain/repositories/repositories.dart';
-import 'package:compass/features/assets/infrastructure/in_memory_asset_repository.dart';
-import 'package:compass/features/assets/infrastructure/in_memory_asset_type_repository.dart';
-import 'package:compass/features/containers/infrastructure/in_memory_container_repository.dart';
-import 'package:compass/features/locations/infrastructure/in_memory_location_repository.dart';
+import 'package:compass/features/assets/infrastructure/drift_asset_repository.dart';
+import 'package:compass/features/assets/infrastructure/drift_asset_type_repository.dart';
+import 'package:compass/features/containers/infrastructure/drift_container_repository.dart';
+import 'package:compass/features/locations/infrastructure/drift_location_repository.dart';
 import 'package:compass/shared/infrastructure/in_memory_history_repository.dart';
 import 'package:compass/shared/infrastructure/in_memory_movement_repository.dart';
 import 'package:compass/shared/infrastructure/in_memory_photo_repository.dart';
 import 'package:compass/shared/infrastructure/in_memory_relationship_repository.dart';
 import 'package:compass/shared/infrastructure/in_memory_tag_repository.dart';
+import 'package:compass/shared/providers/database_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final assetRepositoryProvider = Provider<AssetRepository>((ref) {
-  final repository = InMemoryAssetRepository();
-  ref.onDispose(repository.dispose);
-  return repository;
+  return DriftAssetRepository(ref.watch(appDatabaseProvider));
 });
 
 final assetTypeRepositoryProvider = Provider<AssetTypeRepository>((ref) {
-  final repository = InMemoryAssetTypeRepository();
-  ref.onDispose(repository.dispose);
-  return repository;
+  return DriftAssetTypeRepository(ref.watch(appDatabaseProvider));
 });
 
 final containerRepositoryProvider = Provider<ContainerRepository>((ref) {
-  final repository = InMemoryContainerRepository();
-  ref.onDispose(repository.dispose);
-  return repository;
+  return DriftContainerRepository(ref.watch(appDatabaseProvider));
 });
 
 final locationRepositoryProvider = Provider<LocationRepository>((ref) {
-  final repository = InMemoryLocationRepository();
-  ref.onDispose(repository.dispose);
-  return repository;
+  return DriftLocationRepository(ref.watch(appDatabaseProvider));
 });
 
 final movementRepositoryProvider = Provider<MovementRepository>((ref) {

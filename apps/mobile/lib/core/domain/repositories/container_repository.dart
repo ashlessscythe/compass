@@ -13,4 +13,6 @@ abstract interface class ContainerRepository {
   Future<Container> update(Container container);
 
   Future<void> delete(String id);
+
+  Future<List<Container>> searchByName(String query);
 }

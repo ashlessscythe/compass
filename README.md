@@ -22,7 +22,7 @@ Bridge digital inventories and physical storage with an offline-first, NFC-aware
 compass/
 ├── apps/
 │   ├── web/                 # Next.js 15 marketing site
-│   └── mobile/              # Flutter app (Clean Architecture foundation)
+│   └── mobile/              # Flutter app (on-device location graph)
 ├── packages/
 │   ├── api/                 # Shared types + API client
 │   ├── branding/            # Brand tokens & copy
@@ -44,7 +44,7 @@ compass/
 | Styling      | Tailwind CSS, shadcn/ui, Framer Motion      |
 | Icons        | Lucide                                      |
 | Fonts        | Geist, Inter, Space Grotesk                 |
-| Mobile       | Flutter (foundation)                        |
+| Mobile       | Flutter (iOS-first; on-device SQLite)       |
 | Deploy       | Vercel, Koyeb (Docker)                      |
 
 ---
@@ -89,7 +89,7 @@ pnpm format       # Prettier
 High level:
 
 1. **Foundation** — monorepo, marketing site, shared packages, Flutter scaffold
-2. **MTG MVP** — locations, search, NFC, imports, Scryfall catalog
+2. **MTG MVP** — local location graph and name search are in; NFC, imports, Scryfall catalog next
 3. **Platform** — additional modules, sync, web app surfaces
 
 Details: [docs/roadmap.md](./docs/roadmap.md)

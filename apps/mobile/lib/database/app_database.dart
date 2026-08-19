@@ -1,14 +1,16 @@
+import 'package:compass/core/constants/app_constants.dart';
 import 'package:compass/database/connection/connection.dart';
 import 'package:compass/database/migrations/migrations.dart';
+import 'package:compass/database/tables/asset_types.dart';
+import 'package:compass/database/tables/assets.dart';
+import 'package:compass/database/tables/containers.dart';
+import 'package:compass/database/tables/locations.dart';
 import 'package:drift/drift.dart';
 
 part 'app_database.g.dart';
 
 /// Local SQLite database for Compass.
-///
-/// Schema tables are intentionally empty in this foundation milestone.
-/// Migration infrastructure is ready for incremental schema evolution.
-@DriftDatabase()
+@DriftDatabase(tables: [Locations, Containers, AssetTypes, Assets])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? openConnection());
 
@@ -19,5 +21,38 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => DatabaseMigrations.schemaVersion;
 
   @override
-  MigrationStrategy get migration => DatabaseMigrations.strategy;
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            await m.createAll();
+          }
+        },
+        beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
+          await _seedDefaultAssetType();
+        },
+      );
+
+  Future<void> _seedDefaultAssetType() async {
+    final existing = await (select(assetTypes)
+          ..where((t) => t.id.equals(AppConstants.defaultAssetTypeId)))
+        .getSingleOrNull();
+    if (existing != null) {
+      return;
+    }
+
+    final now = DateTime.now().toUtc();
+    await into(assetTypes).insert(
+      AssetTypesCompanion.insert(
+        id: AppConstants.defaultAssetTypeId,
+        name: AppConstants.defaultAssetTypeName,
+        moduleId: AppConstants.defaultModuleId,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+  }
 }

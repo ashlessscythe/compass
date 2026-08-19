@@ -82,7 +82,11 @@ Do **not** add MTG (or any vertical) columns to core tables. Expand via `AssetTy
 Source of truth is **on-device SQLite**, not the cloud.
 
 - Intended: Drift at `apps/mobile/lib/database/`. Native file is `compass.sqlite` in the app documents directory.
-- Today: Drift ships **empty** (migration hooks only). Repositories are in-memory maps, so inventory does not survive process restart.
+- Schema v2: `locations`, `containers`, `asset_types`, `assets`. Remaining entities (tags, photos, …) stay in-memory until needed.
+- v1 was an empty foundation DB. Existing simulator installs upgrade with `createAll()`; delete the app if a local file is wedged.
+- Seeded `AssetType`: id `asset-type-item`, name `Item`, module `collectibles`. MTG types come later.
+- Location `path` is stored and recomputed on rename/move. Container and asset paths are derived at read time (`Office / Desk / Binder / Lightning Bolt`).
+- Name search is case-insensitive SQL `LIKE` (no FTS5 yet).
 - Cloud API is a **sync replica**, not required for “where is it?”
 - **Website Postgres** (waitlist, marketing/account tables) is a separate database from inventory. Prisma schema: `apps/web/prisma/schema.prisma`. Migrations: `apps/web/prisma/migrations/`. Secrets: `apps/web/.env.local` (`DATABASE_URL` pooled, `DIRECT_URL` unpooled). Template: `apps/web/.env.example`. Local: `pnpm --filter @compass/web db:migrate`. Deploy runs `prisma migrate deploy` (Vercel build command; Docker entrypoint).
 
@@ -138,9 +142,9 @@ Future web surfaces (account, collection browser) can grow in the same app or as
 
 - **presentation / application / domain / infrastructure** layers
 - Core domain: Asset, Container, Location, AssetType, Movement, Relationship, History, Tag, Metadata, Photo
-- Drift (SQLite) with migration infrastructure; Riverpod DI; GoRouter; Material 3 (dark-first)
+- Drift (SQLite) schema v2: Location, Container, AssetType, Asset; Riverpod DI; GoRouter; Material 3 (dark-first)
 - Module-specific fields stay in Metadata — the core app is not MTG-specific
-- Foundation milestone: empty schema, in-memory repositories until tables land
+- Home search answers “where is it?” from local data
 
 See `apps/mobile/README.md` for setup and run instructions.
 

@@ -14,6 +14,7 @@ abstract class Location with _$Location {
     required DateTime updatedAt,
     String? parentLocationId,
     String? path,
+    String? nfcTagId,
     String? notes,
     @Default(Metadata.empty) Metadata metadata,
   }) = _Location;

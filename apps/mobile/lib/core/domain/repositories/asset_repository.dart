@@ -13,4 +13,6 @@ abstract interface class AssetRepository {
   Future<Asset> update(Asset asset);
 
   Future<void> delete(String id);
+
+  Future<List<Asset>> searchByName(String query);
 }

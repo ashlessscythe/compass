@@ -13,4 +13,6 @@ abstract interface class LocationRepository {
   Future<Location> update(Location location);
 
   Future<void> delete(String id);
+
+  Future<List<Location>> searchByName(String query);
 }

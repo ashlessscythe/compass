@@ -43,6 +43,17 @@ class InMemoryLocationRepository implements LocationRepository {
     _emit();
   }
 
+  @override
+  Future<List<Location>> searchByName(String query) async {
+    final needle = query.trim().toLowerCase();
+    if (needle.isEmpty) {
+      return const [];
+    }
+    return _store.values
+        .where((location) => location.name.toLowerCase().contains(needle))
+        .toList(growable: false);
+  }
+
   Future<void> dispose() async {
     await _controller.close();
   }

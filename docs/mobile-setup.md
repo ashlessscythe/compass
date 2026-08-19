@@ -100,6 +100,12 @@ killall -9 CoreDeviceService
 
 Then boot again.
 
+Debug builds need `flutter run`. `xcrun simctl launch` without the Flutter tool attached usually shows a white screen.
+
+If the simulator still has a v1 empty database and the graph UI fails to open, delete the Compass app from the simulator and run again. Inventory is `Documents/compass.sqlite` (on-device only).
+
+Smoke the graph after launch: Add place (Office) → nested place (Desk) → container (Binder) → asset (Lightning Bolt) → kill/relaunch → search `Lightning` → path `Office / Desk / Binder / Lightning Bolt`.
+
 ### Physical iPhone
 
 Plug it in, trust the computer, and add a Developer Apple ID in Xcode (**Settings → Accounts**). It should appear in `flutter devices`. Signing is configured the first time you run from Xcode or via `flutter run`.
@@ -115,6 +121,8 @@ Plug it in, trust the computer, and add a Developer Apple ID in Xcode (**Setting
 cd apps/mobile
 flutter analyze
 flutter test
+# Optional: UI loop on a booted simulator
+flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 ```
 
 ## What not to commit

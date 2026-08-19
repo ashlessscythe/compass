@@ -43,6 +43,17 @@ class InMemoryContainerRepository implements ContainerRepository {
     _emit();
   }
 
+  @override
+  Future<List<Container>> searchByName(String query) async {
+    final needle = query.trim().toLowerCase();
+    if (needle.isEmpty) {
+      return const [];
+    }
+    return _store.values
+        .where((container) => container.name.toLowerCase().contains(needle))
+        .toList(growable: false);
+  }
+
   Future<void> dispose() async {
     await _controller.close();
   }

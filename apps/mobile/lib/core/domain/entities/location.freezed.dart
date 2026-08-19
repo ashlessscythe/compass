@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Location {
 
- String get id; String get name; DateTime get createdAt; DateTime get updatedAt; String? get parentLocationId; String? get path; String? get notes; Metadata get metadata;
+ String get id; String get name; DateTime get createdAt; DateTime get updatedAt; String? get parentLocationId; String? get path; String? get nfcTagId; String? get notes; Metadata get metadata;
 /// Create a copy of Location
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $LocationCopyWith<Location> get copyWith => _$LocationCopyWithImpl<Location>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Location&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.parentLocationId, parentLocationId) || other.parentLocationId == parentLocationId)&&(identical(other.path, path) || other.path == path)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.metadata, metadata) || other.metadata == metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Location&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.parentLocationId, parentLocationId) || other.parentLocationId == parentLocationId)&&(identical(other.path, path) || other.path == path)&&(identical(other.nfcTagId, nfcTagId) || other.nfcTagId == nfcTagId)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.metadata, metadata) || other.metadata == metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,createdAt,updatedAt,parentLocationId,path,notes,metadata);
+int get hashCode => Object.hash(runtimeType,id,name,createdAt,updatedAt,parentLocationId,path,nfcTagId,notes,metadata);
 
 @override
 String toString() {
-  return 'Location(id: $id, name: $name, createdAt: $createdAt, updatedAt: $updatedAt, parentLocationId: $parentLocationId, path: $path, notes: $notes, metadata: $metadata)';
+  return 'Location(id: $id, name: $name, createdAt: $createdAt, updatedAt: $updatedAt, parentLocationId: $parentLocationId, path: $path, nfcTagId: $nfcTagId, notes: $notes, metadata: $metadata)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $LocationCopyWith<$Res>  {
   factory $LocationCopyWith(Location value, $Res Function(Location) _then) = _$LocationCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, DateTime createdAt, DateTime updatedAt, String? parentLocationId, String? path, String? notes, Metadata metadata
+ String id, String name, DateTime createdAt, DateTime updatedAt, String? parentLocationId, String? path, String? nfcTagId, String? notes, Metadata metadata
 });
 
 
@@ -65,7 +65,7 @@ class _$LocationCopyWithImpl<$Res>
 
 /// Create a copy of Location
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? createdAt = null,Object? updatedAt = null,Object? parentLocationId = freezed,Object? path = freezed,Object? notes = freezed,Object? metadata = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? createdAt = null,Object? updatedAt = null,Object? parentLocationId = freezed,Object? path = freezed,Object? nfcTagId = freezed,Object? notes = freezed,Object? metadata = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -73,6 +73,7 @@ as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: 
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,parentLocationId: freezed == parentLocationId ? _self.parentLocationId : parentLocationId // ignore: cast_nullable_to_non_nullable
 as String?,path: freezed == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as String?,nfcTagId: freezed == nfcTagId ? _self.nfcTagId : nfcTagId // ignore: cast_nullable_to_non_nullable
 as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
 as Metadata,
@@ -169,10 +170,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  DateTime createdAt,  DateTime updatedAt,  String? parentLocationId,  String? path,  String? notes,  Metadata metadata)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  DateTime createdAt,  DateTime updatedAt,  String? parentLocationId,  String? path,  String? nfcTagId,  String? notes,  Metadata metadata)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Location() when $default != null:
-return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parentLocationId,_that.path,_that.notes,_that.metadata);case _:
+return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parentLocationId,_that.path,_that.nfcTagId,_that.notes,_that.metadata);case _:
   return orElse();
 
 }
@@ -190,10 +191,10 @@ return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parent
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  DateTime createdAt,  DateTime updatedAt,  String? parentLocationId,  String? path,  String? notes,  Metadata metadata)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  DateTime createdAt,  DateTime updatedAt,  String? parentLocationId,  String? path,  String? nfcTagId,  String? notes,  Metadata metadata)  $default,) {final _that = this;
 switch (_that) {
 case _Location():
-return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parentLocationId,_that.path,_that.notes,_that.metadata);case _:
+return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parentLocationId,_that.path,_that.nfcTagId,_that.notes,_that.metadata);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -210,10 +211,10 @@ return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parent
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  DateTime createdAt,  DateTime updatedAt,  String? parentLocationId,  String? path,  String? notes,  Metadata metadata)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  DateTime createdAt,  DateTime updatedAt,  String? parentLocationId,  String? path,  String? nfcTagId,  String? notes,  Metadata metadata)?  $default,) {final _that = this;
 switch (_that) {
 case _Location() when $default != null:
-return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parentLocationId,_that.path,_that.notes,_that.metadata);case _:
+return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parentLocationId,_that.path,_that.nfcTagId,_that.notes,_that.metadata);case _:
   return null;
 
 }
@@ -225,7 +226,7 @@ return $default(_that.id,_that.name,_that.createdAt,_that.updatedAt,_that.parent
 @JsonSerializable()
 
 class _Location implements Location {
-  const _Location({required this.id, required this.name, required this.createdAt, required this.updatedAt, this.parentLocationId, this.path, this.notes, this.metadata = Metadata.empty});
+  const _Location({required this.id, required this.name, required this.createdAt, required this.updatedAt, this.parentLocationId, this.path, this.nfcTagId, this.notes, this.metadata = Metadata.empty});
   factory _Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
 
 @override final  String id;
@@ -234,6 +235,7 @@ class _Location implements Location {
 @override final  DateTime updatedAt;
 @override final  String? parentLocationId;
 @override final  String? path;
+@override final  String? nfcTagId;
 @override final  String? notes;
 @override@JsonKey() final  Metadata metadata;
 
@@ -250,16 +252,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Location&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.parentLocationId, parentLocationId) || other.parentLocationId == parentLocationId)&&(identical(other.path, path) || other.path == path)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.metadata, metadata) || other.metadata == metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Location&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.parentLocationId, parentLocationId) || other.parentLocationId == parentLocationId)&&(identical(other.path, path) || other.path == path)&&(identical(other.nfcTagId, nfcTagId) || other.nfcTagId == nfcTagId)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.metadata, metadata) || other.metadata == metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,createdAt,updatedAt,parentLocationId,path,notes,metadata);
+int get hashCode => Object.hash(runtimeType,id,name,createdAt,updatedAt,parentLocationId,path,nfcTagId,notes,metadata);
 
 @override
 String toString() {
-  return 'Location(id: $id, name: $name, createdAt: $createdAt, updatedAt: $updatedAt, parentLocationId: $parentLocationId, path: $path, notes: $notes, metadata: $metadata)';
+  return 'Location(id: $id, name: $name, createdAt: $createdAt, updatedAt: $updatedAt, parentLocationId: $parentLocationId, path: $path, nfcTagId: $nfcTagId, notes: $notes, metadata: $metadata)';
 }
 
 
@@ -270,7 +272,7 @@ abstract mixin class _$LocationCopyWith<$Res> implements $LocationCopyWith<$Res>
   factory _$LocationCopyWith(_Location value, $Res Function(_Location) _then) = __$LocationCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, DateTime createdAt, DateTime updatedAt, String? parentLocationId, String? path, String? notes, Metadata metadata
+ String id, String name, DateTime createdAt, DateTime updatedAt, String? parentLocationId, String? path, String? nfcTagId, String? notes, Metadata metadata
 });
 
 
@@ -287,7 +289,7 @@ class __$LocationCopyWithImpl<$Res>
 
 /// Create a copy of Location
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? createdAt = null,Object? updatedAt = null,Object? parentLocationId = freezed,Object? path = freezed,Object? notes = freezed,Object? metadata = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? createdAt = null,Object? updatedAt = null,Object? parentLocationId = freezed,Object? path = freezed,Object? nfcTagId = freezed,Object? notes = freezed,Object? metadata = null,}) {
   return _then(_Location(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -295,6 +297,7 @@ as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: 
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,parentLocationId: freezed == parentLocationId ? _self.parentLocationId : parentLocationId // ignore: cast_nullable_to_non_nullable
 as String?,path: freezed == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as String?,nfcTagId: freezed == nfcTagId ? _self.nfcTagId : nfcTagId // ignore: cast_nullable_to_non_nullable
 as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
 as Metadata,

@@ -117,12 +117,12 @@ Module-specific data (MTG, jewelry, tools, …) belongs in `Metadata`, not the c
 ```bash
 flutter analyze
 flutter test
+flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 ```
 
 ## Notes
 
-- Database schema ships empty in this foundation milestone; migration hooks are ready.
-- Repository interfaces are wired to in-memory implementations until tables land.
+- Location graph persists in SQLite (Drift). Search by name shows the physical path.
 - Do not put business logic in widgets.
 
 ## UI captures

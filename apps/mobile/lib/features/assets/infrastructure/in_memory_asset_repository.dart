@@ -43,6 +43,17 @@ class InMemoryAssetRepository implements AssetRepository {
     _emit();
   }
 
+  @override
+  Future<List<Asset>> searchByName(String query) async {
+    final needle = query.trim().toLowerCase();
+    if (needle.isEmpty) {
+      return const [];
+    }
+    return _store.values
+        .where((asset) => asset.name.toLowerCase().contains(needle))
+        .toList(growable: false);
+  }
+
   Future<void> dispose() async {
     await _controller.close();
   }
