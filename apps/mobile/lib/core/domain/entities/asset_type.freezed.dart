@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AssetType {
 
- String get id; String get name; String get moduleId; DateTime get createdAt; DateTime get updatedAt; String? get description; Metadata get metadata;
+ String get id; String get name; String get moduleId; DateTime get createdAt; DateTime get updatedAt; String? get parentId; String? get description; Metadata get metadata;
 /// Create a copy of AssetType
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AssetTypeCopyWith<AssetType> get copyWith => _$AssetTypeCopyWithImpl<AssetType>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssetType&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.moduleId, moduleId) || other.moduleId == moduleId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.description, description) || other.description == description)&&(identical(other.metadata, metadata) || other.metadata == metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssetType&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.moduleId, moduleId) || other.moduleId == moduleId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.description, description) || other.description == description)&&(identical(other.metadata, metadata) || other.metadata == metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,moduleId,createdAt,updatedAt,description,metadata);
+int get hashCode => Object.hash(runtimeType,id,name,moduleId,createdAt,updatedAt,parentId,description,metadata);
 
 @override
 String toString() {
-  return 'AssetType(id: $id, name: $name, moduleId: $moduleId, createdAt: $createdAt, updatedAt: $updatedAt, description: $description, metadata: $metadata)';
+  return 'AssetType(id: $id, name: $name, moduleId: $moduleId, createdAt: $createdAt, updatedAt: $updatedAt, parentId: $parentId, description: $description, metadata: $metadata)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AssetTypeCopyWith<$Res>  {
   factory $AssetTypeCopyWith(AssetType value, $Res Function(AssetType) _then) = _$AssetTypeCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String moduleId, DateTime createdAt, DateTime updatedAt, String? description, Metadata metadata
+ String id, String name, String moduleId, DateTime createdAt, DateTime updatedAt, String? parentId, String? description, Metadata metadata
 });
 
 
@@ -65,14 +65,15 @@ class _$AssetTypeCopyWithImpl<$Res>
 
 /// Create a copy of AssetType
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? moduleId = null,Object? createdAt = null,Object? updatedAt = null,Object? description = freezed,Object? metadata = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? moduleId = null,Object? createdAt = null,Object? updatedAt = null,Object? parentId = freezed,Object? description = freezed,Object? metadata = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,moduleId: null == moduleId ? _self.moduleId : moduleId // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as DateTime,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
 as Metadata,
   ));
@@ -168,10 +169,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String moduleId,  DateTime createdAt,  DateTime updatedAt,  String? description,  Metadata metadata)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String moduleId,  DateTime createdAt,  DateTime updatedAt,  String? parentId,  String? description,  Metadata metadata)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AssetType() when $default != null:
-return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updatedAt,_that.description,_that.metadata);case _:
+return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updatedAt,_that.parentId,_that.description,_that.metadata);case _:
   return orElse();
 
 }
@@ -189,10 +190,10 @@ return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updated
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String moduleId,  DateTime createdAt,  DateTime updatedAt,  String? description,  Metadata metadata)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String moduleId,  DateTime createdAt,  DateTime updatedAt,  String? parentId,  String? description,  Metadata metadata)  $default,) {final _that = this;
 switch (_that) {
 case _AssetType():
-return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updatedAt,_that.description,_that.metadata);case _:
+return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updatedAt,_that.parentId,_that.description,_that.metadata);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +210,10 @@ return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updated
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String moduleId,  DateTime createdAt,  DateTime updatedAt,  String? description,  Metadata metadata)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String moduleId,  DateTime createdAt,  DateTime updatedAt,  String? parentId,  String? description,  Metadata metadata)?  $default,) {final _that = this;
 switch (_that) {
 case _AssetType() when $default != null:
-return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updatedAt,_that.description,_that.metadata);case _:
+return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updatedAt,_that.parentId,_that.description,_that.metadata);case _:
   return null;
 
 }
@@ -224,7 +225,7 @@ return $default(_that.id,_that.name,_that.moduleId,_that.createdAt,_that.updated
 @JsonSerializable()
 
 class _AssetType implements AssetType {
-  const _AssetType({required this.id, required this.name, required this.moduleId, required this.createdAt, required this.updatedAt, this.description, this.metadata = Metadata.empty});
+  const _AssetType({required this.id, required this.name, required this.moduleId, required this.createdAt, required this.updatedAt, this.parentId, this.description, this.metadata = Metadata.empty});
   factory _AssetType.fromJson(Map<String, dynamic> json) => _$AssetTypeFromJson(json);
 
 @override final  String id;
@@ -232,6 +233,7 @@ class _AssetType implements AssetType {
 @override final  String moduleId;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
+@override final  String? parentId;
 @override final  String? description;
 @override@JsonKey() final  Metadata metadata;
 
@@ -248,16 +250,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssetType&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.moduleId, moduleId) || other.moduleId == moduleId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.description, description) || other.description == description)&&(identical(other.metadata, metadata) || other.metadata == metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AssetType&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.moduleId, moduleId) || other.moduleId == moduleId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.description, description) || other.description == description)&&(identical(other.metadata, metadata) || other.metadata == metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,moduleId,createdAt,updatedAt,description,metadata);
+int get hashCode => Object.hash(runtimeType,id,name,moduleId,createdAt,updatedAt,parentId,description,metadata);
 
 @override
 String toString() {
-  return 'AssetType(id: $id, name: $name, moduleId: $moduleId, createdAt: $createdAt, updatedAt: $updatedAt, description: $description, metadata: $metadata)';
+  return 'AssetType(id: $id, name: $name, moduleId: $moduleId, createdAt: $createdAt, updatedAt: $updatedAt, parentId: $parentId, description: $description, metadata: $metadata)';
 }
 
 
@@ -268,7 +270,7 @@ abstract mixin class _$AssetTypeCopyWith<$Res> implements $AssetTypeCopyWith<$Re
   factory _$AssetTypeCopyWith(_AssetType value, $Res Function(_AssetType) _then) = __$AssetTypeCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String moduleId, DateTime createdAt, DateTime updatedAt, String? description, Metadata metadata
+ String id, String name, String moduleId, DateTime createdAt, DateTime updatedAt, String? parentId, String? description, Metadata metadata
 });
 
 
@@ -285,14 +287,15 @@ class __$AssetTypeCopyWithImpl<$Res>
 
 /// Create a copy of AssetType
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? moduleId = null,Object? createdAt = null,Object? updatedAt = null,Object? description = freezed,Object? metadata = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? moduleId = null,Object? createdAt = null,Object? updatedAt = null,Object? parentId = freezed,Object? description = freezed,Object? metadata = null,}) {
   return _then(_AssetType(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,moduleId: null == moduleId ? _self.moduleId : moduleId // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as DateTime,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
 as Metadata,
   ));

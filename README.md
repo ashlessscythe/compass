@@ -89,7 +89,7 @@ pnpm format       # Prettier
 High level:
 
 1. **Foundation** — monorepo, marketing site, shared packages, Flutter scaffold
-2. **MTG MVP** — local location graph and name search are in; NFC, imports, Scryfall catalog next
+2. **MTG MVP** — local location graph and name search are in; iOS UX pass next ([milestones](./docs/mobile-ux.md)), then NFC, imports, Scryfall
 3. **Platform** — additional modules, sync, web app surfaces
 
 Details: [docs/roadmap.md](./docs/roadmap.md)
@@ -153,7 +153,9 @@ docker run --rm -p 3000:3000 compass-web
 
 - [Vision](./docs/vision.md)
 - [Architecture](./docs/architecture.md)
+- [Taxonomy and domain schema](./docs/taxonomy.md)
 - [Roadmap](./docs/roadmap.md)
+- [Mobile UX milestones](./docs/mobile-ux.md)
 - [Branding](./docs/branding.md)
 - [Flutter / mobile setup](./docs/mobile-setup.md)
 

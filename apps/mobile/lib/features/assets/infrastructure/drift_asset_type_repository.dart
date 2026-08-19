@@ -16,6 +16,7 @@ class DriftAssetTypeRepository implements AssetTypeRepository {
       moduleId: row.moduleId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
+      parentId: row.parentId,
       description: row.description,
       metadata: decodeMetadata(row.metadataJson),
     );
@@ -26,6 +27,7 @@ class DriftAssetTypeRepository implements AssetTypeRepository {
       id: type.id,
       name: type.name,
       moduleId: type.moduleId,
+      parentId: Value(type.parentId),
       description: Value(type.description),
       metadataJson: Value(encodeMetadata(type.metadata)),
       createdAt: type.createdAt,

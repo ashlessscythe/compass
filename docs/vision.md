@@ -49,7 +49,7 @@ The architecture is module-based so additional verticals can share the same loca
 2. **Location native** — Every asset can answer “where.”
 3. **Tap to open** — NFC tags turn containers into instant entry points.
 4. **Import friendly** — Meet collectors where their data already lives.
-5. **Universal core** — Domain modules plug into a shared location + asset model.
+5. **Universal core** — Domain modules plug into a shared location + asset model. Vertical fields live in schemas and data, never as columns on Asset ([taxonomy.md](./taxonomy.md)).
 6. **Premium craft** — Software should feel as considered as the objects people care about.
 
 ## Brand

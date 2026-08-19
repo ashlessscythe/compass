@@ -1179,6 +1179,17 @@ class $AssetTypesTable extends AssetTypes
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _descriptionMeta = const VerificationMeta(
     'description',
   );
@@ -1229,6 +1240,7 @@ class $AssetTypesTable extends AssetTypes
     id,
     name,
     moduleId,
+    parentId,
     description,
     metadataJson,
     createdAt,
@@ -1266,6 +1278,12 @@ class $AssetTypesTable extends AssetTypes
       );
     } else if (isInserting) {
       context.missing(_moduleIdMeta);
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -1322,6 +1340,10 @@ class $AssetTypesTable extends AssetTypes
         DriftSqlType.string,
         data['${effectivePrefix}module_id'],
       )!,
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}description'],
@@ -1351,6 +1373,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
   final String id;
   final String name;
   final String moduleId;
+  final String? parentId;
   final String? description;
   final String metadataJson;
   final DateTime createdAt;
@@ -1359,6 +1382,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
     required this.id,
     required this.name,
     required this.moduleId,
+    this.parentId,
     this.description,
     required this.metadataJson,
     required this.createdAt,
@@ -1370,6 +1394,9 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['module_id'] = Variable<String>(moduleId);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
+    }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -1384,6 +1411,9 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
       id: Value(id),
       name: Value(name),
       moduleId: Value(moduleId),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -1402,6 +1432,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       moduleId: serializer.fromJson<String>(json['moduleId']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
       description: serializer.fromJson<String?>(json['description']),
       metadataJson: serializer.fromJson<String>(json['metadataJson']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1415,6 +1446,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'moduleId': serializer.toJson<String>(moduleId),
+      'parentId': serializer.toJson<String?>(parentId),
       'description': serializer.toJson<String?>(description),
       'metadataJson': serializer.toJson<String>(metadataJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -1426,6 +1458,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
     String? id,
     String? name,
     String? moduleId,
+    Value<String?> parentId = const Value.absent(),
     Value<String?> description = const Value.absent(),
     String? metadataJson,
     DateTime? createdAt,
@@ -1434,6 +1467,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
     id: id ?? this.id,
     name: name ?? this.name,
     moduleId: moduleId ?? this.moduleId,
+    parentId: parentId.present ? parentId.value : this.parentId,
     description: description.present ? description.value : this.description,
     metadataJson: metadataJson ?? this.metadataJson,
     createdAt: createdAt ?? this.createdAt,
@@ -1444,6 +1478,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       moduleId: data.moduleId.present ? data.moduleId.value : this.moduleId,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
       description: data.description.present
           ? data.description.value
           : this.description,
@@ -1461,6 +1496,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('moduleId: $moduleId, ')
+          ..write('parentId: $parentId, ')
           ..write('description: $description, ')
           ..write('metadataJson: $metadataJson, ')
           ..write('createdAt: $createdAt, ')
@@ -1474,6 +1510,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
     id,
     name,
     moduleId,
+    parentId,
     description,
     metadataJson,
     createdAt,
@@ -1486,6 +1523,7 @@ class AssetTypeRow extends DataClass implements Insertable<AssetTypeRow> {
           other.id == this.id &&
           other.name == this.name &&
           other.moduleId == this.moduleId &&
+          other.parentId == this.parentId &&
           other.description == this.description &&
           other.metadataJson == this.metadataJson &&
           other.createdAt == this.createdAt &&
@@ -1496,6 +1534,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<String> moduleId;
+  final Value<String?> parentId;
   final Value<String?> description;
   final Value<String> metadataJson;
   final Value<DateTime> createdAt;
@@ -1505,6 +1544,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.moduleId = const Value.absent(),
+    this.parentId = const Value.absent(),
     this.description = const Value.absent(),
     this.metadataJson = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1515,6 +1555,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
     required String id,
     required String name,
     required String moduleId,
+    this.parentId = const Value.absent(),
     this.description = const Value.absent(),
     this.metadataJson = const Value.absent(),
     required DateTime createdAt,
@@ -1529,6 +1570,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? moduleId,
+    Expression<String>? parentId,
     Expression<String>? description,
     Expression<String>? metadataJson,
     Expression<DateTime>? createdAt,
@@ -1539,6 +1581,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (moduleId != null) 'module_id': moduleId,
+      if (parentId != null) 'parent_id': parentId,
       if (description != null) 'description': description,
       if (metadataJson != null) 'metadata_json': metadataJson,
       if (createdAt != null) 'created_at': createdAt,
@@ -1551,6 +1594,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
     Value<String>? id,
     Value<String>? name,
     Value<String>? moduleId,
+    Value<String?>? parentId,
     Value<String?>? description,
     Value<String>? metadataJson,
     Value<DateTime>? createdAt,
@@ -1561,6 +1605,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
       id: id ?? this.id,
       name: name ?? this.name,
       moduleId: moduleId ?? this.moduleId,
+      parentId: parentId ?? this.parentId,
       description: description ?? this.description,
       metadataJson: metadataJson ?? this.metadataJson,
       createdAt: createdAt ?? this.createdAt,
@@ -1580,6 +1625,9 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
     }
     if (moduleId.present) {
       map['module_id'] = Variable<String>(moduleId.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
@@ -1605,6 +1653,7 @@ class AssetTypesCompanion extends UpdateCompanion<AssetTypeRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('moduleId: $moduleId, ')
+          ..write('parentId: $parentId, ')
           ..write('description: $description, ')
           ..write('metadataJson: $metadataJson, ')
           ..write('createdAt: $createdAt, ')
@@ -1648,6 +1697,18 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, AssetRow> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
   );
   static const VerificationMeta _containerIdMeta = const VerificationMeta(
     'containerId',
@@ -1719,6 +1780,7 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, AssetRow> {
     id,
     name,
     assetTypeId,
+    quantity,
     containerId,
     locationId,
     notes,
@@ -1761,6 +1823,12 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, AssetRow> {
       );
     } else if (isInserting) {
       context.missing(_assetTypeIdMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
     }
     if (data.containsKey('container_id')) {
       context.handle(
@@ -1829,6 +1897,10 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, AssetRow> {
         DriftSqlType.string,
         data['${effectivePrefix}asset_type_id'],
       )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
       containerId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}container_id'],
@@ -1866,6 +1938,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
   final String id;
   final String name;
   final String assetTypeId;
+  final int quantity;
   final String? containerId;
   final String? locationId;
   final String? notes;
@@ -1876,6 +1949,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
     required this.id,
     required this.name,
     required this.assetTypeId,
+    required this.quantity,
     this.containerId,
     this.locationId,
     this.notes,
@@ -1889,6 +1963,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['asset_type_id'] = Variable<String>(assetTypeId);
+    map['quantity'] = Variable<int>(quantity);
     if (!nullToAbsent || containerId != null) {
       map['container_id'] = Variable<String>(containerId);
     }
@@ -1909,6 +1984,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
       id: Value(id),
       name: Value(name),
       assetTypeId: Value(assetTypeId),
+      quantity: Value(quantity),
       containerId: containerId == null && nullToAbsent
           ? const Value.absent()
           : Value(containerId),
@@ -1933,6 +2009,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       assetTypeId: serializer.fromJson<String>(json['assetTypeId']),
+      quantity: serializer.fromJson<int>(json['quantity']),
       containerId: serializer.fromJson<String?>(json['containerId']),
       locationId: serializer.fromJson<String?>(json['locationId']),
       notes: serializer.fromJson<String?>(json['notes']),
@@ -1948,6 +2025,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'assetTypeId': serializer.toJson<String>(assetTypeId),
+      'quantity': serializer.toJson<int>(quantity),
       'containerId': serializer.toJson<String?>(containerId),
       'locationId': serializer.toJson<String?>(locationId),
       'notes': serializer.toJson<String?>(notes),
@@ -1961,6 +2039,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
     String? id,
     String? name,
     String? assetTypeId,
+    int? quantity,
     Value<String?> containerId = const Value.absent(),
     Value<String?> locationId = const Value.absent(),
     Value<String?> notes = const Value.absent(),
@@ -1971,6 +2050,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
     id: id ?? this.id,
     name: name ?? this.name,
     assetTypeId: assetTypeId ?? this.assetTypeId,
+    quantity: quantity ?? this.quantity,
     containerId: containerId.present ? containerId.value : this.containerId,
     locationId: locationId.present ? locationId.value : this.locationId,
     notes: notes.present ? notes.value : this.notes,
@@ -1985,6 +2065,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
       assetTypeId: data.assetTypeId.present
           ? data.assetTypeId.value
           : this.assetTypeId,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
       containerId: data.containerId.present
           ? data.containerId.value
           : this.containerId,
@@ -2006,6 +2087,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('assetTypeId: $assetTypeId, ')
+          ..write('quantity: $quantity, ')
           ..write('containerId: $containerId, ')
           ..write('locationId: $locationId, ')
           ..write('notes: $notes, ')
@@ -2021,6 +2103,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
     id,
     name,
     assetTypeId,
+    quantity,
     containerId,
     locationId,
     notes,
@@ -2035,6 +2118,7 @@ class AssetRow extends DataClass implements Insertable<AssetRow> {
           other.id == this.id &&
           other.name == this.name &&
           other.assetTypeId == this.assetTypeId &&
+          other.quantity == this.quantity &&
           other.containerId == this.containerId &&
           other.locationId == this.locationId &&
           other.notes == this.notes &&
@@ -2047,6 +2131,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<String> assetTypeId;
+  final Value<int> quantity;
   final Value<String?> containerId;
   final Value<String?> locationId;
   final Value<String?> notes;
@@ -2058,6 +2143,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.assetTypeId = const Value.absent(),
+    this.quantity = const Value.absent(),
     this.containerId = const Value.absent(),
     this.locationId = const Value.absent(),
     this.notes = const Value.absent(),
@@ -2070,6 +2156,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
     required String id,
     required String name,
     required String assetTypeId,
+    this.quantity = const Value.absent(),
     this.containerId = const Value.absent(),
     this.locationId = const Value.absent(),
     this.notes = const Value.absent(),
@@ -2086,6 +2173,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? assetTypeId,
+    Expression<int>? quantity,
     Expression<String>? containerId,
     Expression<String>? locationId,
     Expression<String>? notes,
@@ -2098,6 +2186,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (assetTypeId != null) 'asset_type_id': assetTypeId,
+      if (quantity != null) 'quantity': quantity,
       if (containerId != null) 'container_id': containerId,
       if (locationId != null) 'location_id': locationId,
       if (notes != null) 'notes': notes,
@@ -2112,6 +2201,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
     Value<String>? id,
     Value<String>? name,
     Value<String>? assetTypeId,
+    Value<int>? quantity,
     Value<String?>? containerId,
     Value<String?>? locationId,
     Value<String?>? notes,
@@ -2124,6 +2214,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
       id: id ?? this.id,
       name: name ?? this.name,
       assetTypeId: assetTypeId ?? this.assetTypeId,
+      quantity: quantity ?? this.quantity,
       containerId: containerId ?? this.containerId,
       locationId: locationId ?? this.locationId,
       notes: notes ?? this.notes,
@@ -2145,6 +2236,9 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
     }
     if (assetTypeId.present) {
       map['asset_type_id'] = Variable<String>(assetTypeId.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
     }
     if (containerId.present) {
       map['container_id'] = Variable<String>(containerId.value);
@@ -2176,6 +2270,7 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('assetTypeId: $assetTypeId, ')
+          ..write('quantity: $quantity, ')
           ..write('containerId: $containerId, ')
           ..write('locationId: $locationId, ')
           ..write('notes: $notes, ')
@@ -2219,6 +2314,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'asset_types_module_idx',
     'CREATE INDEX asset_types_module_idx ON asset_types (module_id)',
   );
+  late final Index assetTypesParentIdx = Index(
+    'asset_types_parent_idx',
+    'CREATE INDEX asset_types_parent_idx ON asset_types (parent_id)',
+  );
   late final Index assetsContainerIdx = Index(
     'assets_container_idx',
     'CREATE INDEX assets_container_idx ON assets (container_id)',
@@ -2246,6 +2345,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     containersLocationIdx,
     containersNameIdx,
     assetTypesModuleIdx,
+    assetTypesParentIdx,
     assetsContainerIdx,
     assetsLocationIdx,
     assetsNameIdx,
@@ -2819,6 +2919,7 @@ typedef $$AssetTypesTableCreateCompanionBuilder =
       required String id,
       required String name,
       required String moduleId,
+      Value<String?> parentId,
       Value<String?> description,
       Value<String> metadataJson,
       required DateTime createdAt,
@@ -2830,6 +2931,7 @@ typedef $$AssetTypesTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> name,
       Value<String> moduleId,
+      Value<String?> parentId,
       Value<String?> description,
       Value<String> metadataJson,
       Value<DateTime> createdAt,
@@ -2858,6 +2960,11 @@ class $$AssetTypesTableFilterComposer
 
   ColumnFilters<String> get moduleId => $composableBuilder(
     column: $table.moduleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentId => $composableBuilder(
+    column: $table.parentId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2906,6 +3013,11 @@ class $$AssetTypesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get description => $composableBuilder(
     column: $table.description,
     builder: (column) => ColumnOrderings(column),
@@ -2944,6 +3056,9 @@ class $$AssetTypesTableAnnotationComposer
 
   GeneratedColumn<String> get moduleId =>
       $composableBuilder(column: $table.moduleId, builder: (column) => column);
+
+  GeneratedColumn<String> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
     column: $table.description,
@@ -2996,6 +3111,7 @@ class $$AssetTypesTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> moduleId = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<String> metadataJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -3005,6 +3121,7 @@ class $$AssetTypesTableTableManager
                 id: id,
                 name: name,
                 moduleId: moduleId,
+                parentId: parentId,
                 description: description,
                 metadataJson: metadataJson,
                 createdAt: createdAt,
@@ -3016,6 +3133,7 @@ class $$AssetTypesTableTableManager
                 required String id,
                 required String name,
                 required String moduleId,
+                Value<String?> parentId = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<String> metadataJson = const Value.absent(),
                 required DateTime createdAt,
@@ -3025,6 +3143,7 @@ class $$AssetTypesTableTableManager
                 id: id,
                 name: name,
                 moduleId: moduleId,
+                parentId: parentId,
                 description: description,
                 metadataJson: metadataJson,
                 createdAt: createdAt,
@@ -3061,6 +3180,7 @@ typedef $$AssetsTableCreateCompanionBuilder =
       required String id,
       required String name,
       required String assetTypeId,
+      Value<int> quantity,
       Value<String?> containerId,
       Value<String?> locationId,
       Value<String?> notes,
@@ -3074,6 +3194,7 @@ typedef $$AssetsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> name,
       Value<String> assetTypeId,
+      Value<int> quantity,
       Value<String?> containerId,
       Value<String?> locationId,
       Value<String?> notes,
@@ -3104,6 +3225,11 @@ class $$AssetsTableFilterComposer
 
   ColumnFilters<String> get assetTypeId => $composableBuilder(
     column: $table.assetTypeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3162,6 +3288,11 @@ class $$AssetsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get containerId => $composableBuilder(
     column: $table.containerId,
     builder: (column) => ColumnOrderings(column),
@@ -3212,6 +3343,9 @@ class $$AssetsTableAnnotationComposer
     column: $table.assetTypeId,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
 
   GeneratedColumn<String> get containerId => $composableBuilder(
     column: $table.containerId,
@@ -3269,6 +3403,7 @@ class $$AssetsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> assetTypeId = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
                 Value<String?> containerId = const Value.absent(),
                 Value<String?> locationId = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -3280,6 +3415,7 @@ class $$AssetsTableTableManager
                 id: id,
                 name: name,
                 assetTypeId: assetTypeId,
+                quantity: quantity,
                 containerId: containerId,
                 locationId: locationId,
                 notes: notes,
@@ -3293,6 +3429,7 @@ class $$AssetsTableTableManager
                 required String id,
                 required String name,
                 required String assetTypeId,
+                Value<int> quantity = const Value.absent(),
                 Value<String?> containerId = const Value.absent(),
                 Value<String?> locationId = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -3304,6 +3441,7 @@ class $$AssetsTableTableManager
                 id: id,
                 name: name,
                 assetTypeId: assetTypeId,
+                quantity: quantity,
                 containerId: containerId,
                 locationId: locationId,
                 notes: notes,

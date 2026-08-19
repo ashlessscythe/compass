@@ -8,6 +8,7 @@ class Assets extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get assetTypeId => text().named('asset_type_id')();
+  IntColumn get quantity => integer().withDefault(const Constant(1))();
   TextColumn get containerId => text().named('container_id').nullable()();
   TextColumn get locationId => text().named('location_id').nullable()();
   TextColumn get notes => text().nullable()();

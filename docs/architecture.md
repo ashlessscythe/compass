@@ -39,7 +39,9 @@ compass/
 
 ## Core domain model
 
-Mobile is the source of truth for this split. `packages/api` currently has a flatter Location + Asset shape (no Container); align it when the Cloud API is real.
+Mobile is the source of truth for this split. `packages/api` mirrors the generic Asset / AssetType / Container / attribute contracts; the Cloud API is not implemented yet.
+
+How verticals attach without widening Asset: [taxonomy.md](./taxonomy.md).
 
 ### Location
 
@@ -59,31 +61,33 @@ Room → shelf → box → sleeve is **not** all locations. Room is a Location; 
 
 ### Asset
 
-A generic tracked item: `name`, `assetTypeId`, optional `containerId` / `locationId`. Module-specific fields live in `metadata` so the core schema stays universal.
+A generic tracked item: `name`, `assetTypeId`, `quantity`, optional `containerId` / `locationId`, notes. Photos, tags, and history are separate entities.
 
-`AssetType.moduleId` (`mtg`, `tools`, …) is how a card, a wrench, or a ring share one table.
+The core Asset entity must **not** contain vertical fields (set, foil, material, carat, serial number, …). `AssetType.moduleId` (`mtg`, `tools`, `jewelry`, …) plus a type hierarchy (`parentId`) is how a card, a wrench, or a ring share one table.
+
+Module-specific data lives in `Metadata` today. The target model is typed attribute definitions/values, controlled vocabularies, and external identifiers — see [taxonomy.md](./taxonomy.md).
 
 ### Modules
 
-Vertical modules provide:
+Vertical modules (later, installable domain packs) provide:
 
-- Catalog schemas and validation
+- Asset types and attribute schemas
+- Controlled vocabularies and reference data
 - Import adapters (Deckbox, Moxfield, CSV, …)
-- External catalog providers (see MTG / Scryfall below)
-- Domain-specific search facets
-- UI presentations for item detail
+- External catalog / pricing providers (see MTG / Scryfall below)
+- Domain-specific search facets and UI
 
 The location engine, NFC layer, and sync protocol remain shared.
 
-Do **not** add MTG (or any vertical) columns to core tables. Expand via `AssetType.moduleId` + `Metadata`, plus module-owned UI and adapters.
+Do **not** add MTG (or any vertical) columns to core tables. Expand via `AssetType` + attributes (or `Metadata` until those tables persist), plus module-owned UI and adapters.
 
 ## Persistence
 
 Source of truth is **on-device SQLite**, not the cloud.
 
 - Intended: Drift at `apps/mobile/lib/database/`. Native file is `compass.sqlite` in the app documents directory.
-- Schema v2: `locations`, `containers`, `asset_types`, `assets`. Remaining entities (tags, photos, …) stay in-memory until needed.
-- v1 was an empty foundation DB. Existing simulator installs upgrade with `createAll()`; delete the app if a local file is wedged.
+- Schema v3: `locations`, `containers`, `asset_types` (optional `parent_id`), `assets` (`quantity`). Remaining entities (tags, photos, attributes, vocabularies, external ids) stay in-memory / in `metadata_json` until a consumer needs tables.
+- v1 was an empty foundation DB; v2 introduced the location graph. Existing simulator installs add columns on upgrade; delete the app if a local file is wedged.
 - Seeded `AssetType`: id `asset-type-item`, name `Item`, module `collectibles`. MTG types come later.
 - Location `path` is stored and recomputed on rename/move. Container and asset paths are derived at read time (`Office / Desk / Binder / Lightning Bolt`).
 - Name search is case-insensitive SQL `LIKE` (no FTS5 yet).
@@ -120,7 +124,7 @@ For `moduleId = mtg` assets, **Scryfall** is the default (configurable) source f
 Rules:
 
 - Configurable: user can disable network catalog lookup, swap provider later, or run without it
-- Store identifiers in `Asset.metadata` (e.g. Scryfall oracle/card id); do not put printings into core schema
+- Store identifiers as external ids (source + id). Until that table persists, they live in `Asset.metadata` (e.g. Scryfall oracle/card id). Do not put printings into core schema.
 - Images and stats are cached on device after fetch so search-by-location still works offline
 - Compass answers *where* the card is; Scryfall answers *what it looks like / what it does*
 
@@ -142,11 +146,11 @@ Future web surfaces (account, collection browser) can grow in the same app or as
 
 - **presentation / application / domain / infrastructure** layers
 - Core domain: Asset, Container, Location, AssetType, Movement, Relationship, History, Tag, Metadata, Photo
-- Drift (SQLite) schema v2: Location, Container, AssetType, Asset; Riverpod DI; GoRouter; Material 3 (dark-first)
-- Module-specific fields stay in Metadata — the core app is not MTG-specific
+- Drift (SQLite) schema v3: Location, Container, AssetType, Asset; Riverpod DI; GoRouter; Material 3 (dark-first)
+- Module-specific fields stay in Metadata / attributes — the core app is not MTG-specific. Contract: [taxonomy.md](./taxonomy.md).
 - Home search answers “where is it?” from local data
 
-See `apps/mobile/README.md` for setup and run instructions.
+See `apps/mobile/README.md` for setup and run instructions. iOS UX order and tollgates: [mobile-ux.md](./mobile-ux.md).
 
 ## Tooling
 

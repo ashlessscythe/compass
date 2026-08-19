@@ -28,6 +28,9 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
             await m.createAll();
+          } else if (from < 3) {
+            await m.addColumn(assets, assets.quantity);
+            await m.addColumn(assetTypes, assetTypes.parentId);
           }
         },
         beforeOpen: (details) async {

@@ -12,6 +12,7 @@ _AssetType _$AssetTypeFromJson(Map<String, dynamic> json) => _AssetType(
   moduleId: json['moduleId'] as String,
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: DateTime.parse(json['updatedAt'] as String),
+  parentId: json['parentId'] as String?,
   description: json['description'] as String?,
   metadata: json['metadata'] == null
       ? Metadata.empty
@@ -25,6 +26,7 @@ Map<String, dynamic> _$AssetTypeToJson(_AssetType instance) =>
       'moduleId': instance.moduleId,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
+      'parentId': instance.parentId,
       'description': instance.description,
       'metadata': instance.metadata,
     };

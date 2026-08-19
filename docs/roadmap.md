@@ -9,14 +9,18 @@
 - [x] Documentation (vision, architecture, branding)
 - [x] Flutter mobile scaffold initialization
 - [x] Persist waitlist to a durable store
+- [x] Generic domain schema foundation (see [taxonomy.md](./taxonomy.md))
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
+
+iOS UI is functional, not crafted. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Current milestone: **UX-1 First run**.
 
 ## Next — MTG MVP
 
 - [x] Local asset + location data model (on-device SQLite; see architecture)
 - [x] Nested containers (location = place, container = vessel)
 - [x] Search: item → location path
+- [ ] iOS UX pass (first run → confirm delete → move → chrome → sheets → stills)
 - [ ] NFC tag association for containers
 - [ ] Import from CSV
 - [ ] Import adapters for Deckbox and Moxfield
@@ -27,7 +31,11 @@ Pricing / entitlements (free local vs paid sync) are **undecided** — see [arch
 
 ## Later — Platform
 
-- [ ] Additional modules (tools, jewelry, electronics, home, …)
+Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add domain columns to core Asset.
+
+- [ ] MTG schema + Scryfall / importers / pricing providers (persist attributes when catalog needs them)
+- [ ] Taxonomy model, versioning, external taxonomy import, reference entities
+- [ ] Domain packs (jewelry, tools, clothing, collectibles, …)
 - [ ] Cross-module search
 - [ ] Sharing / household spaces
 - [ ] Web collection browser

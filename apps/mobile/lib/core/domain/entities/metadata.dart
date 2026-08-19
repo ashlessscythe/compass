@@ -5,7 +5,9 @@ part 'metadata.g.dart';
 
 /// Extensible key-value bag for module-specific fields.
 ///
-/// Core entities stay generic; vertical modules store specialized data here.
+/// Core entities stay generic. Until attribute tables persist, vertical
+/// modules store specialized data here. Prefer canonical keys
+/// (`material.gold.14k`) over display aliases.
 @freezed
 abstract class Metadata with _$Metadata {
   const factory Metadata({

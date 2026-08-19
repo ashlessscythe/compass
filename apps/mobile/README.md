@@ -10,6 +10,8 @@ Use the **stable** channel. This project targets Dart 3.12+ / Flutter 3.44+.
 
 Full new-Mac walkthrough (Xcode, DeviceHub, iOS simulator, what not to commit): [docs/mobile-setup.md](../../docs/mobile-setup.md).
 
+UI/UX sequence and tollgates: [docs/mobile-ux.md](../../docs/mobile-ux.md).
+
 ```bash
 brew install --cask flutter
 flutter doctor
@@ -98,9 +100,9 @@ lib/
 
 The platform is built around generic concepts — never module-specific fields:
 
-`Asset` · `Container` · `Location` · `AssetType` · `Movement` · `Relationship` · `History` · `Tag` · `Metadata` · `Photo`
+`Asset` · `Container` · `Location` · `AssetType` · `Movement` · `Relationship` · `History` · `Tag` · `Metadata` · `Photo` · `AttributeDefinition` · `AttributeValue` · `ControlledValue` · `ExternalIdentifier`
 
-Module-specific data (MTG, jewelry, tools, …) belongs in `Metadata`, not the core schema.
+Module-specific data (MTG, jewelry, tools, …) belongs in attribute values (or `Metadata` until those tables persist), not columns on Asset. See [docs/taxonomy.md](../../docs/taxonomy.md).
 
 ### Stack
 

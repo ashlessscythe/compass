@@ -4,7 +4,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'asset.freezed.dart';
 part 'asset.g.dart';
 
-/// A generic tracked item. Module-specific fields live in [metadata].
+/// A generic tracked item.
+///
+/// Vertical fields (set, foil, material, carat, …) do not belong here.
+/// Store them as attribute values, or in [metadata] until tables persist.
 @freezed
 abstract class Asset with _$Asset {
   const factory Asset({
@@ -13,6 +16,7 @@ abstract class Asset with _$Asset {
     required String assetTypeId,
     required DateTime createdAt,
     required DateTime updatedAt,
+    @Default(1) int quantity,
     String? containerId,
     String? locationId,
     String? notes,

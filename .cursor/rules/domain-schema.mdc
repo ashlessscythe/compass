@@ -1,0 +1,21 @@
+---
+description: Keep Compass core entities generic; domain fields belong in schemas, not Asset columns.
+alwaysApply: true
+---
+
+# Domain schema
+
+Adding a vertical is a schema and data problem. It is not a core table change.
+
+Do **not** add MTG, jewelry, tools, clothing, or any other domain fields to `Asset`, `Location`, `Container`, or `AssetType`.
+
+```text
+❌ Asset.mtgSet / foil / material / carat / serialNumber / shoeSize
+✅ AssetType + attribute definitions/values (or Metadata until those tables persist)
+✅ ExternalIdentifier (source + id) for Scryfall, Wikidata, …
+✅ Controlled values with canonical keys (material.gold.14k), not alias strings
+```
+
+Core Asset may hold identity, type, name, notes, quantity, location/container, timestamps. Photos, tags, and history stay separate entities.
+
+Follow [docs/taxonomy.md](docs/taxonomy.md). Do not build schema-driven forms, taxonomy import, or domain packs during the iOS UX pass ([docs/mobile-ux.md](docs/mobile-ux.md)).
