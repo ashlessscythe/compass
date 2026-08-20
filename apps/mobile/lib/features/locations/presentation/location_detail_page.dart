@@ -9,6 +9,7 @@ import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/confirm_delete.dart';
 import 'package:compass/widgets/empty_state.dart';
 import 'package:compass/widgets/graph_tile.dart';
+import 'package:compass/widgets/move_target_picker.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -56,6 +57,11 @@ class LocationDetailPage extends ConsumerWidget {
           tooltip: 'Rename',
           onPressed: () => _rename(context, ref, location!),
           icon: const Icon(Icons.edit_outlined),
+        ),
+        IconButton(
+          tooltip: 'Move',
+          onPressed: () => _move(context, ref, location!, locations),
+          icon: const Icon(Icons.drive_file_move_outline),
         ),
         IconButton(
           tooltip: 'Delete',
@@ -178,6 +184,51 @@ class LocationDetailPage extends ConsumerWidget {
     }
   }
 
+  Future<void> _move(
+    BuildContext context,
+    WidgetRef ref,
+    Location location,
+    List<Location> locations,
+  ) async {
+    final byId = {for (final item in locations) item.id: item};
+    final destinations = <MoveDestination>[
+      if (location.parentLocationId != null)
+        const MoveDestination(
+          key: 'root',
+          label: 'Top level',
+          subtitle: 'No parent place',
+          icon: Icons.home_outlined,
+        ),
+      for (final item in locations)
+        if (item.id != location.id &&
+            !_isUnderPlace(byId, ancestorId: location.id, candidateId: item.id))
+          MoveDestination(
+            key: 'location:${item.id}',
+            label: item.name,
+            subtitle: item.path ?? item.name,
+          ),
+    ];
+
+    final picked = await pickMoveDestination(
+      context,
+      title: 'Move ${location.name}',
+      destinations: destinations,
+    );
+    if (picked == null || !context.mounted) {
+      return;
+    }
+
+    final parentLocationId =
+        picked.key == 'root' ? null : picked.key.substring('location:'.length);
+    final result = await ref.read(locationServiceProvider).moveLocation(
+          id: location.id,
+          parentLocationId: parentLocationId,
+        );
+    if (context.mounted && result.isFailure) {
+      showFailureSnackBar(context, result.failureOrNull!.message);
+    }
+  }
+
   Future<void> _delete(
     BuildContext context,
     WidgetRef ref, {
@@ -207,4 +258,19 @@ class LocationDetailPage extends ConsumerWidget {
     }
     context.pop();
   }
+}
+
+bool _isUnderPlace(
+  Map<String, Location> byId, {
+  required String ancestorId,
+  required String candidateId,
+}) {
+  var current = byId[candidateId];
+  while (current?.parentLocationId != null) {
+    if (current!.parentLocationId == ancestorId) {
+      return true;
+    }
+    current = byId[current.parentLocationId];
+  }
+  return false;
 }

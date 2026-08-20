@@ -1,4 +1,6 @@
 import 'package:compass/core/domain/entities/asset.dart';
+import 'package:compass/core/domain/entities/container.dart' as graph;
+import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
@@ -8,6 +10,7 @@ import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/confirm_delete.dart';
+import 'package:compass/widgets/move_target_picker.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -53,6 +56,18 @@ class AssetDetailPage extends ConsumerWidget {
           icon: const Icon(Icons.edit_outlined),
         ),
         IconButton(
+          tooltip: 'Move',
+          onPressed: () => _move(
+            context,
+            ref,
+            asset!,
+            containers,
+            locationById,
+            containerById,
+          ),
+          icon: const Icon(Icons.drive_file_move_outline),
+        ),
+        IconButton(
           tooltip: 'Delete',
           onPressed: () => _delete(context, ref, name: asset!.name),
           icon: const Icon(Icons.delete_outline),
@@ -84,6 +99,43 @@ class AssetDetailPage extends ConsumerWidget {
     final result = await ref.read(assetServiceProvider).renameAsset(
           id: asset.id,
           name: name,
+        );
+    if (context.mounted && result.isFailure) {
+      showFailureSnackBar(context, result.failureOrNull!.message);
+    }
+  }
+
+  Future<void> _move(
+    BuildContext context,
+    WidgetRef ref,
+    Asset asset,
+    List<graph.Container> containers,
+    Map<String, Location> locationById,
+    Map<String, graph.Container> containerById,
+  ) async {
+    final destinations = [
+      for (final item in containers)
+        if (item.id != asset.containerId)
+          MoveDestination(
+            key: item.id,
+            label: item.name,
+            subtitle: containerPath(item, locationById, containerById),
+            icon: Icons.inventory_2_outlined,
+          ),
+    ];
+
+    final picked = await pickMoveDestination(
+      context,
+      title: 'Move ${asset.name}',
+      destinations: destinations,
+    );
+    if (picked == null || !context.mounted) {
+      return;
+    }
+
+    final result = await ref.read(assetServiceProvider).moveAsset(
+          id: asset.id,
+          containerId: picked.key,
         );
     if (context.mounted && result.isFailure) {
       showFailureSnackBar(context, result.failureOrNull!.message);

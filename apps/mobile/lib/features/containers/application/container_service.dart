@@ -115,6 +115,112 @@ class ContainerService {
       );
     }
   }
+
+  /// Move under [parentContainerId], or to the root of [locationId].
+  Future<Result<Container>> moveContainer({
+    required String id,
+    String? locationId,
+    String? parentContainerId,
+  }) async {
+    if (locationId == null && parentContainerId == null) {
+      return const Result.failure(
+        Failure.validation(
+          message: 'Choose a place or container to move into',
+        ),
+      );
+    }
+
+    try {
+      final existing = await _repository.getById(id);
+      if (existing == null) {
+        return Result.failure(Failure.notFound(entity: 'Container', id: id));
+      }
+
+      if (parentContainerId == id) {
+        return const Result.failure(
+          Failure.validation(
+            message: 'A container cannot be moved under itself',
+          ),
+        );
+      }
+
+      var resolvedLocationId = locationId;
+      if (parentContainerId != null) {
+        final parent = await _repository.getById(parentContainerId);
+        if (parent == null) {
+          return Result.failure(
+            Failure.notFound(entity: 'Container', id: parentContainerId),
+          );
+        }
+        final all = await _repository.getAll();
+        if (_isContainerDescendant(
+          all,
+          ancestorId: id,
+          candidateId: parentContainerId,
+        )) {
+          return const Result.failure(
+            Failure.validation(
+              message: 'A container cannot be moved under one of '
+                  'its nested containers',
+            ),
+          );
+        }
+        resolvedLocationId = parent.locationId;
+      }
+
+      if (existing.parentContainerId == parentContainerId &&
+          existing.locationId == resolvedLocationId) {
+        return Result.success(existing);
+      }
+
+      final updated = existing.copyWith(
+        parentContainerId: parentContainerId,
+        locationId: resolvedLocationId,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      await _repository.update(updated);
+      await _reassignDescendantLocations(updated);
+      return Result.success(updated);
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(
+          message: 'Failed to move container',
+          cause: error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _reassignDescendantLocations(Container parent) async {
+    final all = await _repository.getAll();
+    final children = all.where((item) => item.parentContainerId == parent.id);
+    for (final child in children) {
+      final next = child.copyWith(
+        locationId: parent.locationId,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      if (next.locationId != child.locationId) {
+        await _repository.update(next);
+      }
+      await _reassignDescendantLocations(next);
+    }
+  }
+}
+
+bool _isContainerDescendant(
+  List<Container> all, {
+  required String ancestorId,
+  required String candidateId,
+}) {
+  final byId = {for (final item in all) item.id: item};
+  var current = byId[candidateId];
+  while (current?.parentContainerId != null) {
+    if (current!.parentContainerId == ancestorId) {
+      return true;
+    }
+    current = byId[current.parentContainerId];
+  }
+  return false;
 }
 
 final containerServiceProvider = Provider<ContainerService>((ref) {

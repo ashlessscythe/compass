@@ -102,6 +102,32 @@ class AssetService {
       );
     }
   }
+
+  Future<Result<Asset>> moveAsset({
+    required String id,
+    required String containerId,
+  }) async {
+    try {
+      final existing = await _repository.getById(id);
+      if (existing == null) {
+        return Result.failure(Failure.notFound(entity: 'Asset', id: id));
+      }
+      if (existing.containerId == containerId) {
+        return Result.success(existing);
+      }
+
+      final updated = existing.copyWith(
+        containerId: containerId,
+        locationId: null,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      return Result.success(await _repository.update(updated));
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(message: 'Failed to move asset', cause: error),
+      );
+    }
+  }
 }
 
 final assetServiceProvider = Provider<AssetService>((ref) {

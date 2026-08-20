@@ -71,6 +71,61 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('move container to another place updates search path',
+      (tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+        ],
+        child: const CompassApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pumpAndSettle();
+
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Office');
+    await tester.tap(find.text('Office'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Desk');
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Shelf');
+    await tester.tap(find.text('Desk'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add container', name: 'Binder');
+    await tester.tap(find.text('Binder'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
+
+    await tester.tap(find.byTooltip('Move'));
+    await tester.pumpAndSettle();
+    expect(find.text('Move Binder'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ListTile, 'Shelf'));
+    await tester.pumpAndSettle();
+
+    // Binder → Desk → Office → Home
+    for (var i = 0; i < 3; i++) {
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.widgetWithText(TextField, 'Search by name'), findsOneWidget);
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Search by name'),
+      'Lightning',
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Office / Shelf / Binder / Lightning Bolt'),
+      findsOneWidget,
+    );
+
+    await database.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('delete cancel keeps item; confirm removes from search',
       (tester) async {
     final database = AppDatabase.forTesting(NativeDatabase.memory());

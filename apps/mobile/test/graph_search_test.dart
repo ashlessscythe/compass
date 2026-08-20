@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:compass/core/constants/app_constants.dart';
+import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/display_path.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/database/app_database.dart';
@@ -87,6 +88,67 @@ void main() {
     final updatedDesk =
         (await locations.getLocation(desk!.id)).valueOrNull;
     expect(updatedDesk?.path, 'Studio / Desk');
+  });
+
+  test('moving a container updates search path', () async {
+    final locations = container.read(locationServiceProvider);
+    final containers = container.read(containerServiceProvider);
+    final assets = container.read(assetServiceProvider);
+    final search = container.read(searchServiceProvider);
+
+    final office =
+        (await locations.createLocation(name: 'Office')).valueOrNull!;
+    final desk = (await locations.createLocation(
+      name: 'Desk',
+      parentLocationId: office.id,
+    )).valueOrNull!;
+    final shelf = (await locations.createLocation(
+      name: 'Shelf',
+      parentLocationId: office.id,
+    )).valueOrNull!;
+    final binder = (await containers.createContainer(
+      name: 'Binder',
+      locationId: desk.id,
+    )).valueOrNull!;
+    await assets.createAsset(
+      name: 'Lightning Bolt',
+      containerId: binder.id,
+    );
+
+    final moved = await containers.moveContainer(
+      id: binder.id,
+      locationId: shelf.id,
+    );
+    expect(moved.isSuccess, isTrue);
+    expect(moved.valueOrNull!.locationId, shelf.id);
+    expect(moved.valueOrNull!.parentContainerId, isNull);
+
+    final hits = await search.query('Lightning');
+    expect(hits, hasLength(1));
+    expect(
+      hits.first.path,
+      'Office / Shelf / Binder / Lightning Bolt',
+    );
+  });
+
+  test('rejects moving a place under its descendant', () async {
+    final locations = container.read(locationServiceProvider);
+    final office =
+        (await locations.createLocation(name: 'Office')).valueOrNull!;
+    final desk = (await locations.createLocation(
+      name: 'Desk',
+      parentLocationId: office.id,
+    )).valueOrNull!;
+
+    final result = await locations.moveLocation(
+      id: office.id,
+      parentLocationId: desk.id,
+    );
+    expect(result.isFailure, isTrue);
+    expect(
+      result.failureOrNull!.message,
+      contains('nested places'),
+    );
   });
   });
 

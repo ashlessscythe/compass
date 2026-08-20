@@ -1,4 +1,5 @@
 import 'package:compass/core/domain/entities/container.dart' as graph;
+import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
@@ -11,6 +12,7 @@ import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/confirm_delete.dart';
 import 'package:compass/widgets/empty_state.dart';
 import 'package:compass/widgets/graph_tile.dart';
+import 'package:compass/widgets/move_target_picker.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -60,6 +62,19 @@ class ContainerDetailPage extends ConsumerWidget {
           tooltip: 'Rename',
           onPressed: () => _rename(context, ref, container!),
           icon: const Icon(Icons.edit_outlined),
+        ),
+        IconButton(
+          tooltip: 'Move',
+          onPressed: () => _move(
+            context,
+            ref,
+            container!,
+            locations,
+            containers,
+            locationById,
+            containerById,
+          ),
+          icon: const Icon(Icons.drive_file_move_outline),
         ),
         IconButton(
           tooltip: 'Delete',
@@ -182,6 +197,63 @@ class ContainerDetailPage extends ConsumerWidget {
     }
   }
 
+  Future<void> _move(
+    BuildContext context,
+    WidgetRef ref,
+    graph.Container container,
+    List<Location> locations,
+    List<graph.Container> containers,
+    Map<String, Location> locationById,
+    Map<String, graph.Container> containerById,
+  ) async {
+    final destinations = <MoveDestination>[
+      for (final place in locations)
+        MoveDestination(
+          key: 'location:${place.id}',
+          label: place.name,
+          subtitle: 'In ${place.path ?? place.name}',
+        ),
+      for (final item in containers)
+        if (item.id != container.id &&
+            !_isUnderContainer(
+              containerById,
+              ancestorId: container.id,
+              candidateId: item.id,
+            ))
+          MoveDestination(
+            key: 'container:${item.id}',
+            label: item.name,
+            subtitle: containerPath(item, locationById, containerById),
+            icon: Icons.inventory_2_outlined,
+          ),
+    ];
+
+    final picked = await pickMoveDestination(
+      context,
+      title: 'Move ${container.name}',
+      destinations: destinations,
+    );
+    if (picked == null || !context.mounted) {
+      return;
+    }
+
+    final Result<graph.Container> result;
+    if (picked.key.startsWith('location:')) {
+      result = await ref.read(containerServiceProvider).moveContainer(
+            id: container.id,
+            locationId: picked.key.substring('location:'.length),
+          );
+    } else {
+      result = await ref.read(containerServiceProvider).moveContainer(
+            id: container.id,
+            parentContainerId: picked.key.substring('container:'.length),
+          );
+    }
+    if (context.mounted && result.isFailure) {
+      showFailureSnackBar(context, result.failureOrNull!.message);
+    }
+  }
+
   Future<void> _delete(
     BuildContext context,
     WidgetRef ref, {
@@ -219,4 +291,19 @@ class ContainerDetailPage extends ConsumerWidget {
     }
     context.pop();
   }
+}
+
+bool _isUnderContainer(
+  Map<String, graph.Container> byId, {
+  required String ancestorId,
+  required String candidateId,
+}) {
+  var current = byId[candidateId];
+  while (current?.parentContainerId != null) {
+    if (current!.parentContainerId == ancestorId) {
+      return true;
+    }
+    current = byId[current.parentContainerId];
+  }
+  return false;
 }

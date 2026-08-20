@@ -110,6 +110,66 @@ class LocationService {
     }
   }
 
+  Future<Result<Location>> moveLocation({
+    required String id,
+    String? parentLocationId,
+  }) async {
+    try {
+      final existing = await _repository.getById(id);
+      if (existing == null) {
+        return Result.failure(Failure.notFound(entity: 'Location', id: id));
+      }
+
+      if (parentLocationId == id) {
+        return const Result.failure(
+          Failure.validation(
+            message: 'A place cannot be moved under itself',
+          ),
+        );
+      }
+
+      Location? parent;
+      if (parentLocationId != null) {
+        parent = await _repository.getById(parentLocationId);
+        if (parent == null) {
+          return Result.failure(
+            Failure.notFound(entity: 'Location', id: parentLocationId),
+          );
+        }
+        final all = await _repository.getAll();
+        if (_isLocationDescendant(
+          all,
+          ancestorId: id,
+          candidateId: parentLocationId,
+        )) {
+          return const Result.failure(
+            Failure.validation(
+              message:
+                  'A place cannot be moved under one of its nested places',
+            ),
+          );
+        }
+      }
+
+      if (existing.parentLocationId == parentLocationId) {
+        return Result.success(existing);
+      }
+
+      final updated = existing.copyWith(
+        parentLocationId: parentLocationId,
+        path: DisplayPath.join(parent?.path, existing.name),
+        updatedAt: DateTime.now().toUtc(),
+      );
+      await _repository.update(updated);
+      await _recomputeDescendantPaths(updated);
+      return Result.success(updated);
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(message: 'Failed to move location', cause: error),
+      );
+    }
+  }
+
   Future<void> _recomputeDescendantPaths(Location parent) async {
     final all = await _repository.getAll();
     final children = all.where((location) {
@@ -126,6 +186,22 @@ class LocationService {
       await _recomputeDescendantPaths(next);
     }
   }
+}
+
+bool _isLocationDescendant(
+  List<Location> all, {
+  required String ancestorId,
+  required String candidateId,
+}) {
+  final byId = {for (final location in all) location.id: location};
+  var current = byId[candidateId];
+  while (current?.parentLocationId != null) {
+    if (current!.parentLocationId == ancestorId) {
+      return true;
+    }
+    current = byId[current.parentLocationId];
+  }
+  return false;
 }
 
 final locationServiceProvider = Provider<LocationService>((ref) {

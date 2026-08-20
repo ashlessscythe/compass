@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** UX-3 — Move
+**Current milestone:** UX-4 — Shared chrome
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -86,9 +86,9 @@ You can nest on create. You cannot reparent later. “Where is it?” is incompl
 - NFC
 
 **Tollgate**
-- [ ] Move Binder from Desk to a new Shelf; search “Lightning Bolt” shows `Office / Shelf / Binder / Lightning Bolt` (or the equivalent names you used)
-- [ ] Kill/relaunch: still on the new path
-- [ ] Illegal moves are blocked (cannot parent a place under itself / its descendant) with a readable error, not a crash
+- [x] Move Binder from Desk to a new Shelf; search “Lightning Bolt” shows `Office / Shelf / Binder / Lightning Bolt` (or the equivalent names you used)
+- [x] Kill/relaunch: still on the new path
+- [x] Illegal moves are blocked (cannot parent a place under itself / its descendant) with a readable error, not a crash
 
 **Verify:** the move loop above, plus one rejected cycle.
 

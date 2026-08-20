@@ -13,7 +13,7 @@
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
-iOS UI is functional, not crafted. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Current milestone: **UX-3 Move**.
+iOS UI is functional, not crafted. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Current milestone: **UX-4 Shared chrome**.
 
 ## Next — MTG MVP
 
