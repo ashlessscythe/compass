@@ -14,6 +14,16 @@ Icon?
 **/.symlinks/
 profile
 xcuserdata
+**/*.xcuserstate
+
+# Local signing / Apple credentials (team ID lives in Xcode UI; do not commit profiles/certs)
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.cer
+*.certSigningRequest
+**/Local.xcconfig
+
 **/.generated/
 Flutter/App.framework
 Flutter/Flutter.framework
