@@ -1,10 +1,12 @@
+import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/theme/theme_mode_provider.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Placeholder settings surface.
+/// Settings surface: appearance + collection import.
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
@@ -47,8 +49,19 @@ class SettingsPage extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(
-            'More settings will arrive with future modules.',
-            style: theme.textTheme.bodyMedium,
+            'Collection',
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.upload_file_outlined),
+            title: const Text('Import CSV'),
+            subtitle: const Text(
+              'Deckbox, Moxfield, or generic collection export',
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(AppRoutes.importCsv),
           ),
         ],
       ),

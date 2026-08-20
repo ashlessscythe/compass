@@ -128,6 +128,7 @@ flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 ## Notes
 
 - Location graph persists in SQLite (Drift). Search by name shows the physical path.
+- Settings → Import CSV accepts Deckbox, Moxfield, and generic collection exports into a chosen container.
 - Do not put business logic in widgets.
 
 ## UI captures

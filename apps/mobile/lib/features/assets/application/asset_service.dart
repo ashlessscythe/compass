@@ -1,5 +1,6 @@
 import 'package:compass/core/constants/app_constants.dart';
 import 'package:compass/core/domain/entities/asset.dart';
+import 'package:compass/core/domain/entities/metadata.dart';
 import 'package:compass/core/domain/repositories/asset_repository.dart';
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/id_generator.dart';
@@ -37,11 +38,19 @@ class AssetService {
     required String name,
     String? containerId,
     String? locationId,
+    int quantity = 1,
+    String? notes,
+    Metadata metadata = Metadata.empty,
   }) async {
     final trimmed = name.trim();
     if (trimmed.isEmpty) {
       return const Result.failure(
         Failure.validation(message: 'Name is required'),
+      );
+    }
+    if (quantity < 1) {
+      return const Result.failure(
+        Failure.validation(message: 'Quantity must be at least 1'),
       );
     }
 
@@ -53,8 +62,11 @@ class AssetService {
         assetTypeId: AppConstants.defaultAssetTypeId,
         createdAt: now,
         updatedAt: now,
+        quantity: quantity,
         containerId: containerId,
         locationId: locationId,
+        notes: notes,
+        metadata: metadata,
       );
       return Result.success(await _repository.create(asset));
     } on Object catch (error) {
