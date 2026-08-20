@@ -1,6 +1,10 @@
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
+import 'package:compass/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+
+/// Key for the create/rename sheet body (widget + integration tests).
+const namePromptSheetKey = Key('name_prompt_sheet');
 
 Future<String?> promptForName(
   BuildContext context, {
@@ -8,13 +12,20 @@ Future<String?> promptForName(
   String? initial,
   String confirmLabel = 'Save',
 }) async {
-  final result = await showDialog<String>(
+  final result = await showModalBottomSheet<String>(
     context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
     builder: (context) {
-      return _NamePromptDialog(
-        title: title,
-        initial: initial,
-        confirmLabel: confirmLabel,
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: _NamePromptSheet(
+          title: title,
+          initial: initial,
+          confirmLabel: confirmLabel,
+        ),
       );
     },
   );
@@ -25,8 +36,8 @@ Future<String?> promptForName(
   return trimmed;
 }
 
-class _NamePromptDialog extends StatefulWidget {
-  const _NamePromptDialog({
+class _NamePromptSheet extends StatefulWidget {
+  const _NamePromptSheet({
     required this.title,
     required this.confirmLabel,
     this.initial,
@@ -37,10 +48,10 @@ class _NamePromptDialog extends StatefulWidget {
   final String confirmLabel;
 
   @override
-  State<_NamePromptDialog> createState() => _NamePromptDialogState();
+  State<_NamePromptSheet> createState() => _NamePromptSheetState();
 }
 
-class _NamePromptDialogState extends State<_NamePromptDialog> {
+class _NamePromptSheetState extends State<_NamePromptSheet> {
   late final TextEditingController _controller;
   var _popped = false;
 
@@ -64,27 +75,62 @@ class _NamePromptDialogState extends State<_NamePromptDialog> {
     Navigator.of(context).pop(_controller.text);
   }
 
+  void _cancel() {
+    if (_popped) {
+      return;
+    }
+    _popped = true;
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.title),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        textCapitalization: TextCapitalization.sentences,
-        decoration: const InputDecoration(hintText: 'Name'),
-        onSubmitted: (_) => _submit(),
+    final theme = Theme.of(context);
+
+    return SafeArea(
+      child: Padding(
+        key: namePromptSheetKey,
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(widget.title, style: theme.textTheme.titleMedium),
+            const SizedBox(height: AppSpacing.md),
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              textInputAction: TextInputAction.done,
+              decoration: const InputDecoration(hintText: 'Name'),
+              onSubmitted: (_) => _submit(),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: _cancel,
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _submit,
+                    child: Text(widget.confirmLabel),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: _submit,
-          child: Text(widget.confirmLabel),
-        ),
-      ],
     );
   }
 }

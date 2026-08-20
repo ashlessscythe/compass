@@ -1,6 +1,7 @@
 import 'package:compass/app.dart';
 import 'package:compass/bootstrap.dart';
 import 'package:compass/shared/providers/database_provider.dart';
+import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -70,7 +71,7 @@ Future<void> _addNamed(
   await tester.tap(find.text(buttonLabel));
   await tester.pumpAndSettle();
   final field = find.descendant(
-    of: find.byType(AlertDialog),
+    of: find.byKey(namePromptSheetKey),
     matching: find.byType(TextField),
   );
   await tester.enterText(field, name);

@@ -3,6 +3,7 @@ import 'package:compass/core/constants/app_constants.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/shared/providers/database_provider.dart';
 import 'package:compass/theme/theme_mode_provider.dart';
+import 'package:compass/widgets/name_prompt.dart';
 import 'package:compass/widgets/path_breadcrumbs.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -322,6 +323,73 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
+
+  testWidgets('name sheet cancel skips create; rename updates path',
+      (tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+        ],
+        child: const CompassApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Add place'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(namePromptSheetKey), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(namePromptSheetKey), findsNothing);
+    expect(find.text('Office'), findsNothing);
+    expect(
+      find.text('Add a place to start mapping where things live.'),
+      findsOneWidget,
+    );
+
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Office');
+    await tester.tap(find.text('Office'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add container', name: 'Binder');
+    await tester.tap(find.text('Binder'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Rename'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(namePromptSheetKey), findsOneWidget);
+    final field = find.descendant(
+      of: find.byKey(namePromptSheetKey),
+      matching: find.byType(TextField),
+    );
+    await tester.enterText(field, 'Studio');
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Studio'), findsWidgets);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Search by name'),
+      'Lightning',
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Studio / Binder / Lightning Bolt'),
+      findsOneWidget,
+    );
+
+    await database.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
 }
 
 Future<void> _addNamed(
@@ -332,7 +400,7 @@ Future<void> _addNamed(
   await tester.tap(find.text(buttonLabel));
   await tester.pumpAndSettle();
   final field = find.descendant(
-    of: find.byType(AlertDialog),
+    of: find.byKey(namePromptSheetKey),
     matching: find.byType(TextField),
   );
   await tester.enterText(field, name);

@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** UX-5 — Create / rename sheet
+**Current milestone:** UX-6 — Phone stills
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -130,10 +130,10 @@ Name prompts are `AlertDialog`s. They work. They do not match the rest of the cr
 - Full editors, photos, tags, metadata JSON UI
 
 **Tollgate**
-- [ ] Add place / container / asset from the sheet; list updates live
-- [ ] Rename from the sheet; path updates on descendants
-- [ ] Dismiss without saving does not create a blank row
-- [ ] Widget or integration coverage for the create loop still passes on the 17 Pro
+- [x] Add place / container / asset from the sheet; list updates live
+- [x] Rename from the sheet; path updates on descendants
+- [x] Dismiss without saving does not create a blank row
+- [x] Widget or integration coverage for the create loop still passes on the 17 Pro
 
 **Verify:** create + rename + cancel on one place and one asset. `flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"`
 
