@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** UX-1 — First run
+**Current milestone:** UX-3 — Move
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -41,9 +41,9 @@ Empty Compass should teach the one action that starts the product: add a place.
 - Visual redesign of Home beyond the empty state
 
 **Tollgate**
-- [ ] Fresh install (no sqlite): Home explains the product in one sentence and the only primary action is Add place
-- [ ] After adding “Office”: empty state is gone; Office is listed; search still works
-- [ ] Opening an empty Office: one obvious way to add a nested place or a container
+- [x] Fresh install (no sqlite): Home explains the product in one sentence and the only primary action is Add place
+- [x] After adding “Office”: empty state is gone; Office is listed; search still works
+- [x] Opening an empty Office: one obvious way to add a nested place or a container
 
 **Verify:** delete the app from the 17 Pro (or clear `compass.sqlite`), launch, add a place, relaunch.
 
@@ -63,9 +63,9 @@ Delete is instant today. That is not acceptable once people have nested data.
 - Move (that is UX-3)
 
 **Tollgate**
-- [ ] Delete → cancel → item still there, path still searchable
-- [ ] Delete → confirm → item gone, search no longer finds it
-- [ ] Deleting a place that has children is explicit (not a silent cascade surprise)
+- [x] Delete → cancel → item still there, path still searchable
+- [x] Delete → confirm → item gone, search no longer finds it
+- [x] Deleting a place that has children is explicit (not a silent cascade surprise)
 
 **Verify:** Office → Desk → Binder → Lightning Bolt. Cancel delete on Binder. Confirm delete on the asset. Search both names.
 

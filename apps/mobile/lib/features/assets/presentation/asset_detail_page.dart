@@ -7,6 +7,7 @@ import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
+import 'package:compass/widgets/confirm_delete.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -53,7 +54,7 @@ class AssetDetailPage extends ConsumerWidget {
         ),
         IconButton(
           tooltip: 'Delete',
-          onPressed: () => _delete(context, ref),
+          onPressed: () => _delete(context, ref, name: asset!.name),
           icon: const Icon(Icons.delete_outline),
         ),
       ],
@@ -89,7 +90,19 @@ class AssetDetailPage extends ConsumerWidget {
     }
   }
 
-  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref, {
+    required String name,
+  }) async {
+    final confirmed = await confirmDelete(
+      context,
+      title: 'Delete asset?',
+      body: 'Delete “$name”? This cannot be undone.',
+    );
+    if (!confirmed || !context.mounted) {
+      return;
+    }
     final result = await ref.read(assetServiceProvider).deleteAsset(assetId);
     if (!context.mounted) {
       return;

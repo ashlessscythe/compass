@@ -9,6 +9,7 @@ import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_colors.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/widgets/compass_mark.dart';
+import 'package:compass/widgets/empty_state.dart';
 import 'package:compass/widgets/graph_tile.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
@@ -97,6 +98,13 @@ class HomePage extends HookConsumerWidget {
                       const SizedBox(height: AppSpacing.xl),
                       if (query.value.trim().isNotEmpty)
                         _SearchResults(hits: hits)
+                      else if (rootPlaces.isEmpty)
+                        EmptyState(
+                          body: 'Add a place to start mapping '
+                              'where things live.',
+                          primaryLabel: 'Add place',
+                          onPrimary: () => _addPlace(context, ref),
+                        )
                       else ...[
                         Text(
                           'Dashboard',
@@ -104,10 +112,7 @@ class HomePage extends HookConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          rootPlaces.isEmpty
-                              ? 'Add a place to start mapping '
-                                  'where things live.'
-                              : 'Browse places or search for an item.',
+                          'Browse places or search for an item.',
                           style: theme.textTheme.bodyMedium,
                         ),
                         const SizedBox(height: AppSpacing.lg),
@@ -131,24 +136,15 @@ class HomePage extends HookConsumerWidget {
                           'Places',
                           style: theme.textTheme.titleMedium,
                         ),
-                        if (rootPlaces.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: AppSpacing.sm),
-                            child: Text(
-                              'Nothing here yet.',
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                          )
-                        else
-                          ...rootPlaces.map(
-                            (item) => GraphTile(
-                              title: item.name,
-                              subtitle: item.path,
-                              onTap: () => context.push(
-                                AppRoutes.locationPath(item.id),
-                              ),
+                        ...rootPlaces.map(
+                          (item) => GraphTile(
+                            title: item.name,
+                            subtitle: item.path,
+                            onTap: () => context.push(
+                              AppRoutes.locationPath(item.id),
                             ),
                           ),
+                        ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: TextButton.icon(

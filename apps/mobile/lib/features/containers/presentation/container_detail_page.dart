@@ -8,6 +8,8 @@ import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
+import 'package:compass/widgets/confirm_delete.dart';
+import 'package:compass/widgets/empty_state.dart';
 import 'package:compass/widgets/graph_tile.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +63,13 @@ class ContainerDetailPage extends ConsumerWidget {
         ),
         IconButton(
           tooltip: 'Delete',
-          onPressed: () => _delete(context, ref),
+          onPressed: () => _delete(
+            context,
+            ref,
+            name: container!.name,
+            hasNested: nested.isNotEmpty,
+            hasAssets: heldAssets.isNotEmpty,
+          ),
           icon: const Icon(Icons.delete_outline),
         ),
       ],
@@ -69,51 +77,43 @@ class ContainerDetailPage extends ConsumerWidget {
         children: [
           Text(path, style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: AppSpacing.lg),
-          Text('Containers', style: Theme.of(context).textTheme.titleMedium),
-          if (nested.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-              child: Text('No nested containers yet.'),
+          if (nested.isEmpty && heldAssets.isEmpty)
+            EmptyState(
+              body: 'Add a nested container or an asset.',
+              primaryLabel: 'Add container',
+              onPrimary: () => _addContainer(context, ref, container!),
+              secondaryLabel: 'Add asset',
+              onSecondary: () => _addAsset(context, ref),
             )
-          else
-            ...nested.map(
-              (item) => GraphTile(
-                title: item.name,
-                icon: Icons.inventory_2_outlined,
-                onTap: () => context.push(AppRoutes.containerPath(item.id)),
-              ),
+          else ...[
+            GraphChildSection(
+              title: 'Containers',
+              tiles: [
+                for (final item in nested)
+                  GraphTile(
+                    title: item.name,
+                    icon: Icons.inventory_2_outlined,
+                    onTap: () => context.push(AppRoutes.containerPath(item.id)),
+                  ),
+              ],
+              addLabel: 'Add container',
+              onAdd: () => _addContainer(context, ref, container!),
             ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => _addContainer(context, ref, container!),
-              icon: const Icon(Icons.add),
-              label: const Text('Add container'),
+            const SizedBox(height: AppSpacing.md),
+            GraphChildSection(
+              title: 'Assets',
+              tiles: [
+                for (final item in heldAssets)
+                  GraphTile(
+                    title: item.name,
+                    icon: Icons.style_outlined,
+                    onTap: () => context.push(AppRoutes.assetPath(item.id)),
+                  ),
+              ],
+              addLabel: 'Add asset',
+              onAdd: () => _addAsset(context, ref),
             ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text('Assets', style: Theme.of(context).textTheme.titleMedium),
-          if (heldAssets.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-              child: Text('No assets in this container yet.'),
-            )
-          else
-            ...heldAssets.map(
-              (item) => GraphTile(
-                title: item.name,
-                icon: Icons.style_outlined,
-                onTap: () => context.push(AppRoutes.assetPath(item.id)),
-              ),
-            ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => _addAsset(context, ref),
-              icon: const Icon(Icons.add),
-              label: const Text('Add asset'),
-            ),
-          ),
+          ],
         ],
       ),
     );
@@ -182,7 +182,32 @@ class ContainerDetailPage extends ConsumerWidget {
     }
   }
 
-  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref, {
+    required String name,
+    required bool hasNested,
+    required bool hasAssets,
+  }) async {
+    final body = switch ((hasNested, hasAssets)) {
+      (true, true) =>
+        'Delete “$name”? Nested containers will also be deleted. '
+            'Assets inside will no longer be in this container.',
+      (true, false) =>
+        'Delete “$name”? Nested containers will also be deleted.',
+      (false, true) =>
+        'Delete “$name”? Assets inside will no longer be in '
+            'this container.',
+      (false, false) => 'Delete “$name”? This cannot be undone.',
+    };
+    final confirmed = await confirmDelete(
+      context,
+      title: 'Delete container?',
+      body: body,
+    );
+    if (!confirmed || !context.mounted) {
+      return;
+    }
     final result =
         await ref.read(containerServiceProvider).deleteContainer(containerId);
     if (!context.mounted) {

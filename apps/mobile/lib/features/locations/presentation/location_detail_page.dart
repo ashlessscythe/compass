@@ -6,6 +6,8 @@ import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
+import 'package:compass/widgets/confirm_delete.dart';
+import 'package:compass/widgets/empty_state.dart';
 import 'package:compass/widgets/graph_tile.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,13 @@ class LocationDetailPage extends ConsumerWidget {
         ),
         IconButton(
           tooltip: 'Delete',
-          onPressed: () => _delete(context, ref),
+          onPressed: () => _delete(
+            context,
+            ref,
+            name: location!.name,
+            hasChildren:
+                childPlaces.isNotEmpty || rootContainers.isNotEmpty,
+          ),
           icon: const Icon(Icons.delete_outline),
         ),
       ],
@@ -68,51 +76,45 @@ class LocationDetailPage extends ConsumerWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text('Places', style: Theme.of(context).textTheme.titleMedium),
-          if (childPlaces.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-              child: Text('No nested places yet.'),
+          if (childPlaces.isEmpty && rootContainers.isEmpty)
+            EmptyState(
+              body: 'Add a nested place or a container so things '
+                  'have somewhere to live.',
+              primaryLabel: 'Add place',
+              onPrimary: () => _addPlace(context, ref),
+              secondaryLabel: 'Add container',
+              onSecondary: () => _addContainer(context, ref),
             )
-          else
-            ...childPlaces.map(
-              (item) => GraphTile(
-                title: item.name,
-                subtitle: item.path,
-                onTap: () => context.push(AppRoutes.locationPath(item.id)),
-              ),
+          else ...[
+            GraphChildSection(
+              title: 'Places',
+              tiles: [
+                for (final item in childPlaces)
+                  GraphTile(
+                    title: item.name,
+                    subtitle: item.path,
+                    onTap: () => context.push(AppRoutes.locationPath(item.id)),
+                  ),
+              ],
+              addLabel: 'Add place',
+              onAdd: () => _addPlace(context, ref),
             ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => _addPlace(context, ref),
-              icon: const Icon(Icons.add),
-              label: const Text('Add place'),
+            const SizedBox(height: AppSpacing.md),
+            GraphChildSection(
+              title: 'Containers',
+              tiles: [
+                for (final item in rootContainers)
+                  GraphTile(
+                    title: item.name,
+                    icon: Icons.inventory_2_outlined,
+                    onTap: () =>
+                        context.push(AppRoutes.containerPath(item.id)),
+                  ),
+              ],
+              addLabel: 'Add container',
+              onAdd: () => _addContainer(context, ref),
             ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text('Containers', style: Theme.of(context).textTheme.titleMedium),
-          if (rootContainers.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-              child: Text('No containers here yet.'),
-            )
-          else
-            ...rootContainers.map(
-              (item) => GraphTile(
-                title: item.name,
-                icon: Icons.inventory_2_outlined,
-                onTap: () => context.push(AppRoutes.containerPath(item.id)),
-              ),
-            ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => _addContainer(context, ref),
-              icon: const Icon(Icons.add),
-              label: const Text('Add container'),
-            ),
-          ),
+          ],
         ],
       ),
     );
@@ -176,7 +178,24 @@ class LocationDetailPage extends ConsumerWidget {
     }
   }
 
-  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref, {
+    required String name,
+    required bool hasChildren,
+  }) async {
+    final body = hasChildren
+        ? 'Delete “$name”? Nested places and containers under it '
+            'will also be deleted. Assets will lose their place.'
+        : 'Delete “$name”? This cannot be undone.';
+    final confirmed = await confirmDelete(
+      context,
+      title: 'Delete place?',
+      body: body,
+    );
+    if (!confirmed || !context.mounted) {
+      return;
+    }
     final result =
         await ref.read(locationServiceProvider).deleteLocation(locationId);
     if (!context.mounted) {
