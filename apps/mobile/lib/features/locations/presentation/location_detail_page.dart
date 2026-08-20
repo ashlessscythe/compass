@@ -11,6 +11,7 @@ import 'package:compass/widgets/empty_state.dart';
 import 'package:compass/widgets/graph_tile.dart';
 import 'package:compass/widgets/move_target_picker.dart';
 import 'package:compass/widgets/name_prompt.dart';
+import 'package:compass/widgets/path_breadcrumbs.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -77,9 +78,13 @@ class LocationDetailPage extends ConsumerWidget {
       ],
       body: ListView(
         children: [
-          Text(
-            location.path ?? location.name,
-            style: Theme.of(context).textTheme.bodyMedium,
+          PathBreadcrumbs(
+            crumbs: locationPathCrumbs(
+              context,
+              location,
+              {for (final item in locations) item.id: item},
+              currentLocationId: locationId,
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           if (childPlaces.isEmpty && rootContainers.isEmpty)

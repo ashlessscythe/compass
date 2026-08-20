@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** UX-4 — Shared chrome
+**Current milestone:** UX-5 — Create / rename sheet
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -109,9 +109,9 @@ Home has the brand (mark, display type, gradient). Detail screens are a bare app
 - Glass everywhere — only if it helps hierarchy
 
 **Tollgate**
-- [ ] From an asset, tap the container and the place in the path; both navigate
-- [ ] Home, place, container, and asset share spacing, type, and row language
-- [ ] Dark and light both remain readable (Settings theme toggle)
+- [x] From an asset, tap the container and the place in the path; both navigate
+- [x] Home, place, container, and asset share spacing, type, and row language
+- [x] Dark and light both remain readable (Settings theme toggle)
 
 **Verify:** Lightning Bolt → tap Binder → tap Desk → back to Home. Toggle theme on a detail screen.
 

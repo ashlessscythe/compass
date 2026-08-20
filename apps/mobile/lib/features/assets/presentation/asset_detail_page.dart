@@ -12,6 +12,7 @@ import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/confirm_delete.dart';
 import 'package:compass/widgets/move_target_picker.dart';
 import 'package:compass/widgets/name_prompt.dart';
+import 'package:compass/widgets/path_breadcrumbs.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -45,7 +46,12 @@ class AssetDetailPage extends ConsumerWidget {
 
     final locationById = {for (final loc in locations) loc.id: loc};
     final containerById = {for (final item in containers) item.id: item};
-    final path = assetPath(asset, locationById, containerById);
+    final crumbs = assetPathCrumbs(
+      context,
+      asset,
+      locationById,
+      containerById,
+    );
 
     return CompassScaffold(
       title: asset.name,
@@ -75,9 +81,14 @@ class AssetDetailPage extends ConsumerWidget {
       ],
       body: ListView(
         children: [
-          Text('Where', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.xs),
-          Text(path, style: Theme.of(context).textTheme.bodyLarge),
+          Text(
+            'Where',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          PathBreadcrumbs(crumbs: crumbs),
         ],
       ),
     );

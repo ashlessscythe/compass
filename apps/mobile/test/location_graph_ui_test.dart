@@ -2,6 +2,8 @@ import 'package:compass/app.dart';
 import 'package:compass/core/constants/app_constants.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/shared/providers/database_provider.dart';
+import 'package:compass/theme/theme_mode_provider.dart';
+import 'package:compass/widgets/path_breadcrumbs.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -38,7 +40,21 @@ void main() {
     await _addNamed(tester, buttonLabel: 'Add place', name: 'Desk');
     await tester.tap(find.text('Desk'));
     await tester.pumpAndSettle();
-    expect(find.text('Office / Desk'), findsWidgets);
+    expect(find.byType(PathBreadcrumbs), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(PathBreadcrumbs),
+        matching: find.text('Office'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(PathBreadcrumbs),
+        matching: find.text('Desk'),
+      ),
+      findsOneWidget,
+    );
 
     await _addNamed(tester, buttonLabel: 'Add container', name: 'Binder');
     await tester.tap(find.text('Binder'));
@@ -64,6 +80,97 @@ void main() {
     expect(
       find.text('Office / Desk / Binder / Lightning Bolt'),
       findsOneWidget,
+    );
+
+    await database.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('asset breadcrumbs navigate to container and place',
+      (tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+        ],
+        child: const CompassApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pumpAndSettle();
+
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Office');
+    await tester.tap(find.text('Office'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Desk');
+    await tester.tap(find.text('Desk'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add container', name: 'Binder');
+    await tester.tap(find.text('Binder'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
+    await tester.tap(find.text('Lightning Bolt'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Where'), findsOneWidget);
+    expect(find.byType(PathBreadcrumbs), findsOneWidget);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PathBreadcrumbs),
+        matching: find.text('Binder'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Add asset'), findsWidgets);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PathBreadcrumbs),
+        matching: find.text('Desk'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Add container'), findsWidgets);
+
+    await database.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('detail chrome stays readable in light theme', (tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const CompassApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pumpAndSettle();
+
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Office');
+    await tester.tap(find.text('Office'));
+    await tester.pumpAndSettle();
+
+    container.read(themeModeProvider.notifier).mode = ThemeMode.light;
+    await tester.pumpAndSettle();
+
+    expect(find.text('Office'), findsWidgets);
+    expect(find.text('Add place'), findsOneWidget);
+    expect(
+      Theme.of(tester.element(find.text('Office').first)).brightness,
+      Brightness.light,
     );
 
     await database.close();
@@ -156,7 +263,7 @@ void main() {
     expect(find.text('Delete asset?'), findsOneWidget);
     await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
     await tester.pumpAndSettle();
-    expect(find.text('Lightning Bolt'), findsOneWidget);
+    expect(find.text('Lightning Bolt'), findsWidgets);
 
     await tester.tap(find.byTooltip('Delete'));
     await tester.pumpAndSettle();
