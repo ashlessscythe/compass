@@ -1,27 +1,41 @@
-# Mobile UI captures — foundation layout
+# Mobile UI captures — iPhone 17 Pro
 
-Stills from the Compass Flutter **application foundation** (Linux desktop run).
+Stills from the Compass Flutter client on the **iPhone 17 Pro** simulator after the
+iOS UX pass (UX-1…UX-6). Dark theme, clean status bar (`9:41`).
 
-These are **layout iteration references**, not marketing assets. They document the
-placeholder shell as of the foundation milestone: brand, empty dashboard, Settings
-(theme), and About.
+These are **layout references** for docs and the mobile README — not App Store
+or marketing heroes.
 
-## Home
+## Empty Home
 
-![Home dashboard — Compass, tagline, empty dashboard](./01-home-dashboard.png)
+![Empty Home — add a place](./01-empty-home.png)
 
-## Settings
+## Home with a graph
 
-![Settings — appearance / theme mode](./02-settings-appearance.png)
+![Home dashboard with Office](./02-home-graph.png)
 
-## About
+## Search hit with path
 
-![About — product summary](./03-about.png)
+![Search Lightning → path](./03-search-path.png)
 
-`.webp` copies are the same frames (smaller).
+## Place
 
-**Not suitable for README hero yet:** captures include desktop chrome (window
-chrome, wallpaper, dock) and the UI is still placeholder-only. Prefer phone/tablet
-device frames from a local run when adding README previews.
+![Office place detail](./04-place.png)
 
-Captured from the Flutter Clean Architecture foundation milestone.
+## Container
+
+![Binder container detail](./05-container.png)
+
+## Asset (where)
+
+![Lightning Bolt — where](./06-asset-where.png)
+
+## Recapture
+
+```bash
+cd apps/mobile
+./tool/capture_ux_stills.sh
+```
+
+Requires a booted iPhone 17 Pro simulator. The script walks the graph via an
+integration test and writes PNGs with `xcrun simctl io … screenshot`.

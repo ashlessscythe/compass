@@ -120,6 +120,9 @@ Module-specific data (MTG, jewelry, tools, …) belongs in attribute values (or 
 flutter analyze
 flutter test
 flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
+
+# Recapture docs stills (iPhone 17 Pro simulator):
+./tool/capture_ux_stills.sh
 ```
 
 ## Notes
@@ -129,17 +132,29 @@ flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 
 ## UI captures
 
-Foundation layout stills from a Linux desktop run (iteration references, not
-marketing heroes). Full set: [`docs/images/mobile/`](../../docs/images/mobile/).
+iPhone 17 Pro stills of the location graph (empty Home → path search → asset
+where). Full set: [`docs/images/mobile/`](../../docs/images/mobile/).
 
-### Home
+### Empty Home
 
-![Home dashboard](../../docs/images/mobile/01-home-dashboard.png)
+![Empty Home](../../docs/images/mobile/01-empty-home.png)
 
-### Settings
+### Home with a graph
 
-![Settings appearance](../../docs/images/mobile/02-settings-appearance.png)
+![Home with graph](../../docs/images/mobile/02-home-graph.png)
 
-### About
+### Search hit with path
 
-![About](../../docs/images/mobile/03-about.png)
+![Search with path](../../docs/images/mobile/03-search-path.png)
+
+### Place
+
+![Place](../../docs/images/mobile/04-place.png)
+
+### Container
+
+![Container](../../docs/images/mobile/05-container.png)
+
+### Asset (where)
+
+![Asset where](../../docs/images/mobile/06-asset-where.png)

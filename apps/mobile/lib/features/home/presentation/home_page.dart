@@ -88,6 +88,7 @@ class HomePage extends HookConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       TextField(
+                        key: const Key('home_search_field'),
                         decoration: const InputDecoration(
                           hintText: 'Search by name',
                           prefixIcon: Icon(Icons.search),

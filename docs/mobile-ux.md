@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** UX-6 — Phone stills
+**Current milestone:** iOS UX pass complete — next product work in [roadmap.md](./roadmap.md) (NFC, CSV, …)
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -23,7 +23,7 @@ Simulator: `flutter run -d "iPhone 17 Pro"` — see [mobile-setup.md](./mobile-s
 
 Inventory persists in on-device SQLite. You can add a place, nest a place, add a container, add an asset, search by name, and see the path. Data survives kill/relaunch.
 
-That loop is **functional, not crafted**. Settings and About are still labeled placeholders. Captures in `docs/images/mobile/` are the old Linux foundation shell.
+That loop is **functional, not crafted**. Settings and About are still labeled placeholders. Gallery stills are iPhone 17 Pro frames of the current graph UI (see UX-6).
 
 ---
 
@@ -152,8 +152,8 @@ Docs still show the Linux foundation placeholder. Replace them only after UX-1�
 - App Store screenshots, marketing site takeover
 
 **Tollgate**
-- [ ] Every image in the gallery is a 17 Pro frame of the current UI
-- [ ] README no longer describes the UI as placeholder-only
+- [x] Every image in the gallery is a 17 Pro frame of the current UI
+- [x] README no longer describes the UI as placeholder-only
 
 **Verify:** open the README gallery; it matches a local run.
 
