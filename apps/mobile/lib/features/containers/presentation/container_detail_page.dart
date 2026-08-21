@@ -236,14 +236,28 @@ class ContainerDetailPage extends ConsumerWidget {
       return;
     }
 
-    final result =
-        await ref.read(nfcServiceProvider).pairContainer(container.id);
+    final result = await ref.read(nfcServiceProvider).pairContainer(
+      container.id,
+      confirmReassign: (ownerPath) {
+        if (!context.mounted) {
+          return Future.value(false);
+        }
+        return confirmDelete(
+          context,
+          title: 'Move this NFC tag?',
+          body: 'Already opens $ownerPath. '
+              'Use it for ${container.name} instead?',
+          confirmLabel: 'Move tag',
+        );
+      },
+    );
     if (!context.mounted) {
       return;
     }
     if (result.isFailure) {
       final failure = result.failureOrNull!;
-      if (failure.message == 'NFC scan cancelled') {
+      if (failure.message == 'NFC scan cancelled' ||
+          failure.message == 'NFC pair cancelled') {
         return;
       }
       showFailureSnackBar(context, failure.message);

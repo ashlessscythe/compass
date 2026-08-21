@@ -50,6 +50,7 @@ void main() {
           locationId: office.id,
         ))
         .valueOrNull!;
+    // Service-level rebind still steals; UI asks before calling this.
     await container.read(containerServiceProvider).pairNfcTag(
           id: other.id,
           nfcTagId: '04A1B2C3D4E5F6',
