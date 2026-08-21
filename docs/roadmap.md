@@ -42,6 +42,7 @@ Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add dom
 - [ ] Web collection browser
 - [ ] Public API for power users
 - [ ] Hardware partnerships (NFC labels, storage kits)
+- [ ] Automate iOS build → TestFlight (fastlane or GitHub Actions `macos` + App Store Connect API; replace manual Transporter)
 
 ## Branching strategy
 
