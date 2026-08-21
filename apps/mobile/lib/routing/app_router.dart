@@ -5,6 +5,7 @@ import 'package:compass/features/home/presentation/home_page.dart';
 import 'package:compass/features/import/presentation/import_page.dart';
 import 'package:compass/features/locations/presentation/location_detail_page.dart';
 import 'package:compass/features/settings/presentation/settings_page.dart';
+import 'package:compass/features/settings/presentation/themes_page.dart';
 import 'package:compass/features/splash/presentation/splash_page.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.settings,
         name: 'settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.themes,
+        name: 'themes',
+        builder: (context, state) => const ThemesPage(),
       ),
       GoRoute(
         path: AppRoutes.importCsv,

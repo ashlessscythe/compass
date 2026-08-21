@@ -1,20 +1,34 @@
+import 'package:compass/theme/compass_theme_id.dart';
+import 'package:compass/theme/theme_preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Controls application [ThemeMode]. Defaults to dark (brand preference).
+/// Legacy [ThemeMode] bridge for existing tests. Prefer theme preferences.
 final themeModeProvider =
     NotifierProvider<ThemeModeController, ThemeMode>(ThemeModeController.new);
 
 class ThemeModeController extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() => ThemeMode.dark;
+  ThemeMode build() {
+    final id = ref.watch(effectiveThemePreferencesProvider).themeId;
+    return switch (id) {
+      CompassThemeId.light => ThemeMode.light,
+      _ => ThemeMode.dark,
+    };
+  }
 
   ThemeMode get mode => state;
 
-  set mode(ThemeMode value) => state = value;
+  set mode(ThemeMode value) {
+    final id = switch (value) {
+      ThemeMode.light => CompassThemeId.light,
+      ThemeMode.system || ThemeMode.dark => CompassThemeId.dark,
+    };
+    ref.read(themePreferencesProvider.notifier).setThemeId(id);
+  }
 
   void toggle() {
-    state = switch (state) {
+    mode = switch (state) {
       ThemeMode.dark => ThemeMode.light,
       ThemeMode.light => ThemeMode.dark,
       ThemeMode.system => ThemeMode.dark,

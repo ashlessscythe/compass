@@ -199,6 +199,59 @@ void main() {
     );
   });
 
+  test('clearMatch drops set/collector; rematchAsset uses current name',
+      () async {
+    await seedFixtureCatalog();
+
+    final office = (await container
+            .read(locationServiceProvider)
+            .createLocation(name: 'Office'))
+        .valueOrNull!;
+    final binder =
+        (await container.read(containerServiceProvider).createContainer(
+              name: 'Binder',
+              locationId: office.id,
+            ))
+            .valueOrNull!;
+
+    final created = await container.read(assetServiceProvider).createAsset(
+          name: 'Lightning Bolt',
+          containerId: binder.id,
+          metadata: const Metadata(
+            values: {
+              MtgMetadataKeys.scryfallCardId:
+                  'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+              MtgMetadataKeys.setCode: 'lea',
+              MtgMetadataKeys.collectorNumber: '161',
+            },
+          ),
+        );
+    var asset = created.valueOrNull!;
+
+    final cleared = await matchService.clearMatch(asset);
+    expect(cleared.isSuccess, isTrue);
+    asset = cleared.valueOrNull!;
+    expect(MtgMetadataKeys.scryfallIdOf(asset.metadata.values), isNull);
+    expect(
+      MtgMetadataKeys.stringOf(asset.metadata.values, MtgMetadataKeys.setCode),
+      isNull,
+    );
+
+    final renamed = await container.read(assetServiceProvider).renameAsset(
+          id: asset.id,
+          name: 'Counterspell',
+        );
+    asset = renamed.valueOrNull!;
+
+    final rematched = await matchService.rematchAsset(asset);
+    expect(rematched.isSuccess, isTrue);
+    expect(rematched.valueOrNull?.name, 'Counterspell');
+    expect(
+      rematched.valueOrNull?.id,
+      'cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee',
+    );
+  });
+
   test('legacy scryfallId metadata is accepted', () {
     final id = MtgMetadataKeys.scryfallIdOf({
       MtgMetadataKeys.legacyScryfallId: 'legacy-id',

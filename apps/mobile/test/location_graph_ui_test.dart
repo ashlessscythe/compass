@@ -2,16 +2,22 @@ import 'package:compass/app.dart';
 import 'package:compass/core/constants/app_constants.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/shared/providers/database_provider.dart';
-import 'package:compass/theme/theme_mode_provider.dart';
+import 'package:compass/theme/compass_theme_id.dart';
+import 'package:compass/theme/theme_preferences_provider.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:compass/widgets/path_breadcrumbs.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
 
   testWidgets('create nested graph then search shows path', (tester) async {
     final database = AppDatabase.forTesting(NativeDatabase.memory());
@@ -213,7 +219,17 @@ void main() {
     expect(find.byTooltip('Refetch all'), findsNothing);
 
     await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
-    expect(find.byTooltip('Refetch all'), findsOneWidget);
+    expect(find.byTooltip('Refetch all · Subscriber'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Refetch all · Subscriber'));
+    await tester.pumpAndSettle();
+    expect(find.text('Refresh this container'), findsOneWidget);
+    expect(
+      find.textContaining('Bulk refetch is a subscriber perk'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Not now'));
+    await tester.pumpAndSettle();
 
     await database.close();
     await tester.pumpWidget(const SizedBox.shrink());
@@ -242,7 +258,9 @@ void main() {
     await tester.tap(find.text('Office'));
     await tester.pumpAndSettle();
 
-    container.read(themeModeProvider.notifier).mode = ThemeMode.light;
+    await container.read(themePreferencesProvider.notifier).setThemeId(
+          CompassThemeId.light,
+        );
     await tester.pumpAndSettle();
 
     expect(find.text('Office'), findsWidgets);

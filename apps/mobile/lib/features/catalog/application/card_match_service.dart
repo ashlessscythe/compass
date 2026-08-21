@@ -42,18 +42,24 @@ class CardMatchService {
     bool prefetchImage = true,
     bool ignoreExistingScryfallId = false,
     bool forceNetwork = false,
+    /// When true, resolve by [Asset.name] only (used after rename / Rematch).
+    bool preferName = false,
   }) async {
     try {
       final values = asset.metadata.values;
       final printing = await _catalog.resolve(
-        scryfallId: ignoreExistingScryfallId
+        scryfallId: ignoreExistingScryfallId || preferName
             ? null
             : MtgMetadataKeys.scryfallIdOf(values),
-        setCode: MtgMetadataKeys.stringOf(values, MtgMetadataKeys.setCode),
-        collectorNumber: MtgMetadataKeys.stringOf(
-          values,
-          MtgMetadataKeys.collectorNumber,
-        ),
+        setCode: preferName
+            ? null
+            : MtgMetadataKeys.stringOf(values, MtgMetadataKeys.setCode),
+        collectorNumber: preferName
+            ? null
+            : MtgMetadataKeys.stringOf(
+                values,
+                MtgMetadataKeys.collectorNumber,
+              ),
         name: asset.name,
         allowNetwork: allowNetwork,
         forceNetwork: forceNetwork,
@@ -64,7 +70,7 @@ class CardMatchService {
       await _bindAsset(
         asset,
         printing,
-        replaceExisting: ignoreExistingScryfallId || forceNetwork,
+        replaceExisting: ignoreExistingScryfallId || forceNetwork || preferName,
       );
       if (prefetchImage) {
         try {
@@ -95,7 +101,7 @@ class CardMatchService {
     }
   }
 
-  /// Re-resolve using set / collector / name, ignoring any bound Scryfall id.
+  /// Re-resolve by the asset's **current name**, ignoring bound id / set / #.
   Future<Result<CardPrinting?>> rematchAsset(
     Asset asset, {
     bool allowNetwork = true,
@@ -105,6 +111,7 @@ class CardMatchService {
       allowNetwork: allowNetwork,
       ignoreExistingScryfallId: true,
       forceNetwork: true,
+      preferName: true,
     );
   }
 
@@ -202,10 +209,18 @@ class CardMatchService {
   Future<Result<Asset>> clearMatch(Asset asset) async {
     try {
       final values = Map<String, dynamic>.from(asset.metadata.values);
-      final hadId = MtgMetadataKeys.scryfallIdOf(values) != null;
+      final hadCatalog = MtgMetadataKeys.scryfallIdOf(values) != null ||
+          MtgMetadataKeys.stringOf(values, MtgMetadataKeys.setCode) != null ||
+          MtgMetadataKeys.stringOf(values, MtgMetadataKeys.collectorNumber) !=
+              null ||
+          MtgMetadataKeys.stringOf(values, MtgMetadataKeys.layout) != null;
       values.remove(MtgMetadataKeys.scryfallCardId);
       values.remove(MtgMetadataKeys.legacyScryfallId);
-      if (!hadId) {
+      // Drop printing keys so a later Match / Rematch uses the current name.
+      values.remove(MtgMetadataKeys.setCode);
+      values.remove(MtgMetadataKeys.collectorNumber);
+      values.remove(MtgMetadataKeys.layout);
+      if (!hadCatalog) {
         return Result.success(asset);
       }
       return await _assets.updateMetadata(

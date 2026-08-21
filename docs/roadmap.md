@@ -25,9 +25,10 @@ iOS UI craft for the location graph is through UX-6 (stills). Sequence and exit 
 - [x] Import from CSV (Deckbox / Moxfield / generic headers → container; Settings → Import CSV)
 - [x] Import adapters for Deckbox and Moxfield (header dialects on the shared CSV surface)
 - [x] Scryfall catalog for MTG images/stats (CardMetadataProvider; local SQLite + bulk; thumbs / full art)
+- [ ] Themes + subscription (Dark/Light/Gray free; ambience skins, custom accent, container refetch ~$2/mo via RevenueCat)
 - [ ] Offline-first sync protocol (v0)
 
-Pricing / entitlements (free local vs paid sync) are **undecided** — see [architecture.md](./architecture.md). Do not block the local iOS MVP on billing.
+Pricing: first paid surface is **appearance + bulk refetch** — see [architecture.md](./architecture.md). Sync / household / web remain undecided and are not gated on the Themes sub yet.
 
 ## Later — Platform
 

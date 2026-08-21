@@ -5,20 +5,18 @@ import 'package:compass/features/catalog/application/catalog_providers.dart';
 import 'package:compass/features/catalog/domain/card_printing.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
-import 'package:compass/theme/theme_mode_provider.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Settings surface: appearance, import, MTG catalog.
+/// Settings surface: themes, import, MTG catalog.
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
     final theme = Theme.of(context);
     final catalogEnabled = ref.watch(catalogEnabledProvider);
     final catalogStatus = ref.watch(catalogStatusProvider);
@@ -32,28 +30,13 @@ class SettingsPage extends ConsumerWidget {
             style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
-          SegmentedButton<ThemeMode>(
-            segments: const [
-              ButtonSegment(
-                value: ThemeMode.dark,
-                label: Text('Dark'),
-                icon: Icon(Icons.dark_mode_outlined),
-              ),
-              ButtonSegment(
-                value: ThemeMode.light,
-                label: Text('Light'),
-                icon: Icon(Icons.light_mode_outlined),
-              ),
-              ButtonSegment(
-                value: ThemeMode.system,
-                label: Text('System'),
-                icon: Icon(Icons.brightness_auto_outlined),
-              ),
-            ],
-            selected: {themeMode},
-            onSelectionChanged: (selection) {
-              ref.read(themeModeProvider.notifier).mode = selection.first;
-            },
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.palette_outlined),
+            title: const Text('Themes'),
+            subtitle: const Text('Dark, Light, Gray — and ambience skins'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(AppRoutes.themes),
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(

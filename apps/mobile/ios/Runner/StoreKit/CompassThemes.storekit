@@ -1,0 +1,60 @@
+{
+  "identifier" : "CompassThemesConfig",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "2.00",
+      "familyShareable" : false,
+      "internalID" : "compass_monthly_local",
+      "localizations" : [
+        {
+          "description" : "Ambience themes, custom accent, and container refetch",
+          "displayName" : "Compass",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "compass_monthly",
+      "referenceName" : "Compass Monthly",
+      "type" : "RecurringSubscription"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_storeKitErrors" : []
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "compass_group",
+      "localizations" : [
+        {
+          "locale" : "en_US",
+          "name" : "Compass"
+        }
+      ],
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "2.00",
+          "internalID" : "compass_monthly_local",
+          "localizations" : [
+            {
+              "description" : "Ambience themes, custom accent, and container refetch",
+              "displayName" : "Compass",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "compass_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Compass Monthly",
+          "subscriptionGroupID" : "compass_group",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

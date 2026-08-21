@@ -4,6 +4,8 @@ import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
+import 'package:compass/features/entitlements/application/entitlement_providers.dart';
+import 'package:compass/features/entitlements/presentation/unlock_sheet.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/nfc/application/nfc_service.dart';
@@ -66,12 +68,20 @@ class ContainerDetailPage extends ConsumerWidget {
       actions: [
         if (heldAssets.isNotEmpty)
           IconButton(
-            tooltip: 'Refetch all',
-            onPressed: () => runCardRematchForAssets(
-              context,
-              ref,
-              assets: heldAssets,
-            ),
+            tooltip: ref.watch(isSubscribedSyncProvider)
+                ? 'Refetch all'
+                : 'Refetch all · Subscriber',
+            onPressed: () async {
+              if (!ref.read(isSubscribedSyncProvider)) {
+                await showRefetchUnlockSheet(context, ref);
+                return;
+              }
+              await runCardRematchForAssets(
+                context,
+                ref,
+                assets: heldAssets,
+              );
+            },
             icon: const Icon(Icons.refresh),
           ),
         IconButton(

@@ -1,7 +1,7 @@
 import 'package:compass/database/app_database.dart';
 import 'package:compass/shared/providers/database_provider.dart';
 import 'package:compass/shared/providers/logger_provider.dart';
-import 'package:compass/theme/theme_mode_provider.dart';
+import 'package:compass/theme/theme_preferences_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -24,7 +24,7 @@ Future<ProviderContainer> bootstrap() async {
 
   // Eagerly resolve theme preference so the first frame is consistent.
   final logger = container.read(appLoggerProvider);
-  container.read(themeModeProvider);
+  container.read(themePreferencesProvider);
   logger.info(
     'Compass bootstrap complete (schema v${database.schemaVersion})',
   );

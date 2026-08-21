@@ -1,5 +1,6 @@
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
+import 'package:compass/theme/theme_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -48,22 +49,24 @@ class CompassScaffold extends StatelessWidget {
         actions: actions,
       ),
       floatingActionButton: floatingActionButton,
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              theme.scaffoldBackgroundColor,
-              theme.colorScheme.surface.withValues(alpha: 0.35),
-              theme.scaffoldBackgroundColor,
-            ],
+      body: ThemeBackdrop(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                theme.scaffoldBackgroundColor.withValues(alpha: 0.92),
+                theme.colorScheme.surface.withValues(alpha: 0.35),
+                theme.scaffoldBackgroundColor.withValues(alpha: 0.92),
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: AppSpacing.pagePadding,
-            child: body,
+          child: SafeArea(
+            child: Padding(
+              padding: AppSpacing.pagePadding,
+              child: body,
+            ),
           ),
         ),
       ),

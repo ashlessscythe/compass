@@ -1,6 +1,5 @@
 import 'package:compass/routing/app_router.dart';
-import 'package:compass/theme/app_theme.dart';
-import 'package:compass/theme/theme_mode_provider.dart';
+import 'package:compass/theme/effective_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -11,14 +10,14 @@ class CompassApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-    final themeMode = ref.watch(themeModeProvider);
+    final theme = ref.watch(appThemeDataProvider);
 
     return MaterialApp.router(
       title: 'Compass',
       debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: theme,
+      darkTheme: theme,
+      themeMode: ThemeMode.light,
       routerConfig: router,
     );
   }

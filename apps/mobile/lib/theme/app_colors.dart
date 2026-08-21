@@ -14,6 +14,11 @@ abstract final class AppColors {
   static const Color lightElevated = Color(0xFFFFFFFF);
   static const Color lightMuted = Color(0xFFEBEEF3);
 
+  // Gray / graphite (between dark and light)
+  static const Color grayBackground = Color(0xFF2E323A);
+  static const Color grayElevated = Color(0xFF3A404B);
+  static const Color grayMuted = Color(0xFF484F5C);
+
   // Foreground
   static const Color foreground = Color(0xFFF4F5F7);
   static const Color foregroundMuted = Color(0xFF9AA3B2);

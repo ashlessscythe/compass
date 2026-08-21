@@ -102,20 +102,34 @@ Source of truth is **on-device SQLite**, not the cloud.
 4. NFC deep links resolve against local data first
 5. External catalogs (Scryfall, etc.) are **enrichment**. Core location workflows must work with them disabled or unreachable; cache fetched images/stats locally when enabled.
 
-## Pricing / sync (undecided)
+## Pricing / subscription
 
-No free vs paid plan is defined. “Premium” in branding means craft, not a subscription.
+First paid surface (v1): a ~$2/mo **Compass** subscription via RevenueCat (`entitlement: compass`).
 
-Do not assume sync, backup, household sharing, or the web collection browser are paid unlocks until this is decided.
+**Included with subscription**
 
-Open questions:
+- Ambience themes (gradients / quiet patterns / restrained fractals)
+- Custom accent color
+- Container **Refetch all** (bulk Scryfall rematch)
+
+**Free forever (local app)**
+
+- Full location graph, NFC, CSV import, search
+- Themes: **Dark**, **Light**, **Gray** (brand steel accent)
+- Per-card Match / Rematch
+
+Paywall tone: calm sheet only when tapping a locked theme or locked refetch — never on launch or core graph flows. Copy stays grateful, not pushy.
+
+Sync, household sharing, and the web collection browser remain **undecided** and are **not** gated on this subscription yet.
+
+Open questions (still):
 
 - Does free stay local-only forever?
-- Is cloud sync / backup a paid tier?
+- Is cloud sync / backup a paid tier later?
 - Is household sharing paid?
 - Is the web collection browser paid?
 
-A reasonable default if we lock this later: **free = full local app; paid = sync + household + web.** That keeps the iOS MVP unblocked.
+A reasonable default if we lock sync later: **free = full local app; paid sync tier can stack or merge with Compass subscription.** That keeps the iOS MVP unblocked.
 
 ## MTG catalog (Scryfall)
 
