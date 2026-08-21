@@ -2351,6 +2351,15 @@ class $CardPrintingsTable extends CardPrintings
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _layoutMeta = const VerificationMeta('layout');
+  @override
+  late final GeneratedColumn<String> layout = GeneratedColumn<String>(
+    'layout',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _typeLineMeta = const VerificationMeta(
     'typeLine',
   );
@@ -2395,6 +2404,18 @@ class $CardPrintingsTable extends CardPrintings
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _facesJsonMeta = const VerificationMeta(
+    'facesJson',
+  );
+  @override
+  late final GeneratedColumn<String> facesJson = GeneratedColumn<String>(
+    'faces_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
   static const VerificationMeta _fetchedAtMeta = const VerificationMeta(
     'fetchedAt',
   );
@@ -2414,10 +2435,12 @@ class $CardPrintingsTable extends CardPrintings
     nameNormalized,
     setCode,
     collectorNumber,
+    layout,
     typeLine,
     manaCost,
     imageSmallUrl,
     imageNormalUrl,
+    facesJson,
     fetchedAt,
   ];
   @override
@@ -2481,6 +2504,12 @@ class $CardPrintingsTable extends CardPrintings
     } else if (isInserting) {
       context.missing(_collectorNumberMeta);
     }
+    if (data.containsKey('layout')) {
+      context.handle(
+        _layoutMeta,
+        layout.isAcceptableOrUnknown(data['layout']!, _layoutMeta),
+      );
+    }
     if (data.containsKey('type_line')) {
       context.handle(
         _typeLineMeta,
@@ -2509,6 +2538,12 @@ class $CardPrintingsTable extends CardPrintings
           data['image_normal_url']!,
           _imageNormalUrlMeta,
         ),
+      );
+    }
+    if (data.containsKey('faces_json')) {
+      context.handle(
+        _facesJsonMeta,
+        facesJson.isAcceptableOrUnknown(data['faces_json']!, _facesJsonMeta),
       );
     }
     if (data.containsKey('fetched_at')) {
@@ -2552,6 +2587,10 @@ class $CardPrintingsTable extends CardPrintings
         DriftSqlType.string,
         data['${effectivePrefix}collector_number'],
       )!,
+      layout: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}layout'],
+      ),
       typeLine: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}type_line'],
@@ -2568,6 +2607,10 @@ class $CardPrintingsTable extends CardPrintings
         DriftSqlType.string,
         data['${effectivePrefix}image_normal_url'],
       ),
+      facesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}faces_json'],
+      )!,
       fetchedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}fetched_at'],
@@ -2588,10 +2631,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
   final String nameNormalized;
   final String setCode;
   final String collectorNumber;
+  final String? layout;
   final String? typeLine;
   final String? manaCost;
   final String? imageSmallUrl;
   final String? imageNormalUrl;
+  final String facesJson;
   final DateTime fetchedAt;
   const CardPrintingRow({
     required this.id,
@@ -2600,10 +2645,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     required this.nameNormalized,
     required this.setCode,
     required this.collectorNumber,
+    this.layout,
     this.typeLine,
     this.manaCost,
     this.imageSmallUrl,
     this.imageNormalUrl,
+    required this.facesJson,
     required this.fetchedAt,
   });
   @override
@@ -2617,6 +2664,9 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     map['name_normalized'] = Variable<String>(nameNormalized);
     map['set_code'] = Variable<String>(setCode);
     map['collector_number'] = Variable<String>(collectorNumber);
+    if (!nullToAbsent || layout != null) {
+      map['layout'] = Variable<String>(layout);
+    }
     if (!nullToAbsent || typeLine != null) {
       map['type_line'] = Variable<String>(typeLine);
     }
@@ -2629,6 +2679,7 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     if (!nullToAbsent || imageNormalUrl != null) {
       map['image_normal_url'] = Variable<String>(imageNormalUrl);
     }
+    map['faces_json'] = Variable<String>(facesJson);
     map['fetched_at'] = Variable<DateTime>(fetchedAt);
     return map;
   }
@@ -2643,6 +2694,9 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       nameNormalized: Value(nameNormalized),
       setCode: Value(setCode),
       collectorNumber: Value(collectorNumber),
+      layout: layout == null && nullToAbsent
+          ? const Value.absent()
+          : Value(layout),
       typeLine: typeLine == null && nullToAbsent
           ? const Value.absent()
           : Value(typeLine),
@@ -2655,6 +2709,7 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       imageNormalUrl: imageNormalUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(imageNormalUrl),
+      facesJson: Value(facesJson),
       fetchedAt: Value(fetchedAt),
     );
   }
@@ -2671,10 +2726,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       nameNormalized: serializer.fromJson<String>(json['nameNormalized']),
       setCode: serializer.fromJson<String>(json['setCode']),
       collectorNumber: serializer.fromJson<String>(json['collectorNumber']),
+      layout: serializer.fromJson<String?>(json['layout']),
       typeLine: serializer.fromJson<String?>(json['typeLine']),
       manaCost: serializer.fromJson<String?>(json['manaCost']),
       imageSmallUrl: serializer.fromJson<String?>(json['imageSmallUrl']),
       imageNormalUrl: serializer.fromJson<String?>(json['imageNormalUrl']),
+      facesJson: serializer.fromJson<String>(json['facesJson']),
       fetchedAt: serializer.fromJson<DateTime>(json['fetchedAt']),
     );
   }
@@ -2688,10 +2745,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       'nameNormalized': serializer.toJson<String>(nameNormalized),
       'setCode': serializer.toJson<String>(setCode),
       'collectorNumber': serializer.toJson<String>(collectorNumber),
+      'layout': serializer.toJson<String?>(layout),
       'typeLine': serializer.toJson<String?>(typeLine),
       'manaCost': serializer.toJson<String?>(manaCost),
       'imageSmallUrl': serializer.toJson<String?>(imageSmallUrl),
       'imageNormalUrl': serializer.toJson<String?>(imageNormalUrl),
+      'facesJson': serializer.toJson<String>(facesJson),
       'fetchedAt': serializer.toJson<DateTime>(fetchedAt),
     };
   }
@@ -2703,10 +2762,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     String? nameNormalized,
     String? setCode,
     String? collectorNumber,
+    Value<String?> layout = const Value.absent(),
     Value<String?> typeLine = const Value.absent(),
     Value<String?> manaCost = const Value.absent(),
     Value<String?> imageSmallUrl = const Value.absent(),
     Value<String?> imageNormalUrl = const Value.absent(),
+    String? facesJson,
     DateTime? fetchedAt,
   }) => CardPrintingRow(
     id: id ?? this.id,
@@ -2715,6 +2776,7 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     nameNormalized: nameNormalized ?? this.nameNormalized,
     setCode: setCode ?? this.setCode,
     collectorNumber: collectorNumber ?? this.collectorNumber,
+    layout: layout.present ? layout.value : this.layout,
     typeLine: typeLine.present ? typeLine.value : this.typeLine,
     manaCost: manaCost.present ? manaCost.value : this.manaCost,
     imageSmallUrl: imageSmallUrl.present
@@ -2723,6 +2785,7 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     imageNormalUrl: imageNormalUrl.present
         ? imageNormalUrl.value
         : this.imageNormalUrl,
+    facesJson: facesJson ?? this.facesJson,
     fetchedAt: fetchedAt ?? this.fetchedAt,
   );
   CardPrintingRow copyWithCompanion(CardPrintingsCompanion data) {
@@ -2737,6 +2800,7 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       collectorNumber: data.collectorNumber.present
           ? data.collectorNumber.value
           : this.collectorNumber,
+      layout: data.layout.present ? data.layout.value : this.layout,
       typeLine: data.typeLine.present ? data.typeLine.value : this.typeLine,
       manaCost: data.manaCost.present ? data.manaCost.value : this.manaCost,
       imageSmallUrl: data.imageSmallUrl.present
@@ -2745,6 +2809,7 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       imageNormalUrl: data.imageNormalUrl.present
           ? data.imageNormalUrl.value
           : this.imageNormalUrl,
+      facesJson: data.facesJson.present ? data.facesJson.value : this.facesJson,
       fetchedAt: data.fetchedAt.present ? data.fetchedAt.value : this.fetchedAt,
     );
   }
@@ -2758,10 +2823,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
           ..write('nameNormalized: $nameNormalized, ')
           ..write('setCode: $setCode, ')
           ..write('collectorNumber: $collectorNumber, ')
+          ..write('layout: $layout, ')
           ..write('typeLine: $typeLine, ')
           ..write('manaCost: $manaCost, ')
           ..write('imageSmallUrl: $imageSmallUrl, ')
           ..write('imageNormalUrl: $imageNormalUrl, ')
+          ..write('facesJson: $facesJson, ')
           ..write('fetchedAt: $fetchedAt')
           ..write(')'))
         .toString();
@@ -2775,10 +2842,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     nameNormalized,
     setCode,
     collectorNumber,
+    layout,
     typeLine,
     manaCost,
     imageSmallUrl,
     imageNormalUrl,
+    facesJson,
     fetchedAt,
   );
   @override
@@ -2791,10 +2860,12 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
           other.nameNormalized == this.nameNormalized &&
           other.setCode == this.setCode &&
           other.collectorNumber == this.collectorNumber &&
+          other.layout == this.layout &&
           other.typeLine == this.typeLine &&
           other.manaCost == this.manaCost &&
           other.imageSmallUrl == this.imageSmallUrl &&
           other.imageNormalUrl == this.imageNormalUrl &&
+          other.facesJson == this.facesJson &&
           other.fetchedAt == this.fetchedAt);
 }
 
@@ -2805,10 +2876,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
   final Value<String> nameNormalized;
   final Value<String> setCode;
   final Value<String> collectorNumber;
+  final Value<String?> layout;
   final Value<String?> typeLine;
   final Value<String?> manaCost;
   final Value<String?> imageSmallUrl;
   final Value<String?> imageNormalUrl;
+  final Value<String> facesJson;
   final Value<DateTime> fetchedAt;
   final Value<int> rowid;
   const CardPrintingsCompanion({
@@ -2818,10 +2891,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     this.nameNormalized = const Value.absent(),
     this.setCode = const Value.absent(),
     this.collectorNumber = const Value.absent(),
+    this.layout = const Value.absent(),
     this.typeLine = const Value.absent(),
     this.manaCost = const Value.absent(),
     this.imageSmallUrl = const Value.absent(),
     this.imageNormalUrl = const Value.absent(),
+    this.facesJson = const Value.absent(),
     this.fetchedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -2832,10 +2907,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     required String nameNormalized,
     required String setCode,
     required String collectorNumber,
+    this.layout = const Value.absent(),
     this.typeLine = const Value.absent(),
     this.manaCost = const Value.absent(),
     this.imageSmallUrl = const Value.absent(),
     this.imageNormalUrl = const Value.absent(),
+    this.facesJson = const Value.absent(),
     required DateTime fetchedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -2851,10 +2928,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     Expression<String>? nameNormalized,
     Expression<String>? setCode,
     Expression<String>? collectorNumber,
+    Expression<String>? layout,
     Expression<String>? typeLine,
     Expression<String>? manaCost,
     Expression<String>? imageSmallUrl,
     Expression<String>? imageNormalUrl,
+    Expression<String>? facesJson,
     Expression<DateTime>? fetchedAt,
     Expression<int>? rowid,
   }) {
@@ -2865,10 +2944,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
       if (nameNormalized != null) 'name_normalized': nameNormalized,
       if (setCode != null) 'set_code': setCode,
       if (collectorNumber != null) 'collector_number': collectorNumber,
+      if (layout != null) 'layout': layout,
       if (typeLine != null) 'type_line': typeLine,
       if (manaCost != null) 'mana_cost': manaCost,
       if (imageSmallUrl != null) 'image_small_url': imageSmallUrl,
       if (imageNormalUrl != null) 'image_normal_url': imageNormalUrl,
+      if (facesJson != null) 'faces_json': facesJson,
       if (fetchedAt != null) 'fetched_at': fetchedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2881,10 +2962,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     Value<String>? nameNormalized,
     Value<String>? setCode,
     Value<String>? collectorNumber,
+    Value<String?>? layout,
     Value<String?>? typeLine,
     Value<String?>? manaCost,
     Value<String?>? imageSmallUrl,
     Value<String?>? imageNormalUrl,
+    Value<String>? facesJson,
     Value<DateTime>? fetchedAt,
     Value<int>? rowid,
   }) {
@@ -2895,10 +2978,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
       nameNormalized: nameNormalized ?? this.nameNormalized,
       setCode: setCode ?? this.setCode,
       collectorNumber: collectorNumber ?? this.collectorNumber,
+      layout: layout ?? this.layout,
       typeLine: typeLine ?? this.typeLine,
       manaCost: manaCost ?? this.manaCost,
       imageSmallUrl: imageSmallUrl ?? this.imageSmallUrl,
       imageNormalUrl: imageNormalUrl ?? this.imageNormalUrl,
+      facesJson: facesJson ?? this.facesJson,
       fetchedAt: fetchedAt ?? this.fetchedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -2925,6 +3010,9 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     if (collectorNumber.present) {
       map['collector_number'] = Variable<String>(collectorNumber.value);
     }
+    if (layout.present) {
+      map['layout'] = Variable<String>(layout.value);
+    }
     if (typeLine.present) {
       map['type_line'] = Variable<String>(typeLine.value);
     }
@@ -2936,6 +3024,9 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     }
     if (imageNormalUrl.present) {
       map['image_normal_url'] = Variable<String>(imageNormalUrl.value);
+    }
+    if (facesJson.present) {
+      map['faces_json'] = Variable<String>(facesJson.value);
     }
     if (fetchedAt.present) {
       map['fetched_at'] = Variable<DateTime>(fetchedAt.value);
@@ -2955,10 +3046,12 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
           ..write('nameNormalized: $nameNormalized, ')
           ..write('setCode: $setCode, ')
           ..write('collectorNumber: $collectorNumber, ')
+          ..write('layout: $layout, ')
           ..write('typeLine: $typeLine, ')
           ..write('manaCost: $manaCost, ')
           ..write('imageSmallUrl: $imageSmallUrl, ')
           ..write('imageNormalUrl: $imageNormalUrl, ')
+          ..write('facesJson: $facesJson, ')
           ..write('fetchedAt: $fetchedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -4439,10 +4532,12 @@ typedef $$CardPrintingsTableCreateCompanionBuilder =
       required String nameNormalized,
       required String setCode,
       required String collectorNumber,
+      Value<String?> layout,
       Value<String?> typeLine,
       Value<String?> manaCost,
       Value<String?> imageSmallUrl,
       Value<String?> imageNormalUrl,
+      Value<String> facesJson,
       required DateTime fetchedAt,
       Value<int> rowid,
     });
@@ -4454,10 +4549,12 @@ typedef $$CardPrintingsTableUpdateCompanionBuilder =
       Value<String> nameNormalized,
       Value<String> setCode,
       Value<String> collectorNumber,
+      Value<String?> layout,
       Value<String?> typeLine,
       Value<String?> manaCost,
       Value<String?> imageSmallUrl,
       Value<String?> imageNormalUrl,
+      Value<String> facesJson,
       Value<DateTime> fetchedAt,
       Value<int> rowid,
     });
@@ -4501,6 +4598,11 @@ class $$CardPrintingsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get layout => $composableBuilder(
+    column: $table.layout,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get typeLine => $composableBuilder(
     column: $table.typeLine,
     builder: (column) => ColumnFilters(column),
@@ -4518,6 +4620,11 @@ class $$CardPrintingsTableFilterComposer
 
   ColumnFilters<String> get imageNormalUrl => $composableBuilder(
     column: $table.imageNormalUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get facesJson => $composableBuilder(
+    column: $table.facesJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4566,6 +4673,11 @@ class $$CardPrintingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get layout => $composableBuilder(
+    column: $table.layout,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get typeLine => $composableBuilder(
     column: $table.typeLine,
     builder: (column) => ColumnOrderings(column),
@@ -4583,6 +4695,11 @@ class $$CardPrintingsTableOrderingComposer
 
   ColumnOrderings<String> get imageNormalUrl => $composableBuilder(
     column: $table.imageNormalUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get facesJson => $composableBuilder(
+    column: $table.facesJson,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4623,6 +4740,9 @@ class $$CardPrintingsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get layout =>
+      $composableBuilder(column: $table.layout, builder: (column) => column);
+
   GeneratedColumn<String> get typeLine =>
       $composableBuilder(column: $table.typeLine, builder: (column) => column);
 
@@ -4638,6 +4758,9 @@ class $$CardPrintingsTableAnnotationComposer
     column: $table.imageNormalUrl,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get facesJson =>
+      $composableBuilder(column: $table.facesJson, builder: (column) => column);
 
   GeneratedColumn<DateTime> get fetchedAt =>
       $composableBuilder(column: $table.fetchedAt, builder: (column) => column);
@@ -4680,10 +4803,12 @@ class $$CardPrintingsTableTableManager
                 Value<String> nameNormalized = const Value.absent(),
                 Value<String> setCode = const Value.absent(),
                 Value<String> collectorNumber = const Value.absent(),
+                Value<String?> layout = const Value.absent(),
                 Value<String?> typeLine = const Value.absent(),
                 Value<String?> manaCost = const Value.absent(),
                 Value<String?> imageSmallUrl = const Value.absent(),
                 Value<String?> imageNormalUrl = const Value.absent(),
+                Value<String> facesJson = const Value.absent(),
                 Value<DateTime> fetchedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CardPrintingsCompanion(
@@ -4693,10 +4818,12 @@ class $$CardPrintingsTableTableManager
                 nameNormalized: nameNormalized,
                 setCode: setCode,
                 collectorNumber: collectorNumber,
+                layout: layout,
                 typeLine: typeLine,
                 manaCost: manaCost,
                 imageSmallUrl: imageSmallUrl,
                 imageNormalUrl: imageNormalUrl,
+                facesJson: facesJson,
                 fetchedAt: fetchedAt,
                 rowid: rowid,
               ),
@@ -4708,10 +4835,12 @@ class $$CardPrintingsTableTableManager
                 required String nameNormalized,
                 required String setCode,
                 required String collectorNumber,
+                Value<String?> layout = const Value.absent(),
                 Value<String?> typeLine = const Value.absent(),
                 Value<String?> manaCost = const Value.absent(),
                 Value<String?> imageSmallUrl = const Value.absent(),
                 Value<String?> imageNormalUrl = const Value.absent(),
+                Value<String> facesJson = const Value.absent(),
                 required DateTime fetchedAt,
                 Value<int> rowid = const Value.absent(),
               }) => CardPrintingsCompanion.insert(
@@ -4721,10 +4850,12 @@ class $$CardPrintingsTableTableManager
                 nameNormalized: nameNormalized,
                 setCode: setCode,
                 collectorNumber: collectorNumber,
+                layout: layout,
                 typeLine: typeLine,
                 manaCost: manaCost,
                 imageSmallUrl: imageSmallUrl,
                 imageNormalUrl: imageNormalUrl,
+                facesJson: facesJson,
                 fetchedAt: fetchedAt,
                 rowid: rowid,
               ),

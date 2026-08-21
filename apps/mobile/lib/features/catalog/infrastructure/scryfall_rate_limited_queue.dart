@@ -26,7 +26,10 @@ class ScryfallRateLimitedQueue {
   var _pumping = false;
   DateTime _nextAllowed = DateTime.fromMillisecondsSinceEpoch(0);
 
-  Future<CardPrinting?> enqueue(CatalogMatchKey key) {
+  Future<CardPrinting?> enqueue(
+    CatalogMatchKey key, {
+    bool bypassCache = false,
+  }) {
     final existing = _inflight[key.dedupeId];
     if (existing != null) {
       return existing;
@@ -35,7 +38,9 @@ class ScryfallRateLimitedQueue {
     final completer = Completer<CardPrinting?>();
     final future = completer.future;
     _inflight[key.dedupeId] = future;
-    _pending.add(_QueueItem(key: key, completer: completer));
+    _pending.add(
+      _QueueItem(key: key, completer: completer, bypassCache: bypassCache),
+    );
     unawaited(_pump());
     return future;
   }
@@ -49,10 +54,12 @@ class ScryfallRateLimitedQueue {
       while (_pending.isNotEmpty) {
         final item = _pending.removeFirst();
         try {
-          final cached = await _lookupLocal(item.key);
-          if (cached != null) {
-            item.completer.complete(cached);
-            continue;
+          if (!item.bypassCache) {
+            final cached = await _lookupLocal(item.key);
+            if (cached != null) {
+              item.completer.complete(cached);
+              continue;
+            }
           }
 
           final wait = _nextAllowed.difference(DateTime.now());
@@ -105,8 +112,13 @@ class ScryfallRateLimitedQueue {
 }
 
 class _QueueItem {
-  _QueueItem({required this.key, required this.completer});
+  _QueueItem({
+    required this.key,
+    required this.completer,
+    this.bypassCache = false,
+  });
 
   final CatalogMatchKey key;
   final Completer<CardPrinting?> completer;
+  final bool bypassCache;
 }

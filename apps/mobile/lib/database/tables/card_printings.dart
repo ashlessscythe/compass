@@ -13,11 +13,14 @@ class CardPrintings extends Table {
   TextColumn get nameNormalized => text().named('name_normalized')();
   TextColumn get setCode => text().named('set_code')();
   TextColumn get collectorNumber => text().named('collector_number')();
+  TextColumn get layout => text().nullable()();
   TextColumn get typeLine => text().named('type_line').nullable()();
   TextColumn get manaCost => text().named('mana_cost').nullable()();
   TextColumn get imageSmallUrl => text().named('image_small_url').nullable()();
   TextColumn get imageNormalUrl =>
       text().named('image_normal_url').nullable()();
+  TextColumn get facesJson =>
+      text().named('faces_json').withDefault(const Constant('[]'))();
   DateTimeColumn get fetchedAt => dateTime().named('fetched_at')();
 
   @override

@@ -122,6 +122,12 @@ class ImportService {
     if (row.scryfallId != null) {
       values[MtgMetadataKeys.scryfallCardId] = row.scryfallId;
     }
+    if (row.cardForm != null) {
+      values[MtgMetadataKeys.layout] = row.cardForm;
+    }
+    if (row.condition != null) {
+      values[MtgMetadataKeys.condition] = row.condition;
+    }
     return Metadata(values: values);
   }
 

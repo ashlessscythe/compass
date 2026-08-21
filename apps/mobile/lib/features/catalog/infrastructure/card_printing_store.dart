@@ -106,7 +106,9 @@ class CardPrintingStore {
   }
 
   Future<void> upsert(CardPrinting printing) async {
-    await _db.into(_db.cardPrintings).insertOnConflictUpdate(_toCompanion(printing));
+    await _db
+        .into(_db.cardPrintings)
+        .insertOnConflictUpdate(_toCompanion(printing));
   }
 
   Future<void> upsertAll(List<CardPrinting> printings) async {
@@ -136,10 +138,12 @@ class CardPrintingStore {
       nameNormalized: normalizeCardName(printing.name),
       setCode: printing.setCode,
       collectorNumber: printing.collectorNumber,
+      layout: Value(printing.layout),
       typeLine: Value(printing.typeLine),
       manaCost: Value(printing.manaCost),
       imageSmallUrl: Value(printing.imageSmallUrl),
       imageNormalUrl: Value(printing.imageNormalUrl),
+      facesJson: Value(CardPrinting.encodeFaces(printing.faces)),
       fetchedAt: printing.fetchedAt,
     );
   }
@@ -151,10 +155,12 @@ class CardPrintingStore {
       name: row.name,
       setCode: row.setCode,
       collectorNumber: row.collectorNumber,
+      layout: row.layout,
       typeLine: row.typeLine,
       manaCost: row.manaCost,
       imageSmallUrl: row.imageSmallUrl,
       imageNormalUrl: row.imageNormalUrl,
+      faces: CardPrinting.decodeFaces(row.facesJson),
       fetchedAt: row.fetchedAt,
     );
   }

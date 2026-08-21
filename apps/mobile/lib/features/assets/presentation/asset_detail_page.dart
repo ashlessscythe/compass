@@ -7,6 +7,7 @@ import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/catalog/application/catalog_prefs.dart';
+import 'package:compass/features/catalog/domain/card_printing.dart';
 import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
 import 'package:compass/features/catalog/infrastructure/card_image_cache.dart';
 import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
@@ -16,6 +17,7 @@ import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/confirm_delete.dart';
+import 'package:compass/widgets/flipping_card_art.dart';
 import 'package:compass/widgets/mana_cost_row.dart';
 import 'package:compass/widgets/move_target_picker.dart';
 import 'package:compass/widgets/name_prompt.dart';
@@ -88,53 +90,61 @@ class AssetDetailPage extends ConsumerWidget {
           ),
           icon: const Icon(Icons.drive_file_move_outline),
         ),
-        IconButton(
-          tooltip: 'Delete',
-          onPressed: () => _delete(context, ref, name: asset!.name),
-          icon: const Icon(Icons.delete_outline),
+        PopupMenuButton<_AssetMenuAction>(
+          tooltip: 'More',
+          onSelected: (action) async {
+            switch (action) {
+              case _AssetMenuAction.rematch:
+                await runSingleCardMatch(
+                  context,
+                  ref,
+                  asset!,
+                  rematch: true,
+                );
+              case _AssetMenuAction.clearMatch:
+                await runClearCardMatch(context, ref, asset!);
+              case _AssetMenuAction.delete:
+                await _delete(context, ref, name: asset!.name);
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: _AssetMenuAction.rematch,
+              enabled: catalogEnabled,
+              child: Text(
+                scryfallId == null ? 'Match with Scryfall' : 'Rematch',
+              ),
+            ),
+            if (scryfallId != null)
+              const PopupMenuItem(
+                value: _AssetMenuAction.clearMatch,
+                child: Text('Clear match'),
+              ),
+            const PopupMenuDivider(),
+            const PopupMenuItem(
+              value: _AssetMenuAction.delete,
+              child: Text('Delete'),
+            ),
+          ],
         ),
       ],
       body: ListView(
         children: [
-          _CardArtBlock(
-            asset: asset,
-            scryfallId: scryfallId,
-            catalogEnabled: catalogEnabled,
-            onMatch: () => runSingleCardMatch(context, ref, asset!),
-          ),
-          if (scryfallId != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            FutureBuilder(
-              future: loadCardPrinting(ref, asset),
-              builder: (context, snapshot) {
-                final printing = snapshot.data;
-                if (printing == null) {
-                  return const SizedBox.shrink();
-                }
-                final theme = Theme.of(context);
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (printing.typeLine != null)
-                      Text(printing.typeLine!, style: theme.textTheme.bodyLarge),
-                    if (printing.manaCost != null &&
-                        printing.manaCost!.isNotEmpty) ...[
-                      const SizedBox(height: AppSpacing.xs),
-                      ManaCostRow(printing.manaCost!),
-                    ],
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '${printing.setCode.toUpperCase()} · '
-                      '#${printing.collectorNumber}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                );
-              },
+          if (scryfallId != null)
+            _MatchedCardPanel(
+              asset: asset,
+              scryfallId: scryfallId,
+              catalogEnabled: catalogEnabled,
+              onMatch: () => runSingleCardMatch(context, ref, asset!),
+            )
+          else
+            _CardArtBlock(
+              asset: asset,
+              scryfallId: null,
+              catalogEnabled: catalogEnabled,
+              onMatch: () => runSingleCardMatch(context, ref, asset!),
             ),
-          ] else if (setCode != null || collector != null) ...[
+          if (scryfallId == null && (setCode != null || collector != null)) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(
               [
@@ -242,7 +252,9 @@ class AssetDetailPage extends ConsumerWidget {
   }
 }
 
-class _CardArtBlock extends ConsumerWidget {
+enum _AssetMenuAction { rematch, clearMatch, delete }
+
+class _CardArtBlock extends StatelessWidget {
   const _CardArtBlock({
     required this.asset,
     required this.scryfallId,
@@ -256,78 +268,215 @@ class _CardArtBlock extends ConsumerWidget {
   final VoidCallback onMatch;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    if (scryfallId == null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AspectRatio(
-            aspectRatio: 5 / 7,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.colorScheme.outlineVariant,
-                  width: 1.5,
-                ),
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.4),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.style_outlined,
-                    size: 48,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'No catalog match',
-                    style: theme.textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  FilledButton.tonal(
-                    onPressed: catalogEnabled ? onMatch : null,
-                    child: const Text('Match with Scryfall'),
-                  ),
-                ],
-              ),
-            ),
+    return AspectRatio(
+      aspectRatio: 5 / 7,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant,
+            width: 1.5,
           ),
-        ],
+          color: theme.colorScheme.surfaceContainerHighest
+              .withValues(alpha: 0.4),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.style_outlined,
+              size: 48,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'No catalog match',
+              style: theme.textTheme.titleSmall,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            FilledButton.tonal(
+              onPressed: catalogEnabled ? onMatch : null,
+              child: const Text('Match with Scryfall'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MatchedCardPanel extends ConsumerStatefulWidget {
+  const _MatchedCardPanel({
+    required this.asset,
+    required this.scryfallId,
+    required this.catalogEnabled,
+    required this.onMatch,
+  });
+
+  final Asset asset;
+  final String scryfallId;
+  final bool catalogEnabled;
+  final VoidCallback onMatch;
+
+  @override
+  ConsumerState<_MatchedCardPanel> createState() => _MatchedCardPanelState();
+}
+
+class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
+  var _faceIndex = 0;
+  Future<({CardPrinting printing, List<File?> files})>? _bundle;
+
+  @override
+  void didUpdateWidget(covariant _MatchedCardPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scryfallId != widget.scryfallId ||
+        oldWidget.asset.updatedAt != widget.asset.updatedAt) {
+      _bundle = null;
+      _faceIndex = 0;
+    }
+  }
+
+  Future<({CardPrinting printing, List<File?> files})> _loadBundle() async {
+    final printing = await loadCardPrinting(ref, widget.asset);
+    if (printing == null) {
+      throw StateError('missing printing');
+    }
+    final count = printing.isMultiFace ? printing.faces.length : 1;
+    final files = <File?>[];
+    for (var i = 0; i < count; i++) {
+      files.add(
+        await loadCardImage(
+          ref,
+          scryfallId: widget.scryfallId,
+          size: CardImageSize.normal,
+          faceIndex: i,
+          urlOverride: printing.imageUrlForFace(i, normal: true),
+        ),
       );
     }
+    return (printing: printing, files: files);
+  }
 
-    return FutureBuilder<File?>(
-      future: loadCardImage(
-        ref,
-        scryfallId: scryfallId!,
-        size: CardImageSize.normal,
-      ),
+  void _flip(int faceCount) {
+    if (faceCount < 2) {
+      return;
+    }
+    setState(() => _faceIndex = (_faceIndex + 1) % faceCount);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _bundle ??= _loadBundle();
+    return FutureBuilder(
+      future: _bundle,
       builder: (context, snapshot) {
-        final file = snapshot.data;
-        if (file != null) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.file(
-              file,
-              fit: BoxFit.fitWidth,
-              width: double.infinity,
+        if (snapshot.hasError) {
+          return AspectRatio(
+            aspectRatio: 5 / 7,
+            child: Center(
+              child: FilledButton.tonal(
+                onPressed: widget.catalogEnabled ? widget.onMatch : null,
+                child: const Text('Retry match'),
+              ),
             ),
           );
         }
-        return AspectRatio(
-          aspectRatio: 5 / 7,
-          child: Center(
-            child: snapshot.connectionState == ConnectionState.waiting
-                ? const CircularProgressIndicator()
-                : FilledButton.tonal(
-                    onPressed: catalogEnabled ? onMatch : null,
-                    child: const Text('Retry match'),
+        final bundle = snapshot.data;
+        if (bundle == null) {
+          return const AspectRatio(
+            aspectRatio: 5 / 7,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final printing = bundle.printing;
+        final files = bundle.files;
+        final faces = printing.faces;
+        final multi = printing.isMultiFace;
+        final safeIndex = multi ? _faceIndex.clamp(0, faces.length - 1) : 0;
+        final face = printing.faceAt(safeIndex);
+        final typeLine = face?.typeLine ?? printing.typeLine;
+        final manaCost = face?.manaCost ?? printing.manaCost;
+        final faceName = multi ? (face?.name ?? printing.name) : null;
+        final theme = Theme.of(context);
+
+        final artFaces = <Widget>[
+          for (var i = 0; i < files.length; i++)
+            if (files[i] != null)
+              Image.file(
+                files[i]!,
+                fit: BoxFit.fitWidth,
+                width: double.infinity,
+              )
+            else
+              const AspectRatio(
+                aspectRatio: 5 / 7,
+                child: Center(child: Icon(Icons.broken_image_outlined)),
+              ),
+        ];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FlippingCardArt(
+              faceIndex: safeIndex,
+              faces: artFaces,
+              onTap: multi ? () => _flip(faces.length) : null,
+            ),
+            if (multi) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                children: [
+                  Text(
+                    'Face ${safeIndex + 1} of ${faces.length}',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
-          ),
+                  const Spacer(),
+                  FilledButton.tonalIcon(
+                    onPressed: () => _flip(faces.length),
+                    icon: const Icon(Icons.flip),
+                    label: Text(
+                      printing.layout == 'split' ? 'Other half' : 'Flip',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: AppSpacing.md),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 280),
+              child: Column(
+                key: ValueKey(safeIndex),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (faceName != null && faceName.isNotEmpty)
+                    Text(faceName, style: theme.textTheme.titleMedium),
+                  if (typeLine != null)
+                    Text(typeLine, style: theme.textTheme.bodyLarge),
+                  if (manaCost != null && manaCost.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    ManaCostRow(manaCost),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              [
+                printing.setCode.toUpperCase(),
+                '#${printing.collectorNumber}',
+                if (printing.layout != null && printing.layout!.isNotEmpty)
+                  printing.layout!,
+              ].join(' · '),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         );
       },
     );

@@ -78,53 +78,81 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
     String? collectorNumber,
     String? name,
     bool allowNetwork = true,
+    bool forceNetwork = false,
   }) async {
     if (scryfallId != null && scryfallId.isNotEmpty) {
-      final local = await _store.getById(scryfallId);
-      if (local != null) {
-        return local;
-      }
-      if (allowNetwork) {
-        return _queue.enqueue(CatalogMatchKey.scryfallId(scryfallId));
-      }
-      return null;
+      return _resolveLocalThenNetwork(
+        local: () => _store.getById(scryfallId),
+        key: CatalogMatchKey.scryfallId(scryfallId),
+        allowNetwork: allowNetwork,
+        forceNetwork: forceNetwork,
+      );
     }
 
     if (setCode != null &&
         setCode.isNotEmpty &&
         collectorNumber != null &&
         collectorNumber.isNotEmpty) {
-      final local = await _store.getBySetCollector(
-        setCode: setCode,
-        collectorNumber: collectorNumber,
+      return _resolveLocalThenNetwork(
+        local: () => _store.getBySetCollector(
+          setCode: setCode,
+          collectorNumber: collectorNumber,
+        ),
+        key: CatalogMatchKey.setCollector(
+          setCode: setCode,
+          collectorNumber: collectorNumber,
+        ),
+        allowNetwork: allowNetwork,
+        forceNetwork: forceNetwork,
       );
-      if (local != null) {
-        return local;
-      }
-      if (allowNetwork) {
-        return _queue.enqueue(
-          CatalogMatchKey.setCollector(
-            setCode: setCode,
-            collectorNumber: collectorNumber,
-          ),
-        );
-      }
-      return null;
     }
 
     if (name != null && name.trim().isNotEmpty) {
-      final exact = await _store.findByExactName(name);
-      if (exact != null) {
+      final trimmed = name.trim();
+      final exact = await _store.findByExactName(trimmed);
+      if (exact != null &&
+          !forceNetwork &&
+          !exact.needsFaceHydration) {
         return exact;
       }
-      final similar = await _store.findSimilarName(name);
-      if (similar != null) {
+      final similar = forceNetwork || (exact?.needsFaceHydration ?? false)
+          ? null
+          : await _store.findSimilarName(trimmed);
+      if (similar != null && !similar.needsFaceHydration) {
         return similar;
       }
       if (allowNetwork) {
-        return _queue.enqueue(CatalogMatchKey.name(name.trim()));
+        final fresh = await _queue.enqueue(
+          CatalogMatchKey.name(trimmed),
+          bypassCache: forceNetwork ||
+              (exact?.needsFaceHydration ?? false) ||
+              (similar?.needsFaceHydration ?? false),
+        );
+        return fresh ?? exact ?? similar;
       }
+      return exact ?? similar;
     }
     return null;
+  }
+
+  Future<CardPrinting?> _resolveLocalThenNetwork({
+    required Future<CardPrinting?> Function() local,
+    required CatalogMatchKey key,
+    required bool allowNetwork,
+    required bool forceNetwork,
+  }) async {
+    final cached = await local();
+    final stale = cached?.needsFaceHydration ?? false;
+    if (cached != null && !forceNetwork && !stale) {
+      return cached;
+    }
+    if (allowNetwork) {
+      final fresh = await _queue.enqueue(
+        key,
+        bypassCache: forceNetwork || stale,
+      );
+      return fresh ?? cached;
+    }
+    return cached;
   }
 }

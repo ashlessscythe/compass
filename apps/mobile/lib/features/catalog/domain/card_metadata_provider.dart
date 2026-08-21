@@ -26,11 +26,14 @@ abstract interface class CardMetadataProvider {
   });
 
   /// Resolve a single key via local cache, then rate-limited network if enabled.
+  ///
+  /// When [forceNetwork] is true, always re-fetch and upsert (used by rematch).
   Future<CardPrinting?> resolve({
     String? scryfallId,
     String? setCode,
     String? collectorNumber,
     String? name,
     bool allowNetwork = true,
+    bool forceNetwork = false,
   });
 }

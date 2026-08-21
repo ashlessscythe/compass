@@ -73,4 +73,31 @@ void main() {
     expect(result.rowCount, 2);
     expect(result.skippedEmptyNames, 1);
   });
+
+  test('recognizes set_hint, card_form, and // multi-face names', () {
+    const content = 'name,quantity,condition,finish,card_form,set_hint\n'
+        'Liliana of the Veil,2,SP,foil,single,EMN\n'
+        'Brazen Borrower // Petty Theft,2,NM,nonfoil,double_faced,ELD\n'
+        'Valakut Awakening // Valakut Stoneforge,2,SP,nonfoil,modal_dfc,ZNR\n';
+    final result = parser.parse(content);
+
+    expect(result.dialect, CsvDialect.generic);
+    expect(result.rowCount, 3);
+
+    final single = result.rows[0];
+    expect(single.setValue, 'EMN');
+    expect(single.finish, 'foil');
+    expect(single.condition, 'SP');
+    expect(single.cardForm, isNull);
+
+    final dfc = result.rows[1];
+    expect(dfc.name, 'Brazen Borrower // Petty Theft');
+    expect(dfc.setValue, 'ELD');
+    expect(dfc.finish, isNull);
+    expect(dfc.cardForm, 'transform');
+
+    final mdfc = result.rows[2];
+    expect(mdfc.cardForm, 'modal_dfc');
+    expect(mdfc.setValue, 'ZNR');
+  });
 }

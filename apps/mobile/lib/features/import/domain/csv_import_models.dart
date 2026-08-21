@@ -29,6 +29,8 @@ class ImportRow {
     this.collectorNumber,
     this.finish,
     this.scryfallId,
+    this.cardForm,
+    this.condition,
   });
 
   final String name;
@@ -38,6 +40,11 @@ class ImportRow {
   final String? collectorNumber;
   final String? finish;
   final String? scryfallId;
+
+  /// Optional layout hint from export (`double_faced`, `modal_dfc`, …).
+  final String? cardForm;
+
+  final String? condition;
 }
 
 /// Result of parsing a collection CSV.

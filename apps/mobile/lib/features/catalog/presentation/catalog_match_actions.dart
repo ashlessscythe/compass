@@ -102,8 +102,9 @@ Future<void> runCardMatchForAssets(
 Future<void> runSingleCardMatch(
   BuildContext context,
   WidgetRef ref,
-  Asset asset,
-) async {
+  Asset asset, {
+  bool rematch = false,
+}) async {
   final enabled = ref.read(catalogEnabledProvider);
   if (!enabled) {
     showFailureSnackBar(
@@ -115,9 +116,11 @@ Future<void> runSingleCardMatch(
 
   await _runBusy(
     context,
-    title: 'Matching…',
+    title: rematch ? 'Rematching…' : 'Matching…',
     work: () async {
-      final result = await ref.read(cardMatchServiceProvider).matchAsset(asset);
+      final result = rematch
+          ? await ref.read(cardMatchServiceProvider).rematchAsset(asset)
+          : await ref.read(cardMatchServiceProvider).matchAsset(asset);
       if (!context.mounted) {
         return;
       }
@@ -130,9 +133,27 @@ Future<void> runSingleCardMatch(
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Card matched')),
+        SnackBar(content: Text(rematch ? 'Card rematched' : 'Card matched')),
       );
     },
+  );
+}
+
+Future<void> runClearCardMatch(
+  BuildContext context,
+  WidgetRef ref,
+  Asset asset,
+) async {
+  final result = await ref.read(cardMatchServiceProvider).clearMatch(asset);
+  if (!context.mounted) {
+    return;
+  }
+  if (result.isFailure) {
+    showFailureSnackBar(context, result.failureOrNull!.message);
+    return;
+  }
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Catalog match cleared')),
   );
 }
 
@@ -140,15 +161,20 @@ Future<File?> loadCardImage(
   WidgetRef ref, {
   required String scryfallId,
   required CardImageSize size,
+  int faceIndex = 0,
+  String? urlOverride,
 }) async {
   final printing = await ref.read(mtgCardCatalogProvider).getById(scryfallId);
-  final url = size == CardImageSize.small
-      ? printing?.imageSmallUrl
-      : printing?.imageNormalUrl;
+  final url = urlOverride ??
+      printing?.imageUrlForFace(
+        faceIndex,
+        normal: size == CardImageSize.normal,
+      );
   return ref.read(cardImageCacheProvider).ensureImage(
         scryfallId: scryfallId,
         size: size,
         url: url,
+        faceIndex: faceIndex,
       );
 }
 
@@ -157,7 +183,14 @@ Future<CardPrinting?> loadCardPrinting(WidgetRef ref, Asset asset) async {
   if (id == null) {
     return null;
   }
-  return ref.read(mtgCardCatalogProvider).getById(id);
+  final catalog = ref.read(mtgCardCatalogProvider);
+  final local = await catalog.getById(id);
+  if (local != null && !local.needsFaceHydration) {
+    return local;
+  }
+  // Hydrate faces for printings cached before multi-face support.
+  final fresh = await catalog.resolve(scryfallId: id, allowNetwork: true);
+  return fresh ?? local;
 }
 
 Future<void> _runBusy(

@@ -47,6 +47,10 @@ class AppDatabase extends _$AppDatabase {
               await m.createTable(cardPrintings);
               await m.createTable(catalogMeta);
             }
+            if (from < 5) {
+              await m.addColumn(cardPrintings, cardPrintings.layout);
+              await m.addColumn(cardPrintings, cardPrintings.facesJson);
+            }
           }
         },
         beforeOpen: (details) async {

@@ -7,6 +7,7 @@ import 'package:compass/core/utils/result.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/catalog/application/card_match_service.dart';
+import 'package:compass/features/catalog/domain/card_printing.dart';
 import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
 import 'package:compass/features/catalog/infrastructure/card_image_cache.dart';
 import 'package:compass/features/catalog/infrastructure/card_printing_store.dart';
@@ -192,5 +193,107 @@ void main() {
     expect(printing.imageSmallUrl, 'https://example.com/t-small.jpg');
     expect(printing.imageNormalUrl, isNull);
     expect(printing.oracleId, isNull);
+    expect(printing.faces, hasLength(1));
+  });
+
+  test('printingFromJson keeps both DFC faces and images', () {
+    final printing = ScryfallHttpClient.printingFromJson({
+      'id': 'dfc-1111-2222-3333-444444444444',
+      'name': 'Delver of Secrets // Insectile Aberration',
+      'layout': 'transform',
+      'set': 'isd',
+      'collector_number': '51',
+      'card_faces': [
+        {
+          'name': 'Delver of Secrets',
+          'mana_cost': '{U}',
+          'type_line': 'Creature — Human Wizard',
+          'image_uris': {
+            'small': 'https://example.com/delver-front-small.jpg',
+            'normal': 'https://example.com/delver-front.jpg',
+          },
+        },
+        {
+          'name': 'Insectile Aberration',
+          'mana_cost': '',
+          'type_line': 'Creature — Human Insect',
+          'image_uris': {
+            'small': 'https://example.com/delver-back-small.jpg',
+            'normal': 'https://example.com/delver-back.jpg',
+          },
+        },
+      ],
+    });
+    expect(printing, isNotNull);
+    expect(printing!.isMultiFace, isTrue);
+    expect(printing.layout, 'transform');
+    expect(printing.faces, hasLength(2));
+    expect(printing.manaCost, '{U}');
+    expect(printing.typeLine, 'Creature — Human Wizard');
+    expect(
+      printing.imageUrlForFace(1, normal: true),
+      'https://example.com/delver-back.jpg',
+    );
+  });
+
+  test('printingFromJson split shares top-level image across faces', () {
+    final printing = ScryfallHttpClient.printingFromJson({
+      'id': 'split-1111-2222-3333-444444444444',
+      'name': 'Fire // Ice',
+      'layout': 'split',
+      'set': 'apc',
+      'collector_number': '128',
+      'image_uris': {
+        'small': 'https://example.com/fire-ice-small.jpg',
+        'normal': 'https://example.com/fire-ice.jpg',
+      },
+      'card_faces': [
+        {
+          'name': 'Fire',
+          'mana_cost': '{1}{R}',
+          'type_line': 'Instant',
+        },
+        {
+          'name': 'Ice',
+          'mana_cost': '{1}{U}',
+          'type_line': 'Instant',
+        },
+      ],
+    });
+    expect(printing, isNotNull);
+    expect(printing!.isMultiFace, isTrue);
+    expect(printing.faces[0].imageNormalUrl, 'https://example.com/fire-ice.jpg');
+    expect(printing.faces[1].manaCost, '{1}{U}');
+  });
+
+  test('needsFaceHydration detects stale single-face DFC cache', () {
+    final stale = CardPrinting(
+      id: 'stale',
+      name: 'Shatterskull Smashing // Shatterskull, the Hammer Pass',
+      setCode: 'znr',
+      collectorNumber: '354',
+      typeLine: 'Sorcery // Land',
+      faces: const [
+        CardFace(name: 'Shatterskull Smashing // Shatterskull, the Hammer Pass'),
+      ],
+      fetchedAt: DateTime.utc(2024),
+    );
+    expect(stale.needsFaceHydration, isTrue);
+    expect(stale.isMultiFace, isFalse);
+
+    final fresh = CardPrinting(
+      id: 'fresh',
+      name: 'Shatterskull Smashing // Shatterskull, the Hammer Pass',
+      setCode: 'znr',
+      collectorNumber: '354',
+      layout: 'modal_dfc',
+      faces: const [
+        CardFace(name: 'Shatterskull Smashing', typeLine: 'Sorcery'),
+        CardFace(name: 'Shatterskull, the Hammer Pass', typeLine: 'Land'),
+      ],
+      fetchedAt: DateTime.utc(2024),
+    );
+    expect(fresh.needsFaceHydration, isFalse);
+    expect(fresh.isMultiFace, isTrue);
   });
 }

@@ -24,6 +24,8 @@ class CsvCollectionParser {
     'edition code',
     'set id',
     'set name',
+    'set_hint',
+    'set hint',
   };
   static const _collectorHeaders = {
     'card number',
@@ -39,6 +41,16 @@ class CsvCollectionParser {
   static const _scryfallHeaders = {
     'scryfall id',
     'scryfallid',
+  };
+  static const _cardFormHeaders = {
+    'card_form',
+    'card form',
+    'layout',
+    'card layout',
+  };
+  static const _conditionHeaders = {
+    'condition',
+    'cond',
   };
 
   /// Parse UTF-8 CSV [content]. Throws [CsvParseException] on bad input.
@@ -77,6 +89,8 @@ class CsvCollectionParser {
     final collectorIndex = _firstIndex(headers, _collectorHeaders);
     final finishIndex = _firstIndex(headers, _finishHeaders);
     final scryfallIndex = _firstIndex(headers, _scryfallHeaders);
+    final cardFormIndex = _firstIndex(headers, _cardFormHeaders);
+    final conditionIndex = _firstIndex(headers, _conditionHeaders);
     final dialect = detectDialect(headers);
 
     final rows = <ImportRow>[];
@@ -102,6 +116,8 @@ class CsvCollectionParser {
       final collector = _nullIfEmpty(cell(collectorIndex));
       final finish = _normalizeFinish(cell(finishIndex));
       final scryfallId = _nullIfEmpty(cell(scryfallIndex));
+      final cardForm = _normalizeCardForm(cell(cardFormIndex));
+      final condition = _nullIfEmpty(cell(conditionIndex));
 
       rows.add(
         ImportRow(
@@ -112,6 +128,8 @@ class CsvCollectionParser {
           collectorNumber: collector,
           finish: finish,
           scryfallId: scryfallId,
+          cardForm: cardForm,
+          condition: condition,
         ),
       );
     }
@@ -183,12 +201,30 @@ class CsvCollectionParser {
     if (value.isEmpty ||
         value == 'normal' ||
         value == 'false' ||
-        value == 'no') {
+        value == 'no' ||
+        value == 'nonfoil') {
       return null;
     }
     if (value == 'true' || value == 'yes') {
       return 'foil';
     }
     return value;
+  }
+
+  /// Maps export card_form values onto Scryfall-ish layout keys when possible.
+  static String? _normalizeCardForm(String raw) {
+    final value = raw.trim().toLowerCase().replaceAll(' ', '_');
+    if (value.isEmpty || value == 'single' || value == 'normal') {
+      return null;
+    }
+    return switch (value) {
+      'double_faced' || 'dfc' || 'transform' => 'transform',
+      'modal_dfc' || 'mdfc' => 'modal_dfc',
+      'split' => 'split',
+      'flip' => 'flip',
+      'adventure' => 'adventure',
+      'meld' => 'meld',
+      _ => value,
+    };
   }
 }

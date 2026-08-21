@@ -4,6 +4,7 @@
 /// v2 introduced the location graph.
 /// v3 adds Asset.quantity and AssetType.parentId (type hierarchy).
 /// v4 adds card catalog cache (Scryfall printings + catalog meta).
+/// v5 adds card layout + faces_json for multi-face printings.
 abstract final class DatabaseMigrations {
-  static const int schemaVersion = 4;
+  static const int schemaVersion = 5;
 }

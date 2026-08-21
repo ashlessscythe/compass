@@ -5,6 +5,8 @@ abstract final class MtgMetadataKeys {
   static const setCode = 'set';
   static const collectorNumber = 'collectorNumber';
   static const finish = 'finish';
+  static const layout = 'layout';
+  static const condition = 'condition';
 
   /// Prefer canonical key; accept legacy import key.
   static String? scryfallIdOf(Map<String, dynamic> values) {

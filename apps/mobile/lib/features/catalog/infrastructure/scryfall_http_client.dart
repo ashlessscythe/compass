@@ -146,36 +146,90 @@ class ScryfallHttpClient {
       return null;
     }
 
-    Map<String, dynamic>? images;
+    Map<String, dynamic>? topImages;
     final rawImages = json['image_uris'];
     if (rawImages is Map) {
-      images = Map<String, dynamic>.from(rawImages);
+      topImages = Map<String, dynamic>.from(rawImages);
     }
 
-    Map<String, dynamic>? faceImages;
-    final faces = json['card_faces'];
-    if (images == null && faces is List && faces.isNotEmpty) {
-      final first = faces.first;
-      if (first is Map) {
-        final face = Map<String, dynamic>.from(first);
-        final faceUris = face['image_uris'];
-        if (faceUris is Map) {
-          faceImages = Map<String, dynamic>.from(faceUris);
+    final faces = <CardFace>[];
+    final rawFaces = json['card_faces'];
+    if (rawFaces is List) {
+      for (final item in rawFaces) {
+        if (item is! Map) {
+          continue;
+        }
+        final face = Map<String, dynamic>.from(item);
+        Map<String, dynamic>? faceUris;
+        final rawFaceUris = face['image_uris'];
+        if (rawFaceUris is Map) {
+          faceUris = Map<String, dynamic>.from(rawFaceUris);
+        }
+        faces.add(
+          CardFace(
+            name: _stringOf(face['name']) ?? '',
+            typeLine: _stringOf(face['type_line']),
+            manaCost: _stringOf(face['mana_cost']),
+            imageSmallUrl: faceUris == null ? null : _stringOf(faceUris['small']),
+            imageNormalUrl:
+                faceUris == null ? null : _stringOf(faceUris['normal']),
+          ),
+        );
+      }
+    }
+
+    // Single-image layouts: synthesize one face from top-level fields.
+    if (faces.isEmpty) {
+      faces.add(
+        CardFace(
+          name: _stringOf(json['name']) ?? '',
+          typeLine: _stringOf(json['type_line']),
+          manaCost: _stringOf(json['mana_cost']),
+          imageSmallUrl:
+              topImages == null ? null : _stringOf(topImages['small']),
+          imageNormalUrl:
+              topImages == null ? null : _stringOf(topImages['normal']),
+        ),
+      );
+    } else if (topImages != null) {
+      // Split / flip often share one card image at the top level.
+      final small = _stringOf(topImages['small']);
+      final normal = _stringOf(topImages['normal']);
+      for (var i = 0; i < faces.length; i++) {
+        final face = faces[i];
+        if ((face.imageSmallUrl == null || face.imageSmallUrl!.isEmpty) &&
+            small != null) {
+          faces[i] = CardFace(
+            name: face.name,
+            typeLine: face.typeLine,
+            manaCost: face.manaCost,
+            imageSmallUrl: small,
+            imageNormalUrl: face.imageNormalUrl ?? normal,
+          );
         }
       }
     }
-    final uris = images ?? faceImages;
+
+    final front = faces.first;
+    final imageSmall = topImages == null
+        ? front.imageSmallUrl
+        : _stringOf(topImages['small']) ?? front.imageSmallUrl;
+    final imageNormal = topImages == null
+        ? front.imageNormalUrl
+        : _stringOf(topImages['normal']) ?? front.imageNormalUrl;
 
     return CardPrinting(
       id: id,
       oracleId: _stringOf(json['oracle_id']),
-      name: _stringOf(json['name']) ?? '',
+      name: _stringOf(json['name']) ?? front.name,
       setCode: (_stringOf(json['set']) ?? '').toLowerCase(),
       collectorNumber: _stringOf(json['collector_number']) ?? '',
-      typeLine: _stringOf(json['type_line']),
-      manaCost: _stringOf(json['mana_cost']),
-      imageSmallUrl: uris == null ? null : _stringOf(uris['small']),
-      imageNormalUrl: uris == null ? null : _stringOf(uris['normal']),
+      layout: _stringOf(json['layout']),
+      typeLine: _stringOf(json['type_line']) ?? front.typeLine,
+      manaCost: _stringOf(json['mana_cost']) ?? front.manaCost,
+      imageSmallUrl: imageSmall,
+      imageNormalUrl: imageNormal,
+      faces: faces,
       fetchedAt: DateTime.now().toUtc(),
     );
   }

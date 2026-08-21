@@ -40,11 +40,15 @@ class CardMatchService {
     Asset asset, {
     bool allowNetwork = true,
     bool prefetchImage = true,
+    bool ignoreExistingScryfallId = false,
+    bool forceNetwork = false,
   }) async {
     try {
       final values = asset.metadata.values;
       final printing = await _catalog.resolve(
-        scryfallId: MtgMetadataKeys.scryfallIdOf(values),
+        scryfallId: ignoreExistingScryfallId
+            ? null
+            : MtgMetadataKeys.scryfallIdOf(values),
         setCode: MtgMetadataKeys.stringOf(values, MtgMetadataKeys.setCode),
         collectorNumber: MtgMetadataKeys.stringOf(
           values,
@@ -52,11 +56,16 @@ class CardMatchService {
         ),
         name: asset.name,
         allowNetwork: allowNetwork,
+        forceNetwork: forceNetwork,
       );
       if (printing == null) {
         return const Result.success(null);
       }
-      await _bindAsset(asset, printing);
+      await _bindAsset(
+        asset,
+        printing,
+        replaceExisting: ignoreExistingScryfallId || forceNetwork,
+      );
       if (prefetchImage) {
         try {
           await _images.ensureImage(
@@ -64,6 +73,16 @@ class CardMatchService {
             size: CardImageSize.small,
             url: printing.imageSmallUrl,
           );
+          if (printing.isMultiFace) {
+            for (var i = 1; i < printing.faces.length; i++) {
+              await _images.ensureImage(
+                scryfallId: printing.id,
+                size: CardImageSize.small,
+                url: printing.imageUrlForFace(i, normal: false),
+                faceIndex: i,
+              );
+            }
+          }
         } on Object {
           // Image cache is best-effort (path_provider may be unavailable in tests).
         }
@@ -72,6 +91,39 @@ class CardMatchService {
     } on Object catch (error) {
       return Result.failure(
         Failure.unexpected(message: 'Failed to match card', cause: error),
+      );
+    }
+  }
+
+  /// Re-resolve using set / collector / name, ignoring any bound Scryfall id.
+  Future<Result<CardPrinting?>> rematchAsset(
+    Asset asset, {
+    bool allowNetwork = true,
+  }) {
+    return matchAsset(
+      asset,
+      allowNetwork: allowNetwork,
+      ignoreExistingScryfallId: true,
+      forceNetwork: true,
+    );
+  }
+
+  Future<Result<Asset>> clearMatch(Asset asset) async {
+    try {
+      final values = Map<String, dynamic>.from(asset.metadata.values);
+      final hadId = MtgMetadataKeys.scryfallIdOf(values) != null;
+      values.remove(MtgMetadataKeys.scryfallCardId);
+      values.remove(MtgMetadataKeys.legacyScryfallId);
+      if (!hadId) {
+        return Result.success(asset);
+      }
+      return await _assets.updateMetadata(
+        id: asset.id,
+        metadata: Metadata(values: values),
+      );
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(message: 'Failed to clear match', cause: error),
       );
     }
   }
@@ -170,20 +222,34 @@ class CardMatchService {
     }
   }
 
-  Future<void> _bindAsset(Asset asset, CardPrinting printing) async {
+  Future<void> _bindAsset(
+    Asset asset,
+    CardPrinting printing, {
+    bool replaceExisting = false,
+  }) async {
     final values = Map<String, dynamic>.from(asset.metadata.values);
     final existing = MtgMetadataKeys.scryfallIdOf(values);
-    if (existing == printing.id &&
+    if (!replaceExisting &&
+        existing == printing.id &&
         values.containsKey(MtgMetadataKeys.scryfallCardId)) {
       return;
     }
     values[MtgMetadataKeys.scryfallCardId] = printing.id;
     values.remove(MtgMetadataKeys.legacyScryfallId);
-    values.putIfAbsent(MtgMetadataKeys.setCode, () => printing.setCode);
-    values.putIfAbsent(
-      MtgMetadataKeys.collectorNumber,
-      () => printing.collectorNumber,
-    );
+    if (replaceExisting ||
+        MtgMetadataKeys.stringOf(values, MtgMetadataKeys.setCode) == null) {
+      values[MtgMetadataKeys.setCode] = printing.setCode;
+    }
+    if (replaceExisting ||
+        MtgMetadataKeys.stringOf(values, MtgMetadataKeys.collectorNumber) ==
+            null) {
+      values[MtgMetadataKeys.collectorNumber] = printing.collectorNumber;
+    }
+    if (printing.layout != null &&
+        (replaceExisting ||
+            MtgMetadataKeys.stringOf(values, MtgMetadataKeys.layout) == null)) {
+      values[MtgMetadataKeys.layout] = printing.layout;
+    }
     await _assets.updateMetadata(
       id: asset.id,
       metadata: Metadata(values: values),
