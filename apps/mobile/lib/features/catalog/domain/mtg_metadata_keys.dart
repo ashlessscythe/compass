@@ -86,10 +86,13 @@ String normalizeCardName(String name) {
 CatalogMatchKey? matchKeyFromAsset({
   required String name,
   required Map<String, dynamic> metadata,
+  bool ignoreScryfallId = false,
 }) {
-  final id = MtgMetadataKeys.scryfallIdOf(metadata);
-  if (id != null) {
-    return CatalogMatchKey.scryfallId(id);
+  if (!ignoreScryfallId) {
+    final id = MtgMetadataKeys.scryfallIdOf(metadata);
+    if (id != null) {
+      return CatalogMatchKey.scryfallId(id);
+    }
   }
   final setCode = MtgMetadataKeys.stringOf(metadata, MtgMetadataKeys.setCode);
   final collector = MtgMetadataKeys.stringOf(

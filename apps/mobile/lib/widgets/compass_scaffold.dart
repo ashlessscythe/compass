@@ -1,5 +1,7 @@
+import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Shared page shell aligned with Home: soft gradient, padded body.
 class CompassScaffold extends StatelessWidget {
@@ -21,11 +23,28 @@ class CompassScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final canPop = ModalRoute.of(context)?.canPop ?? false;
+    final effectiveLeading = leading ??
+        (canPop
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const BackButton(),
+                  IconButton(
+                    tooltip: 'Home',
+                    icon: const Icon(Icons.home_outlined),
+                    onPressed: () => context.go(AppRoutes.home),
+                  ),
+                ],
+              )
+            : null);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        leading: leading,
+        leading: effectiveLeading,
+        leadingWidth: leading == null && canPop ? 96 : null,
+        automaticallyImplyLeading: effectiveLeading == null,
         actions: actions,
       ),
       floatingActionButton: floatingActionButton,

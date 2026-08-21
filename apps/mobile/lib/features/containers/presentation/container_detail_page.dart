@@ -64,6 +64,16 @@ class ContainerDetailPage extends ConsumerWidget {
     return CompassScaffold(
       title: container.name,
       actions: [
+        if (heldAssets.isNotEmpty)
+          IconButton(
+            tooltip: 'Refetch all',
+            onPressed: () => runCardRematchForAssets(
+              context,
+              ref,
+              assets: heldAssets,
+            ),
+            icon: const Icon(Icons.refresh),
+          ),
         IconButton(
           tooltip: nfcPaired ? 'Unpair NFC' : 'Pair NFC',
           onPressed: () => _nfcAction(context, ref, container!),

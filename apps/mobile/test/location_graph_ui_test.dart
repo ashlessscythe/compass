@@ -113,7 +113,19 @@ void main() {
     await tester.tap(find.text('Binder'));
     await tester.pumpAndSettle();
     await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
-    await tester.tap(find.text('Lightning Bolt'));
+    await tester.tap(
+      find.ancestor(
+        of: find.text('Lightning Bolt'),
+        matching: find.byType(InkWell),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Where'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Where'), findsOneWidget);
@@ -136,6 +148,72 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Add container'), findsWidgets);
+
+    await database.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('home button clears stack back to main page', (tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+        ],
+        child: const CompassApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pumpAndSettle();
+
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Office');
+    await tester.tap(find.text('Office'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add container', name: 'Binder');
+    await tester.tap(find.text('Binder'));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Home'), findsOneWidget);
+    await tester.tap(find.byTooltip('Home'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppConstants.appName), findsWidgets);
+    expect(find.text('Search by name'), findsOneWidget);
+    expect(find.text('Add asset'), findsNothing);
+
+    await database.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('container refetch all appears when assets are present',
+      (tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+        ],
+        child: const CompassApp(),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pumpAndSettle();
+
+    await _addNamed(tester, buttonLabel: 'Add place', name: 'Office');
+    await tester.tap(find.text('Office'));
+    await tester.pumpAndSettle();
+    await _addNamed(tester, buttonLabel: 'Add container', name: 'Binder');
+    await tester.tap(find.text('Binder'));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Refetch all'), findsNothing);
+
+    await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
+    expect(find.byTooltip('Refetch all'), findsOneWidget);
 
     await database.close();
     await tester.pumpWidget(const SizedBox.shrink());
@@ -256,17 +334,26 @@ void main() {
     await tester.tap(find.text('Binder'));
     await tester.pumpAndSettle();
     await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
-    await tester.tap(find.text('Lightning Bolt'));
+    await tester.tap(
+      find.ancestor(
+        of: find.text('Lightning Bolt'),
+        matching: find.byType(InkWell),
+      ),
+    );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Delete'));
+    await tester.tap(find.byTooltip('More'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete').last);
     await tester.pumpAndSettle();
     expect(find.text('Delete asset?'), findsOneWidget);
     await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
     await tester.pumpAndSettle();
     expect(find.text('Lightning Bolt'), findsWidgets);
 
-    await tester.tap(find.byTooltip('Delete'));
+    await tester.tap(find.byTooltip('More'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete').last);
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     await tester.pumpAndSettle();

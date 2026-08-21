@@ -156,6 +156,49 @@ void main() {
     );
   });
 
+  test('rematchAssets ignores bound ids and force-refetches by set/name',
+      () async {
+    await seedFixtureCatalog();
+
+    final office = (await container
+            .read(locationServiceProvider)
+            .createLocation(name: 'Office'))
+        .valueOrNull!;
+    final binder =
+        (await container.read(containerServiceProvider).createContainer(
+              name: 'Binder',
+              locationId: office.id,
+            ))
+            .valueOrNull!;
+
+    final created = await container.read(assetServiceProvider).createAsset(
+          name: 'Lightning Bolt',
+          containerId: binder.id,
+          metadata: const Metadata(
+            values: {
+              MtgMetadataKeys.scryfallCardId: 'stale-id',
+              MtgMetadataKeys.setCode: 'lea',
+              MtgMetadataKeys.collectorNumber: '161',
+            },
+          ),
+        );
+    final asset = created.valueOrNull!;
+
+    final summary = await matchService.rematchAssets(
+      [asset],
+      allowNetwork: true,
+    );
+    expect(summary.isSuccess, isTrue);
+    expect(summary.valueOrNull!.matched, 1);
+
+    final refreshed =
+        await container.read(assetServiceProvider).getAsset(asset.id);
+    expect(
+      MtgMetadataKeys.scryfallIdOf(refreshed.valueOrNull!.metadata.values),
+      'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+    );
+  });
+
   test('legacy scryfallId metadata is accepted', () {
     final id = MtgMetadataKeys.scryfallIdOf({
       MtgMetadataKeys.legacyScryfallId: 'legacy-id',

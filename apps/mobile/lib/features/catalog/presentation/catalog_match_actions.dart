@@ -99,6 +99,52 @@ Future<void> runCardMatchForAssets(
   );
 }
 
+Future<void> runCardRematchForAssets(
+  BuildContext context,
+  WidgetRef ref, {
+  required List<Asset> assets,
+}) async {
+  final enabled = ref.read(catalogEnabledProvider);
+  if (!enabled) {
+    showFailureSnackBar(
+      context,
+      'MTG catalog is turned off in Settings.',
+    );
+    return;
+  }
+
+  if (assets.isEmpty) {
+    return;
+  }
+
+  await _runBusy(
+    context,
+    title: 'Refetching cards…',
+    work: () async {
+      final result = await ref.read(cardMatchServiceProvider).rematchAssets(
+            assets,
+            allowNetwork: true,
+          );
+      if (!context.mounted) {
+        return;
+      }
+      if (result.isFailure) {
+        showFailureSnackBar(context, result.failureOrNull!.message);
+        return;
+      }
+      final summary = result.valueOrNull!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Refetched ${summary.matched} of ${summary.considered} '
+            '(${summary.uniqueKeys} unique)',
+          ),
+        ),
+      );
+    },
+  );
+}
+
 Future<void> runSingleCardMatch(
   BuildContext context,
   WidgetRef ref,

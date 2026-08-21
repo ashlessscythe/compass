@@ -108,6 +108,97 @@ class CardMatchService {
     );
   }
 
+  /// Force-network rematch for many assets (set / collector / name keys).
+  Future<Result<CardMatchSummary>> rematchAssets(
+    List<Asset> assets, {
+    required bool allowNetwork,
+    void Function(int done, int total)? onProgress,
+  }) async {
+    try {
+      final targets = <Asset>[];
+      final keyToAssets = <String, List<Asset>>{};
+      final keyOrder = <CatalogMatchKey>[];
+
+      for (final asset in assets) {
+        final key = matchKeyFromAsset(
+          name: asset.name,
+          metadata: asset.metadata.values,
+          ignoreScryfallId: true,
+        );
+        if (key == null) {
+          continue;
+        }
+        targets.add(asset);
+        final list = keyToAssets.putIfAbsent(key.dedupeId, () {
+          keyOrder.add(key);
+          return <Asset>[];
+        });
+        list.add(asset);
+      }
+
+      var matched = 0;
+      var unresolved = 0;
+      var done = 0;
+      final total = keyOrder.length;
+
+      for (final key in keyOrder) {
+        final group = keyToAssets[key.dedupeId]!;
+        final printing = await switch (key) {
+          ScryfallIdKey(:final id) => _catalog.resolve(
+              scryfallId: id,
+              allowNetwork: allowNetwork,
+              forceNetwork: true,
+            ),
+          SetCollectorKey(:final setCode, :final collectorNumber) =>
+            _catalog.resolve(
+              setCode: setCode,
+              collectorNumber: collectorNumber,
+              allowNetwork: allowNetwork,
+              forceNetwork: true,
+            ),
+          NameKey(:final name) => _catalog.resolve(
+              name: name,
+              allowNetwork: allowNetwork,
+              forceNetwork: true,
+            ),
+        };
+
+        if (printing == null) {
+          unresolved += group.length;
+        } else {
+          for (final asset in group) {
+            await _bindAsset(asset, printing, replaceExisting: true);
+            matched++;
+          }
+          try {
+            await _images.ensureImage(
+              scryfallId: printing.id,
+              size: CardImageSize.small,
+              url: printing.imageSmallUrl,
+            );
+          } on Object {
+            // Image cache is best-effort.
+          }
+        }
+        done++;
+        onProgress?.call(done, total);
+      }
+
+      return Result.success(
+        CardMatchSummary(
+          considered: targets.length,
+          matched: matched,
+          unresolved: unresolved,
+          uniqueKeys: keyOrder.length,
+        ),
+      );
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(message: 'Failed to rematch cards', cause: error),
+      );
+    }
+  }
+
   Future<Result<Asset>> clearMatch(Asset asset) async {
     try {
       final values = Map<String, dynamic>.from(asset.metadata.values);
