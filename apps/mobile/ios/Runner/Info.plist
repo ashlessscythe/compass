@@ -26,6 +26,14 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Compass uses the camera so you can photograph items when adding them to your inventory.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Compass may use your location when you attach photos that include location information.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Compass uses your photo library so you can attach photos to items and pick files to import.</string>
 	<key>NFCReaderUsageDescription</key>
 	<string>Compass reads NFC stickers on containers so you can tap a box to open it.</string>
 	<key>UIApplicationSceneManifest</key>
