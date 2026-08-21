@@ -5,6 +5,7 @@ import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
+import 'package:compass/features/nfc/application/nfc_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
@@ -55,9 +56,25 @@ class ContainerDetailPage extends ConsumerWidget {
         .where((item) => item.containerId == containerId)
         .toList(growable: false);
 
+    final nfcPaired = container.nfcTagId != null;
+    final scheme = Theme.of(context).colorScheme;
+
     return CompassScaffold(
       title: container.name,
       actions: [
+        IconButton(
+          tooltip: nfcPaired ? 'Unpair NFC' : 'Pair NFC',
+          onPressed: () => _nfcAction(context, ref, container!),
+          icon: Badge(
+            isLabelVisible: nfcPaired,
+            smallSize: 8,
+            backgroundColor: scheme.primary,
+            child: Icon(
+              nfcPaired ? Icons.nfc : Icons.nfc_outlined,
+              color: nfcPaired ? scheme.primary : null,
+            ),
+          ),
+        ),
         IconButton(
           tooltip: 'Rename',
           onPressed: () => _rename(context, ref, container!),
@@ -98,6 +115,11 @@ class ContainerDetailPage extends ConsumerWidget {
               containerById,
               currentContainerId: containerId,
             ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _NfcStatusRow(
+            paired: nfcPaired,
+            tagId: container.nfcTagId,
           ),
           const SizedBox(height: AppSpacing.lg),
           if (nested.isEmpty && heldAssets.isEmpty)
@@ -181,6 +203,57 @@ class ContainerDetailPage extends ConsumerWidget {
     if (context.mounted && result.isFailure) {
       showFailureSnackBar(context, result.failureOrNull!.message);
     }
+  }
+
+  Future<void> _nfcAction(
+    BuildContext context,
+    WidgetRef ref,
+    graph.Container container,
+  ) async {
+    if (container.nfcTagId != null) {
+      final confirmed = await confirmDelete(
+        context,
+        title: 'Unpair NFC tag?',
+        body: 'This sticker will no longer open ${container.name}. '
+            'You can pair it again later.',
+        confirmLabel: 'Unpair',
+      );
+      if (!confirmed || !context.mounted) {
+        return;
+      }
+      final result =
+          await ref.read(nfcServiceProvider).unpairContainer(container.id);
+      if (!context.mounted) {
+        return;
+      }
+      if (result.isFailure) {
+        showFailureSnackBar(context, result.failureOrNull!.message);
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('NFC tag unpaired')),
+      );
+      return;
+    }
+
+    final result =
+        await ref.read(nfcServiceProvider).pairContainer(container.id);
+    if (!context.mounted) {
+      return;
+    }
+    if (result.isFailure) {
+      final failure = result.failureOrNull!;
+      if (failure.message == 'NFC scan cancelled') {
+        return;
+      }
+      showFailureSnackBar(context, failure.message);
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Paired NFC · ${result.valueOrNull!.nfcTagId}'),
+      ),
+    );
   }
 
   Future<void> _rename(
@@ -298,6 +371,40 @@ class ContainerDetailPage extends ConsumerWidget {
       return;
     }
     context.pop();
+  }
+}
+
+class _NfcStatusRow extends StatelessWidget {
+  const _NfcStatusRow({required this.paired, this.tagId});
+
+  final bool paired;
+  final String? tagId;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final style = Theme.of(context).textTheme.bodySmall;
+    if (!paired) {
+      return Text(
+        'No NFC tag paired',
+        style: style?.copyWith(color: scheme.onSurfaceVariant),
+      );
+    }
+    return Row(
+      children: [
+        Icon(Icons.nfc, size: 16, color: scheme.primary),
+        const SizedBox(width: AppSpacing.xs),
+        Expanded(
+          child: Text(
+            'NFC paired · $tagId',
+            style: style?.copyWith(
+              color: scheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

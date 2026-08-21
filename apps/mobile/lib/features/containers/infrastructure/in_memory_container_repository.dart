@@ -54,6 +54,20 @@ class InMemoryContainerRepository implements ContainerRepository {
         .toList(growable: false);
   }
 
+  @override
+  Future<Container?> getByNfcTagId(String nfcTagId) async {
+    final tag = nfcTagId.trim();
+    if (tag.isEmpty) {
+      return null;
+    }
+    for (final container in _store.values) {
+      if (container.nfcTagId == tag) {
+        return container;
+      }
+    }
+    return null;
+  }
+
   Future<void> dispose() async {
     await _controller.close();
   }

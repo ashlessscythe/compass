@@ -4,6 +4,7 @@ import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
+import 'package:compass/features/nfc/application/nfc_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_colors.dart';
@@ -64,6 +65,11 @@ class HomePage extends HookConsumerWidget {
                         children: [
                           const CompassMark(size: 36),
                           const Spacer(),
+                          IconButton(
+                            tooltip: 'Scan NFC',
+                            onPressed: () => _scanNfc(context, ref),
+                            icon: const Icon(Icons.nfc_outlined),
+                          ),
                           IconButton(
                             tooltip: 'Settings',
                             onPressed: () => context.push(AppRoutes.settings),
@@ -181,6 +187,23 @@ class HomePage extends HookConsumerWidget {
     if (context.mounted && result.isFailure) {
       showFailureSnackBar(context, result.failureOrNull!.message);
     }
+  }
+
+  Future<void> _scanNfc(BuildContext context, WidgetRef ref) async {
+    final result =
+        await ref.read(nfcServiceProvider).openContainerFromScan();
+    if (!context.mounted) {
+      return;
+    }
+    if (result.isFailure) {
+      final failure = result.failureOrNull!;
+      if (failure.message == 'NFC scan cancelled') {
+        return;
+      }
+      showFailureSnackBar(context, failure.message);
+      return;
+    }
+    await context.push(AppRoutes.containerPath(result.valueOrNull!.id));
   }
 }
 

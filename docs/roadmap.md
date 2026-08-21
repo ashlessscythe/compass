@@ -13,7 +13,7 @@
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
-iOS UI craft for the location graph is through UX-6 (stills). Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Next product work: NFC, Scryfall enrichment.
+iOS UI craft for the location graph is through UX-6 (stills). Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Next product work: Scryfall enrichment.
 
 ## Next — MTG MVP
 
@@ -21,7 +21,7 @@ iOS UI craft for the location graph is through UX-6 (stills). Sequence and exit 
 - [x] Nested containers (location = place, container = vessel)
 - [x] Search: item → location path
 - [x] iOS UX pass (first run → confirm delete → move → chrome → sheets → stills)
-- [ ] NFC tag association for containers
+- [x] NFC tag association for containers (chip UID; Home → Scan NFC)
 - [x] Import from CSV (Deckbox / Moxfield / generic headers → container; Settings → Import CSV)
 - [x] Import adapters for Deckbox and Moxfield (header dialects on the shared CSV surface)
 - [ ] Scryfall catalog for MTG images/stats (configurable; cache locally)

@@ -191,6 +191,94 @@ class ContainerService {
     }
   }
 
+  /// Bind an NFC chip UID to this container (clears the same UID elsewhere).
+  Future<Result<Container>> pairNfcTag({
+    required String id,
+    required String nfcTagId,
+  }) async {
+    final tag = nfcTagId.trim().toUpperCase();
+    if (tag.isEmpty) {
+      return const Result.failure(
+        Failure.validation(message: 'NFC tag id is required'),
+      );
+    }
+
+    try {
+      final existing = await _repository.getById(id);
+      if (existing == null) {
+        return Result.failure(Failure.notFound(entity: 'Container', id: id));
+      }
+
+      final owner = await _repository.getByNfcTagId(tag);
+      if (owner != null && owner.id != id) {
+        await _repository.update(
+          owner.copyWith(
+            nfcTagId: null,
+            updatedAt: DateTime.now().toUtc(),
+          ),
+        );
+      }
+
+      if (existing.nfcTagId == tag) {
+        return Result.success(existing);
+      }
+
+      final updated = existing.copyWith(
+        nfcTagId: tag,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      return Result.success(await _repository.update(updated));
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(
+          message: 'Failed to pair NFC tag',
+          cause: error,
+        ),
+      );
+    }
+  }
+
+  Future<Result<Container>> clearNfcTag(String id) async {
+    try {
+      final existing = await _repository.getById(id);
+      if (existing == null) {
+        return Result.failure(Failure.notFound(entity: 'Container', id: id));
+      }
+      if (existing.nfcTagId == null) {
+        return Result.success(existing);
+      }
+      final updated = existing.copyWith(
+        nfcTagId: null,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      return Result.success(await _repository.update(updated));
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(
+          message: 'Failed to clear NFC tag',
+          cause: error,
+        ),
+      );
+    }
+  }
+
+  Future<Result<Container?>> findByNfcTagId(String nfcTagId) async {
+    try {
+      final tag = nfcTagId.trim().toUpperCase();
+      if (tag.isEmpty) {
+        return const Result.success(null);
+      }
+      return Result.success(await _repository.getByNfcTagId(tag));
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(
+          message: 'Failed to look up NFC tag',
+          cause: error,
+        ),
+      );
+    }
+  }
+
   Future<void> _reassignDescendantLocations(Container parent) async {
     final all = await _repository.getAll();
     final children = all.where((item) => item.parentContainerId == parent.id);

@@ -86,6 +86,18 @@ class DriftContainerRepository implements ContainerRepository {
         .get();
     return rows.map(_toDomain).toList(growable: false);
   }
+
+  @override
+  Future<Container?> getByNfcTagId(String nfcTagId) async {
+    final tag = nfcTagId.trim();
+    if (tag.isEmpty) {
+      return null;
+    }
+    final row = await (_db.select(_db.containers)
+          ..where((t) => t.nfcTagId.equals(tag)))
+        .getSingleOrNull();
+    return row == null ? null : _toDomain(row);
+  }
 }
 
 String _sanitizeLike(String query) {

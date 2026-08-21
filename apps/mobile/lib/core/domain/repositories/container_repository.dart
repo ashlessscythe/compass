@@ -15,4 +15,6 @@ abstract interface class ContainerRepository {
   Future<void> delete(String id);
 
   Future<List<Container>> searchByName(String query);
+
+  Future<Container?> getByNfcTagId(String nfcTagId);
 }

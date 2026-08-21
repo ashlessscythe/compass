@@ -129,6 +129,7 @@ flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 
 - Location graph persists in SQLite (Drift). Search by name shows the physical path.
 - Settings → Import CSV accepts Deckbox, Moxfield, and generic collection exports into a chosen container.
+- NFC: on a physical iPhone, open a container → Pair NFC (stores chip UID). Home → Scan NFC opens that container. Simulator cannot exercise NFC.
 - Do not put business logic in widgets.
 
 ## UI captures
