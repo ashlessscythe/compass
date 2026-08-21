@@ -140,6 +140,30 @@ class AssetService {
       );
     }
   }
+
+  Future<Result<Asset>> updateMetadata({
+    required String id,
+    required Metadata metadata,
+  }) async {
+    try {
+      final existing = await _repository.getById(id);
+      if (existing == null) {
+        return Result.failure(Failure.notFound(entity: 'Asset', id: id));
+      }
+      final updated = existing.copyWith(
+        metadata: metadata,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      return Result.success(await _repository.update(updated));
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(
+          message: 'Failed to update asset metadata',
+          cause: error,
+        ),
+      );
+    }
+  }
 }
 
 final assetServiceProvider = Provider<AssetService>((ref) {

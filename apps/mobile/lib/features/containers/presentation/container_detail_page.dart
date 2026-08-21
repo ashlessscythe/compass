@@ -3,12 +3,14 @@ import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
+import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/nfc/application/nfc_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
+import 'package:compass/widgets/asset_card_tile.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/confirm_delete.dart';
 import 'package:compass/widgets/empty_state.dart';
@@ -149,10 +151,10 @@ class ContainerDetailPage extends ConsumerWidget {
               title: 'Assets',
               tiles: [
                 for (final item in heldAssets)
-                  GraphTile(
-                    title: item.name,
-                    icon: Icons.style_outlined,
+                  AssetCardTile(
+                    asset: item,
                     onTap: () => context.push(AppRoutes.assetPath(item.id)),
+                    onMatch: () => runSingleCardMatch(context, ref, item),
                   ),
               ],
               addLabel: 'Add asset',

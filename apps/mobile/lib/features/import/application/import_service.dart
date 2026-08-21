@@ -2,6 +2,7 @@ import 'package:compass/core/domain/entities/metadata.dart';
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
+import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/import/domain/csv_import_models.dart';
 import 'package:compass/features/import/infrastructure/csv_collection_parser.dart';
@@ -119,7 +120,7 @@ class ImportService {
       values['finish'] = row.finish;
     }
     if (row.scryfallId != null) {
-      values['scryfallId'] = row.scryfallId;
+      values[MtgMetadataKeys.scryfallCardId] = row.scryfallId;
     }
     return Metadata(values: values);
   }

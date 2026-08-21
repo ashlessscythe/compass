@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** iOS UX pass complete — next product work in [roadmap.md](./roadmap.md) (Scryfall, …)
+**Current milestone:** iOS UX pass complete — next product work in [roadmap.md](./roadmap.md) (sync, …)
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -168,7 +168,7 @@ These are roadmap items. Do not pull them forward to avoid UX-1…UX-5.
 | NFC tag on a container | Done — physical iPhone; chip UID in `nfcTagId` | Tap tag → that container opens from local data |
 | CSV import | Done — Settings → Import CSV | File in → items searchable with a path |
 | Deckbox / Moxfield | Done — auto-detected header dialects on the CSV surface | Adapter lands in the same import surface |
-| Scryfall | Optional enrichment | Catalog off: where-is-it still works; catalog on: art/stats cached |
+| Scryfall | Done — Settings → MTG catalog; Match after import; container thumbs | Catalog off: where works; on: art/stats from local SQLite cache |
 
 Sync, billing, household sharing, and the web collection browser stay later / undecided. Do not block iOS on them.
 

@@ -4,6 +4,8 @@ import 'package:compass/core/domain/entities/container.dart' as graph;
 import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
+import 'package:compass/features/assets/application/asset_service.dart';
+import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/import/application/import_service.dart';
 import 'package:compass/features/import/domain/csv_import_models.dart';
@@ -246,6 +248,36 @@ class ImportPage extends HookConsumerWidget {
         ),
       ),
     );
+
+    final match = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Match with Scryfall?'),
+        content: const Text(
+          'Check the local card catalog (download if needed), '
+          'dedupe rows, and attach art ids for thumbs.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Later'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Match'),
+          ),
+        ],
+      ),
+    );
+    if (match != true || !context.mounted) {
+      return;
+    }
+
+    final assets = ref.read(assetsListProvider).valueOrNull ?? const [];
+    final inContainer = assets
+        .where((item) => item.containerId == container.id)
+        .toList(growable: false);
+    await runCardMatchForAssets(context, ref, assets: inContainer);
   }
 }
 

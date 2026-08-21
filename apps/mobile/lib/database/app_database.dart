@@ -3,6 +3,7 @@ import 'package:compass/database/connection/connection.dart';
 import 'package:compass/database/migrations/migrations.dart';
 import 'package:compass/database/tables/asset_types.dart';
 import 'package:compass/database/tables/assets.dart';
+import 'package:compass/database/tables/card_printings.dart';
 import 'package:compass/database/tables/containers.dart';
 import 'package:compass/database/tables/locations.dart';
 import 'package:drift/drift.dart';
@@ -10,7 +11,16 @@ import 'package:drift/drift.dart';
 part 'app_database.g.dart';
 
 /// Local SQLite database for Compass.
-@DriftDatabase(tables: [Locations, Containers, AssetTypes, Assets])
+@DriftDatabase(
+  tables: [
+    Locations,
+    Containers,
+    AssetTypes,
+    Assets,
+    CardPrintings,
+    CatalogMeta,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? openConnection());
 
@@ -28,9 +38,15 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
             await m.createAll();
-          } else if (from < 3) {
-            await m.addColumn(assets, assets.quantity);
-            await m.addColumn(assetTypes, assetTypes.parentId);
+          } else {
+            if (from < 3) {
+              await m.addColumn(assets, assets.quantity);
+              await m.addColumn(assetTypes, assetTypes.parentId);
+            }
+            if (from < 4) {
+              await m.createTable(cardPrintings);
+              await m.createTable(catalogMeta);
+            }
           }
         },
         beforeOpen: (details) async {

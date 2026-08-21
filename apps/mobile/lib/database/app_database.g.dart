@@ -2283,6 +2283,951 @@ class AssetsCompanion extends UpdateCompanion<AssetRow> {
   }
 }
 
+class $CardPrintingsTable extends CardPrintings
+    with TableInfo<$CardPrintingsTable, CardPrintingRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CardPrintingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _oracleIdMeta = const VerificationMeta(
+    'oracleId',
+  );
+  @override
+  late final GeneratedColumn<String> oracleId = GeneratedColumn<String>(
+    'oracle_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameNormalizedMeta = const VerificationMeta(
+    'nameNormalized',
+  );
+  @override
+  late final GeneratedColumn<String> nameNormalized = GeneratedColumn<String>(
+    'name_normalized',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _setCodeMeta = const VerificationMeta(
+    'setCode',
+  );
+  @override
+  late final GeneratedColumn<String> setCode = GeneratedColumn<String>(
+    'set_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _collectorNumberMeta = const VerificationMeta(
+    'collectorNumber',
+  );
+  @override
+  late final GeneratedColumn<String> collectorNumber = GeneratedColumn<String>(
+    'collector_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeLineMeta = const VerificationMeta(
+    'typeLine',
+  );
+  @override
+  late final GeneratedColumn<String> typeLine = GeneratedColumn<String>(
+    'type_line',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _manaCostMeta = const VerificationMeta(
+    'manaCost',
+  );
+  @override
+  late final GeneratedColumn<String> manaCost = GeneratedColumn<String>(
+    'mana_cost',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _imageSmallUrlMeta = const VerificationMeta(
+    'imageSmallUrl',
+  );
+  @override
+  late final GeneratedColumn<String> imageSmallUrl = GeneratedColumn<String>(
+    'image_small_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _imageNormalUrlMeta = const VerificationMeta(
+    'imageNormalUrl',
+  );
+  @override
+  late final GeneratedColumn<String> imageNormalUrl = GeneratedColumn<String>(
+    'image_normal_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fetchedAtMeta = const VerificationMeta(
+    'fetchedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> fetchedAt = GeneratedColumn<DateTime>(
+    'fetched_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    oracleId,
+    name,
+    nameNormalized,
+    setCode,
+    collectorNumber,
+    typeLine,
+    manaCost,
+    imageSmallUrl,
+    imageNormalUrl,
+    fetchedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'card_printings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CardPrintingRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('oracle_id')) {
+      context.handle(
+        _oracleIdMeta,
+        oracleId.isAcceptableOrUnknown(data['oracle_id']!, _oracleIdMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('name_normalized')) {
+      context.handle(
+        _nameNormalizedMeta,
+        nameNormalized.isAcceptableOrUnknown(
+          data['name_normalized']!,
+          _nameNormalizedMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_nameNormalizedMeta);
+    }
+    if (data.containsKey('set_code')) {
+      context.handle(
+        _setCodeMeta,
+        setCode.isAcceptableOrUnknown(data['set_code']!, _setCodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_setCodeMeta);
+    }
+    if (data.containsKey('collector_number')) {
+      context.handle(
+        _collectorNumberMeta,
+        collectorNumber.isAcceptableOrUnknown(
+          data['collector_number']!,
+          _collectorNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_collectorNumberMeta);
+    }
+    if (data.containsKey('type_line')) {
+      context.handle(
+        _typeLineMeta,
+        typeLine.isAcceptableOrUnknown(data['type_line']!, _typeLineMeta),
+      );
+    }
+    if (data.containsKey('mana_cost')) {
+      context.handle(
+        _manaCostMeta,
+        manaCost.isAcceptableOrUnknown(data['mana_cost']!, _manaCostMeta),
+      );
+    }
+    if (data.containsKey('image_small_url')) {
+      context.handle(
+        _imageSmallUrlMeta,
+        imageSmallUrl.isAcceptableOrUnknown(
+          data['image_small_url']!,
+          _imageSmallUrlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('image_normal_url')) {
+      context.handle(
+        _imageNormalUrlMeta,
+        imageNormalUrl.isAcceptableOrUnknown(
+          data['image_normal_url']!,
+          _imageNormalUrlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('fetched_at')) {
+      context.handle(
+        _fetchedAtMeta,
+        fetchedAt.isAcceptableOrUnknown(data['fetched_at']!, _fetchedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fetchedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CardPrintingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CardPrintingRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      oracleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}oracle_id'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      nameNormalized: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_normalized'],
+      )!,
+      setCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}set_code'],
+      )!,
+      collectorNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}collector_number'],
+      )!,
+      typeLine: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type_line'],
+      ),
+      manaCost: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mana_cost'],
+      ),
+      imageSmallUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_small_url'],
+      ),
+      imageNormalUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_normal_url'],
+      ),
+      fetchedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}fetched_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CardPrintingsTable createAlias(String alias) {
+    return $CardPrintingsTable(attachedDatabase, alias);
+  }
+}
+
+class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
+  final String id;
+  final String? oracleId;
+  final String name;
+  final String nameNormalized;
+  final String setCode;
+  final String collectorNumber;
+  final String? typeLine;
+  final String? manaCost;
+  final String? imageSmallUrl;
+  final String? imageNormalUrl;
+  final DateTime fetchedAt;
+  const CardPrintingRow({
+    required this.id,
+    this.oracleId,
+    required this.name,
+    required this.nameNormalized,
+    required this.setCode,
+    required this.collectorNumber,
+    this.typeLine,
+    this.manaCost,
+    this.imageSmallUrl,
+    this.imageNormalUrl,
+    required this.fetchedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || oracleId != null) {
+      map['oracle_id'] = Variable<String>(oracleId);
+    }
+    map['name'] = Variable<String>(name);
+    map['name_normalized'] = Variable<String>(nameNormalized);
+    map['set_code'] = Variable<String>(setCode);
+    map['collector_number'] = Variable<String>(collectorNumber);
+    if (!nullToAbsent || typeLine != null) {
+      map['type_line'] = Variable<String>(typeLine);
+    }
+    if (!nullToAbsent || manaCost != null) {
+      map['mana_cost'] = Variable<String>(manaCost);
+    }
+    if (!nullToAbsent || imageSmallUrl != null) {
+      map['image_small_url'] = Variable<String>(imageSmallUrl);
+    }
+    if (!nullToAbsent || imageNormalUrl != null) {
+      map['image_normal_url'] = Variable<String>(imageNormalUrl);
+    }
+    map['fetched_at'] = Variable<DateTime>(fetchedAt);
+    return map;
+  }
+
+  CardPrintingsCompanion toCompanion(bool nullToAbsent) {
+    return CardPrintingsCompanion(
+      id: Value(id),
+      oracleId: oracleId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oracleId),
+      name: Value(name),
+      nameNormalized: Value(nameNormalized),
+      setCode: Value(setCode),
+      collectorNumber: Value(collectorNumber),
+      typeLine: typeLine == null && nullToAbsent
+          ? const Value.absent()
+          : Value(typeLine),
+      manaCost: manaCost == null && nullToAbsent
+          ? const Value.absent()
+          : Value(manaCost),
+      imageSmallUrl: imageSmallUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imageSmallUrl),
+      imageNormalUrl: imageNormalUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imageNormalUrl),
+      fetchedAt: Value(fetchedAt),
+    );
+  }
+
+  factory CardPrintingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CardPrintingRow(
+      id: serializer.fromJson<String>(json['id']),
+      oracleId: serializer.fromJson<String?>(json['oracleId']),
+      name: serializer.fromJson<String>(json['name']),
+      nameNormalized: serializer.fromJson<String>(json['nameNormalized']),
+      setCode: serializer.fromJson<String>(json['setCode']),
+      collectorNumber: serializer.fromJson<String>(json['collectorNumber']),
+      typeLine: serializer.fromJson<String?>(json['typeLine']),
+      manaCost: serializer.fromJson<String?>(json['manaCost']),
+      imageSmallUrl: serializer.fromJson<String?>(json['imageSmallUrl']),
+      imageNormalUrl: serializer.fromJson<String?>(json['imageNormalUrl']),
+      fetchedAt: serializer.fromJson<DateTime>(json['fetchedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'oracleId': serializer.toJson<String?>(oracleId),
+      'name': serializer.toJson<String>(name),
+      'nameNormalized': serializer.toJson<String>(nameNormalized),
+      'setCode': serializer.toJson<String>(setCode),
+      'collectorNumber': serializer.toJson<String>(collectorNumber),
+      'typeLine': serializer.toJson<String?>(typeLine),
+      'manaCost': serializer.toJson<String?>(manaCost),
+      'imageSmallUrl': serializer.toJson<String?>(imageSmallUrl),
+      'imageNormalUrl': serializer.toJson<String?>(imageNormalUrl),
+      'fetchedAt': serializer.toJson<DateTime>(fetchedAt),
+    };
+  }
+
+  CardPrintingRow copyWith({
+    String? id,
+    Value<String?> oracleId = const Value.absent(),
+    String? name,
+    String? nameNormalized,
+    String? setCode,
+    String? collectorNumber,
+    Value<String?> typeLine = const Value.absent(),
+    Value<String?> manaCost = const Value.absent(),
+    Value<String?> imageSmallUrl = const Value.absent(),
+    Value<String?> imageNormalUrl = const Value.absent(),
+    DateTime? fetchedAt,
+  }) => CardPrintingRow(
+    id: id ?? this.id,
+    oracleId: oracleId.present ? oracleId.value : this.oracleId,
+    name: name ?? this.name,
+    nameNormalized: nameNormalized ?? this.nameNormalized,
+    setCode: setCode ?? this.setCode,
+    collectorNumber: collectorNumber ?? this.collectorNumber,
+    typeLine: typeLine.present ? typeLine.value : this.typeLine,
+    manaCost: manaCost.present ? manaCost.value : this.manaCost,
+    imageSmallUrl: imageSmallUrl.present
+        ? imageSmallUrl.value
+        : this.imageSmallUrl,
+    imageNormalUrl: imageNormalUrl.present
+        ? imageNormalUrl.value
+        : this.imageNormalUrl,
+    fetchedAt: fetchedAt ?? this.fetchedAt,
+  );
+  CardPrintingRow copyWithCompanion(CardPrintingsCompanion data) {
+    return CardPrintingRow(
+      id: data.id.present ? data.id.value : this.id,
+      oracleId: data.oracleId.present ? data.oracleId.value : this.oracleId,
+      name: data.name.present ? data.name.value : this.name,
+      nameNormalized: data.nameNormalized.present
+          ? data.nameNormalized.value
+          : this.nameNormalized,
+      setCode: data.setCode.present ? data.setCode.value : this.setCode,
+      collectorNumber: data.collectorNumber.present
+          ? data.collectorNumber.value
+          : this.collectorNumber,
+      typeLine: data.typeLine.present ? data.typeLine.value : this.typeLine,
+      manaCost: data.manaCost.present ? data.manaCost.value : this.manaCost,
+      imageSmallUrl: data.imageSmallUrl.present
+          ? data.imageSmallUrl.value
+          : this.imageSmallUrl,
+      imageNormalUrl: data.imageNormalUrl.present
+          ? data.imageNormalUrl.value
+          : this.imageNormalUrl,
+      fetchedAt: data.fetchedAt.present ? data.fetchedAt.value : this.fetchedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardPrintingRow(')
+          ..write('id: $id, ')
+          ..write('oracleId: $oracleId, ')
+          ..write('name: $name, ')
+          ..write('nameNormalized: $nameNormalized, ')
+          ..write('setCode: $setCode, ')
+          ..write('collectorNumber: $collectorNumber, ')
+          ..write('typeLine: $typeLine, ')
+          ..write('manaCost: $manaCost, ')
+          ..write('imageSmallUrl: $imageSmallUrl, ')
+          ..write('imageNormalUrl: $imageNormalUrl, ')
+          ..write('fetchedAt: $fetchedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    oracleId,
+    name,
+    nameNormalized,
+    setCode,
+    collectorNumber,
+    typeLine,
+    manaCost,
+    imageSmallUrl,
+    imageNormalUrl,
+    fetchedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CardPrintingRow &&
+          other.id == this.id &&
+          other.oracleId == this.oracleId &&
+          other.name == this.name &&
+          other.nameNormalized == this.nameNormalized &&
+          other.setCode == this.setCode &&
+          other.collectorNumber == this.collectorNumber &&
+          other.typeLine == this.typeLine &&
+          other.manaCost == this.manaCost &&
+          other.imageSmallUrl == this.imageSmallUrl &&
+          other.imageNormalUrl == this.imageNormalUrl &&
+          other.fetchedAt == this.fetchedAt);
+}
+
+class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
+  final Value<String> id;
+  final Value<String?> oracleId;
+  final Value<String> name;
+  final Value<String> nameNormalized;
+  final Value<String> setCode;
+  final Value<String> collectorNumber;
+  final Value<String?> typeLine;
+  final Value<String?> manaCost;
+  final Value<String?> imageSmallUrl;
+  final Value<String?> imageNormalUrl;
+  final Value<DateTime> fetchedAt;
+  final Value<int> rowid;
+  const CardPrintingsCompanion({
+    this.id = const Value.absent(),
+    this.oracleId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.nameNormalized = const Value.absent(),
+    this.setCode = const Value.absent(),
+    this.collectorNumber = const Value.absent(),
+    this.typeLine = const Value.absent(),
+    this.manaCost = const Value.absent(),
+    this.imageSmallUrl = const Value.absent(),
+    this.imageNormalUrl = const Value.absent(),
+    this.fetchedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CardPrintingsCompanion.insert({
+    required String id,
+    this.oracleId = const Value.absent(),
+    required String name,
+    required String nameNormalized,
+    required String setCode,
+    required String collectorNumber,
+    this.typeLine = const Value.absent(),
+    this.manaCost = const Value.absent(),
+    this.imageSmallUrl = const Value.absent(),
+    this.imageNormalUrl = const Value.absent(),
+    required DateTime fetchedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       nameNormalized = Value(nameNormalized),
+       setCode = Value(setCode),
+       collectorNumber = Value(collectorNumber),
+       fetchedAt = Value(fetchedAt);
+  static Insertable<CardPrintingRow> custom({
+    Expression<String>? id,
+    Expression<String>? oracleId,
+    Expression<String>? name,
+    Expression<String>? nameNormalized,
+    Expression<String>? setCode,
+    Expression<String>? collectorNumber,
+    Expression<String>? typeLine,
+    Expression<String>? manaCost,
+    Expression<String>? imageSmallUrl,
+    Expression<String>? imageNormalUrl,
+    Expression<DateTime>? fetchedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (oracleId != null) 'oracle_id': oracleId,
+      if (name != null) 'name': name,
+      if (nameNormalized != null) 'name_normalized': nameNormalized,
+      if (setCode != null) 'set_code': setCode,
+      if (collectorNumber != null) 'collector_number': collectorNumber,
+      if (typeLine != null) 'type_line': typeLine,
+      if (manaCost != null) 'mana_cost': manaCost,
+      if (imageSmallUrl != null) 'image_small_url': imageSmallUrl,
+      if (imageNormalUrl != null) 'image_normal_url': imageNormalUrl,
+      if (fetchedAt != null) 'fetched_at': fetchedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CardPrintingsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? oracleId,
+    Value<String>? name,
+    Value<String>? nameNormalized,
+    Value<String>? setCode,
+    Value<String>? collectorNumber,
+    Value<String?>? typeLine,
+    Value<String?>? manaCost,
+    Value<String?>? imageSmallUrl,
+    Value<String?>? imageNormalUrl,
+    Value<DateTime>? fetchedAt,
+    Value<int>? rowid,
+  }) {
+    return CardPrintingsCompanion(
+      id: id ?? this.id,
+      oracleId: oracleId ?? this.oracleId,
+      name: name ?? this.name,
+      nameNormalized: nameNormalized ?? this.nameNormalized,
+      setCode: setCode ?? this.setCode,
+      collectorNumber: collectorNumber ?? this.collectorNumber,
+      typeLine: typeLine ?? this.typeLine,
+      manaCost: manaCost ?? this.manaCost,
+      imageSmallUrl: imageSmallUrl ?? this.imageSmallUrl,
+      imageNormalUrl: imageNormalUrl ?? this.imageNormalUrl,
+      fetchedAt: fetchedAt ?? this.fetchedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (oracleId.present) {
+      map['oracle_id'] = Variable<String>(oracleId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (nameNormalized.present) {
+      map['name_normalized'] = Variable<String>(nameNormalized.value);
+    }
+    if (setCode.present) {
+      map['set_code'] = Variable<String>(setCode.value);
+    }
+    if (collectorNumber.present) {
+      map['collector_number'] = Variable<String>(collectorNumber.value);
+    }
+    if (typeLine.present) {
+      map['type_line'] = Variable<String>(typeLine.value);
+    }
+    if (manaCost.present) {
+      map['mana_cost'] = Variable<String>(manaCost.value);
+    }
+    if (imageSmallUrl.present) {
+      map['image_small_url'] = Variable<String>(imageSmallUrl.value);
+    }
+    if (imageNormalUrl.present) {
+      map['image_normal_url'] = Variable<String>(imageNormalUrl.value);
+    }
+    if (fetchedAt.present) {
+      map['fetched_at'] = Variable<DateTime>(fetchedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardPrintingsCompanion(')
+          ..write('id: $id, ')
+          ..write('oracleId: $oracleId, ')
+          ..write('name: $name, ')
+          ..write('nameNormalized: $nameNormalized, ')
+          ..write('setCode: $setCode, ')
+          ..write('collectorNumber: $collectorNumber, ')
+          ..write('typeLine: $typeLine, ')
+          ..write('manaCost: $manaCost, ')
+          ..write('imageSmallUrl: $imageSmallUrl, ')
+          ..write('imageNormalUrl: $imageNormalUrl, ')
+          ..write('fetchedAt: $fetchedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CatalogMetaTable extends CatalogMeta
+    with TableInfo<$CatalogMetaTable, CatalogMetaRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CatalogMetaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'catalog_meta';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CatalogMetaRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  CatalogMetaRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CatalogMetaRow(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CatalogMetaTable createAlias(String alias) {
+    return $CatalogMetaTable(attachedDatabase, alias);
+  }
+}
+
+class CatalogMetaRow extends DataClass implements Insertable<CatalogMetaRow> {
+  final String key;
+  final String value;
+  final DateTime updatedAt;
+  const CatalogMetaRow({
+    required this.key,
+    required this.value,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CatalogMetaCompanion toCompanion(bool nullToAbsent) {
+    return CatalogMetaCompanion(
+      key: Value(key),
+      value: Value(value),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CatalogMetaRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CatalogMetaRow(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CatalogMetaRow copyWith({String? key, String? value, DateTime? updatedAt}) =>
+      CatalogMetaRow(
+        key: key ?? this.key,
+        value: value ?? this.value,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  CatalogMetaRow copyWithCompanion(CatalogMetaCompanion data) {
+    return CatalogMetaRow(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CatalogMetaRow(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CatalogMetaRow &&
+          other.key == this.key &&
+          other.value == this.value &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CatalogMetaCompanion extends UpdateCompanion<CatalogMetaRow> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CatalogMetaCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CatalogMetaCompanion.insert({
+    required String key,
+    required String value,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value),
+       updatedAt = Value(updatedAt);
+  static Insertable<CatalogMetaRow> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CatalogMetaCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CatalogMetaCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CatalogMetaCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2290,6 +3235,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ContainersTable containers = $ContainersTable(this);
   late final $AssetTypesTable assetTypes = $AssetTypesTable(this);
   late final $AssetsTable assets = $AssetsTable(this);
+  late final $CardPrintingsTable cardPrintings = $CardPrintingsTable(this);
+  late final $CatalogMetaTable catalogMeta = $CatalogMetaTable(this);
   late final Index locationsParentIdx = Index(
     'locations_parent_idx',
     'CREATE INDEX locations_parent_idx ON locations (parent_location_id)',
@@ -2330,6 +3277,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'assets_name_idx',
     'CREATE INDEX assets_name_idx ON assets (name)',
   );
+  late final Index cardPrintingsSetCollectorIdx = Index(
+    'card_printings_set_collector_idx',
+    'CREATE INDEX card_printings_set_collector_idx ON card_printings (set_code, collector_number)',
+  );
+  late final Index cardPrintingsNameIdx = Index(
+    'card_printings_name_idx',
+    'CREATE INDEX card_printings_name_idx ON card_printings (name_normalized)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2339,6 +3294,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     containers,
     assetTypes,
     assets,
+    cardPrintings,
+    catalogMeta,
     locationsParentIdx,
     locationsNameIdx,
     containersParentIdx,
@@ -2349,6 +3306,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     assetsContainerIdx,
     assetsLocationIdx,
     assetsNameIdx,
+    cardPrintingsSetCollectorIdx,
+    cardPrintingsNameIdx,
   ];
 }
 
@@ -3472,6 +4431,490 @@ typedef $$AssetsTableProcessedTableManager =
       AssetRow,
       PrefetchHooks Function()
     >;
+typedef $$CardPrintingsTableCreateCompanionBuilder =
+    CardPrintingsCompanion Function({
+      required String id,
+      Value<String?> oracleId,
+      required String name,
+      required String nameNormalized,
+      required String setCode,
+      required String collectorNumber,
+      Value<String?> typeLine,
+      Value<String?> manaCost,
+      Value<String?> imageSmallUrl,
+      Value<String?> imageNormalUrl,
+      required DateTime fetchedAt,
+      Value<int> rowid,
+    });
+typedef $$CardPrintingsTableUpdateCompanionBuilder =
+    CardPrintingsCompanion Function({
+      Value<String> id,
+      Value<String?> oracleId,
+      Value<String> name,
+      Value<String> nameNormalized,
+      Value<String> setCode,
+      Value<String> collectorNumber,
+      Value<String?> typeLine,
+      Value<String?> manaCost,
+      Value<String?> imageSmallUrl,
+      Value<String?> imageNormalUrl,
+      Value<DateTime> fetchedAt,
+      Value<int> rowid,
+    });
+
+class $$CardPrintingsTableFilterComposer
+    extends Composer<_$AppDatabase, $CardPrintingsTable> {
+  $$CardPrintingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get oracleId => $composableBuilder(
+    column: $table.oracleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameNormalized => $composableBuilder(
+    column: $table.nameNormalized,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get setCode => $composableBuilder(
+    column: $table.setCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get collectorNumber => $composableBuilder(
+    column: $table.collectorNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get typeLine => $composableBuilder(
+    column: $table.typeLine,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get manaCost => $composableBuilder(
+    column: $table.manaCost,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get imageSmallUrl => $composableBuilder(
+    column: $table.imageSmallUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get imageNormalUrl => $composableBuilder(
+    column: $table.imageNormalUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get fetchedAt => $composableBuilder(
+    column: $table.fetchedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CardPrintingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CardPrintingsTable> {
+  $$CardPrintingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get oracleId => $composableBuilder(
+    column: $table.oracleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameNormalized => $composableBuilder(
+    column: $table.nameNormalized,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get setCode => $composableBuilder(
+    column: $table.setCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get collectorNumber => $composableBuilder(
+    column: $table.collectorNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get typeLine => $composableBuilder(
+    column: $table.typeLine,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get manaCost => $composableBuilder(
+    column: $table.manaCost,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get imageSmallUrl => $composableBuilder(
+    column: $table.imageSmallUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get imageNormalUrl => $composableBuilder(
+    column: $table.imageNormalUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get fetchedAt => $composableBuilder(
+    column: $table.fetchedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CardPrintingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CardPrintingsTable> {
+  $$CardPrintingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get oracleId =>
+      $composableBuilder(column: $table.oracleId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get nameNormalized => $composableBuilder(
+    column: $table.nameNormalized,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get setCode =>
+      $composableBuilder(column: $table.setCode, builder: (column) => column);
+
+  GeneratedColumn<String> get collectorNumber => $composableBuilder(
+    column: $table.collectorNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get typeLine =>
+      $composableBuilder(column: $table.typeLine, builder: (column) => column);
+
+  GeneratedColumn<String> get manaCost =>
+      $composableBuilder(column: $table.manaCost, builder: (column) => column);
+
+  GeneratedColumn<String> get imageSmallUrl => $composableBuilder(
+    column: $table.imageSmallUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get imageNormalUrl => $composableBuilder(
+    column: $table.imageNormalUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get fetchedAt =>
+      $composableBuilder(column: $table.fetchedAt, builder: (column) => column);
+}
+
+class $$CardPrintingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CardPrintingsTable,
+          CardPrintingRow,
+          $$CardPrintingsTableFilterComposer,
+          $$CardPrintingsTableOrderingComposer,
+          $$CardPrintingsTableAnnotationComposer,
+          $$CardPrintingsTableCreateCompanionBuilder,
+          $$CardPrintingsTableUpdateCompanionBuilder,
+          (
+            CardPrintingRow,
+            BaseReferences<_$AppDatabase, $CardPrintingsTable, CardPrintingRow>,
+          ),
+          CardPrintingRow,
+          PrefetchHooks Function()
+        > {
+  $$CardPrintingsTableTableManager(_$AppDatabase db, $CardPrintingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CardPrintingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CardPrintingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CardPrintingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> oracleId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> nameNormalized = const Value.absent(),
+                Value<String> setCode = const Value.absent(),
+                Value<String> collectorNumber = const Value.absent(),
+                Value<String?> typeLine = const Value.absent(),
+                Value<String?> manaCost = const Value.absent(),
+                Value<String?> imageSmallUrl = const Value.absent(),
+                Value<String?> imageNormalUrl = const Value.absent(),
+                Value<DateTime> fetchedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CardPrintingsCompanion(
+                id: id,
+                oracleId: oracleId,
+                name: name,
+                nameNormalized: nameNormalized,
+                setCode: setCode,
+                collectorNumber: collectorNumber,
+                typeLine: typeLine,
+                manaCost: manaCost,
+                imageSmallUrl: imageSmallUrl,
+                imageNormalUrl: imageNormalUrl,
+                fetchedAt: fetchedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> oracleId = const Value.absent(),
+                required String name,
+                required String nameNormalized,
+                required String setCode,
+                required String collectorNumber,
+                Value<String?> typeLine = const Value.absent(),
+                Value<String?> manaCost = const Value.absent(),
+                Value<String?> imageSmallUrl = const Value.absent(),
+                Value<String?> imageNormalUrl = const Value.absent(),
+                required DateTime fetchedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CardPrintingsCompanion.insert(
+                id: id,
+                oracleId: oracleId,
+                name: name,
+                nameNormalized: nameNormalized,
+                setCode: setCode,
+                collectorNumber: collectorNumber,
+                typeLine: typeLine,
+                manaCost: manaCost,
+                imageSmallUrl: imageSmallUrl,
+                imageNormalUrl: imageNormalUrl,
+                fetchedAt: fetchedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CardPrintingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CardPrintingsTable,
+      CardPrintingRow,
+      $$CardPrintingsTableFilterComposer,
+      $$CardPrintingsTableOrderingComposer,
+      $$CardPrintingsTableAnnotationComposer,
+      $$CardPrintingsTableCreateCompanionBuilder,
+      $$CardPrintingsTableUpdateCompanionBuilder,
+      (
+        CardPrintingRow,
+        BaseReferences<_$AppDatabase, $CardPrintingsTable, CardPrintingRow>,
+      ),
+      CardPrintingRow,
+      PrefetchHooks Function()
+    >;
+typedef $$CatalogMetaTableCreateCompanionBuilder =
+    CatalogMetaCompanion Function({
+      required String key,
+      required String value,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CatalogMetaTableUpdateCompanionBuilder =
+    CatalogMetaCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$CatalogMetaTableFilterComposer
+    extends Composer<_$AppDatabase, $CatalogMetaTable> {
+  $$CatalogMetaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CatalogMetaTableOrderingComposer
+    extends Composer<_$AppDatabase, $CatalogMetaTable> {
+  $$CatalogMetaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CatalogMetaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CatalogMetaTable> {
+  $$CatalogMetaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$CatalogMetaTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CatalogMetaTable,
+          CatalogMetaRow,
+          $$CatalogMetaTableFilterComposer,
+          $$CatalogMetaTableOrderingComposer,
+          $$CatalogMetaTableAnnotationComposer,
+          $$CatalogMetaTableCreateCompanionBuilder,
+          $$CatalogMetaTableUpdateCompanionBuilder,
+          (
+            CatalogMetaRow,
+            BaseReferences<_$AppDatabase, $CatalogMetaTable, CatalogMetaRow>,
+          ),
+          CatalogMetaRow,
+          PrefetchHooks Function()
+        > {
+  $$CatalogMetaTableTableManager(_$AppDatabase db, $CatalogMetaTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CatalogMetaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CatalogMetaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CatalogMetaTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CatalogMetaCompanion(
+                key: key,
+                value: value,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CatalogMetaCompanion.insert(
+                key: key,
+                value: value,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CatalogMetaTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CatalogMetaTable,
+      CatalogMetaRow,
+      $$CatalogMetaTableFilterComposer,
+      $$CatalogMetaTableOrderingComposer,
+      $$CatalogMetaTableAnnotationComposer,
+      $$CatalogMetaTableCreateCompanionBuilder,
+      $$CatalogMetaTableUpdateCompanionBuilder,
+      (
+        CatalogMetaRow,
+        BaseReferences<_$AppDatabase, $CatalogMetaTable, CatalogMetaRow>,
+      ),
+      CatalogMetaRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3484,4 +4927,8 @@ class $AppDatabaseManager {
       $$AssetTypesTableTableManager(_db, _db.assetTypes);
   $$AssetsTableTableManager get assets =>
       $$AssetsTableTableManager(_db, _db.assets);
+  $$CardPrintingsTableTableManager get cardPrintings =>
+      $$CardPrintingsTableTableManager(_db, _db.cardPrintings);
+  $$CatalogMetaTableTableManager get catalogMeta =>
+      $$CatalogMetaTableTableManager(_db, _db.catalogMeta);
 }

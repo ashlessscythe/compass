@@ -1,0 +1,40 @@
+[
+  {
+    "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+    "oracle_id": "11111111-2222-3333-4444-555555555555",
+    "name": "Lightning Bolt",
+    "set": "lea",
+    "collector_number": "161",
+    "type_line": "Instant",
+    "mana_cost": "{R}",
+    "image_uris": {
+      "small": "https://example.com/bolt-small.jpg",
+      "normal": "https://example.com/bolt-normal.jpg"
+    }
+  },
+  {
+    "id": "bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee",
+    "oracle_id": "11111111-2222-3333-4444-555555555555",
+    "name": "Lightning Bolt",
+    "set": "m10",
+    "collector_number": "146",
+    "type_line": "Instant",
+    "mana_cost": "{R}",
+    "image_uris": {
+      "small": "https://example.com/bolt2-small.jpg",
+      "normal": "https://example.com/bolt2-normal.jpg"
+    }
+  },
+  {
+    "id": "cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee",
+    "name": "Counterspell",
+    "set": "lea",
+    "collector_number": "54",
+    "type_line": "Instant",
+    "mana_cost": "{U}{U}",
+    "image_uris": {
+      "small": "https://example.com/cs-small.jpg",
+      "normal": "https://example.com/cs-normal.jpg"
+    }
+  }
+]

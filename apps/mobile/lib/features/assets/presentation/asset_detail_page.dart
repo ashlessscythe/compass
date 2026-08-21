@@ -1,15 +1,22 @@
+import 'dart:io';
+
 import 'package:compass/core/domain/entities/asset.dart';
 import 'package:compass/core/domain/entities/container.dart' as graph;
 import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
+import 'package:compass/features/catalog/application/catalog_prefs.dart';
+import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
+import 'package:compass/features/catalog/infrastructure/card_image_cache.dart';
+import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/widgets/compass_scaffold.dart';
 import 'package:compass/widgets/confirm_delete.dart';
+import 'package:compass/widgets/mana_cost_row.dart';
 import 'package:compass/widgets/move_target_picker.dart';
 import 'package:compass/widgets/name_prompt.dart';
 import 'package:compass/widgets/path_breadcrumbs.dart';
@@ -28,6 +35,7 @@ class AssetDetailPage extends ConsumerWidget {
     final containers =
         ref.watch(containersListProvider).valueOrNull ?? const [];
     final assets = ref.watch(assetsListProvider).valueOrNull ?? const [];
+    final catalogEnabled = ref.watch(catalogEnabledProvider);
 
     Asset? asset;
     for (final item in assets) {
@@ -51,6 +59,13 @@ class AssetDetailPage extends ConsumerWidget {
       asset,
       locationById,
       containerById,
+    );
+    final scryfallId = MtgMetadataKeys.scryfallIdOf(asset.metadata.values);
+    final setCode =
+        MtgMetadataKeys.stringOf(asset.metadata.values, MtgMetadataKeys.setCode);
+    final collector = MtgMetadataKeys.stringOf(
+      asset.metadata.values,
+      MtgMetadataKeys.collectorNumber,
     );
 
     return CompassScaffold(
@@ -81,6 +96,55 @@ class AssetDetailPage extends ConsumerWidget {
       ],
       body: ListView(
         children: [
+          _CardArtBlock(
+            asset: asset,
+            scryfallId: scryfallId,
+            catalogEnabled: catalogEnabled,
+            onMatch: () => runSingleCardMatch(context, ref, asset!),
+          ),
+          if (scryfallId != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            FutureBuilder(
+              future: loadCardPrinting(ref, asset),
+              builder: (context, snapshot) {
+                final printing = snapshot.data;
+                if (printing == null) {
+                  return const SizedBox.shrink();
+                }
+                final theme = Theme.of(context);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (printing.typeLine != null)
+                      Text(printing.typeLine!, style: theme.textTheme.bodyLarge),
+                    if (printing.manaCost != null &&
+                        printing.manaCost!.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      ManaCostRow(printing.manaCost!),
+                    ],
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      '${printing.setCode.toUpperCase()} · '
+                      '#${printing.collectorNumber}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ] else if (setCode != null || collector != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              [
+                if (setCode != null) setCode.toUpperCase(),
+                if (collector != null) '#$collector',
+              ].join(' · '),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+          const SizedBox(height: AppSpacing.xl),
           Text(
             'Where',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -175,5 +239,97 @@ class AssetDetailPage extends ConsumerWidget {
       return;
     }
     context.pop();
+  }
+}
+
+class _CardArtBlock extends ConsumerWidget {
+  const _CardArtBlock({
+    required this.asset,
+    required this.scryfallId,
+    required this.catalogEnabled,
+    required this.onMatch,
+  });
+
+  final Asset asset;
+  final String? scryfallId;
+  final bool catalogEnabled;
+  final VoidCallback onMatch;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    if (scryfallId == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AspectRatio(
+            aspectRatio: 5 / 7,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant,
+                  width: 1.5,
+                ),
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.4),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.style_outlined,
+                    size: 48,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'No catalog match',
+                    style: theme.textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  FilledButton.tonal(
+                    onPressed: catalogEnabled ? onMatch : null,
+                    child: const Text('Match with Scryfall'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return FutureBuilder<File?>(
+      future: loadCardImage(
+        ref,
+        scryfallId: scryfallId!,
+        size: CardImageSize.normal,
+      ),
+      builder: (context, snapshot) {
+        final file = snapshot.data;
+        if (file != null) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.file(
+              file,
+              fit: BoxFit.fitWidth,
+              width: double.infinity,
+            ),
+          );
+        }
+        return AspectRatio(
+          aspectRatio: 5 / 7,
+          child: Center(
+            child: snapshot.connectionState == ConnectionState.waiting
+                ? const CircularProgressIndicator()
+                : FilledButton.tonal(
+                    onPressed: catalogEnabled ? onMatch : null,
+                    child: const Text('Retry match'),
+                  ),
+          ),
+        );
+      },
+    );
   }
 }
