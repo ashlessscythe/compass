@@ -1,5 +1,6 @@
 import 'package:compass/routing/app_router.dart';
 import 'package:compass/theme/effective_theme.dart';
+import 'package:compass/widgets/dismiss_keyboard.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,6 +20,11 @@ class CompassApp extends ConsumerWidget {
       darkTheme: theme,
       themeMode: ThemeMode.light,
       routerConfig: router,
+      builder: (context, child) {
+        return DismissKeyboard(
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

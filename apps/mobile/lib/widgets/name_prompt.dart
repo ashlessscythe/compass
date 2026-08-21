@@ -109,6 +109,7 @@ class _NamePromptSheetState extends State<_NamePromptSheet> {
               textInputAction: TextInputAction.done,
               decoration: const InputDecoration(hintText: 'Name'),
               onSubmitted: (_) => _submit(),
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
             ),
             const SizedBox(height: AppSpacing.lg),
             Row(

@@ -54,6 +54,7 @@ class HomePage extends HookConsumerWidget {
         ),
         child: SafeArea(
           child: CustomScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
               SliverPadding(
                 padding: AppSpacing.pagePadding,
@@ -93,13 +94,7 @@ class HomePage extends HookConsumerWidget {
                         style: theme.textTheme.bodyLarge,
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      TextField(
-                        key: const Key('home_search_field'),
-                        decoration: const InputDecoration(
-                          hintText: 'Search by name',
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                        textInputAction: TextInputAction.search,
+                      _HomeSearchField(
                         onChanged: (value) => query.value = value,
                       ),
                       const SizedBox(height: AppSpacing.xl),
@@ -252,6 +247,38 @@ class _SearchResults extends StatelessWidget {
         child: Center(child: CircularProgressIndicator()),
       ),
       error: (error, _) => Text('Search failed: $error'),
+    );
+  }
+}
+
+class _HomeSearchField extends HookWidget {
+  const _HomeSearchField({required this.onChanged});
+
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final focusNode = useFocusNode();
+    final focused = useListenable(focusNode);
+
+    return TextField(
+      key: const Key('home_search_field'),
+      focusNode: focusNode,
+      decoration: InputDecoration(
+        hintText: 'Search by name',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: focused.hasFocus
+            ? IconButton(
+                tooltip: 'Hide keyboard',
+                onPressed: () => focusNode.unfocus(),
+                icon: const Icon(Icons.keyboard_arrow_down),
+              )
+            : null,
+      ),
+      textInputAction: TextInputAction.done,
+      onChanged: onChanged,
+      onSubmitted: (_) => focusNode.unfocus(),
+      onTapOutside: (_) => focusNode.unfocus(),
     );
   }
 }
