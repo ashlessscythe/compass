@@ -13,7 +13,7 @@
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
-iOS UI craft for the location graph is through UX-6 (stills). Themes + subscription shipped. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Next product work: offline-first sync.
+iOS UI craft for the location graph is through UX-6 (stills). Themes + subscription shipped. Offline catalog art hardened. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Next product work: offline-first sync protocol.
 
 ## Next — MTG MVP
 
@@ -26,6 +26,7 @@ iOS UI craft for the location graph is through UX-6 (stills). Themes + subscript
 - [x] Import adapters for Deckbox and Moxfield (header dialects on the shared CSV surface)
 - [x] Scryfall catalog for MTG images/stats (CardMetadataProvider; local SQLite + bulk; thumbs / full art)
 - [x] Themes + subscription (Dark/Light/Gray free; ambience skins, custom accent, container refetch ~$2/mo via RevenueCat)
+- [x] Offline catalog art (match prefetches small+normal; soft-fail + small fallback when airplane)
 - [ ] Offline-first sync protocol (v0)
 
 Pricing: first paid surface is **appearance + bulk refetch** — see [architecture.md](./architecture.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). Sync / household / web remain undecided and are not gated on the Themes sub.

@@ -122,13 +122,17 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
         return similar;
       }
       if (allowNetwork) {
-        final fresh = await _queue.enqueue(
-          CatalogMatchKey.name(trimmed),
-          bypassCache: forceNetwork ||
-              (exact?.needsFaceHydration ?? false) ||
-              (similar?.needsFaceHydration ?? false),
-        );
-        return fresh ?? exact ?? similar;
+        try {
+          final fresh = await _queue.enqueue(
+            CatalogMatchKey.name(trimmed),
+            bypassCache: forceNetwork ||
+                (exact?.needsFaceHydration ?? false) ||
+                (similar?.needsFaceHydration ?? false),
+          );
+          return fresh ?? exact ?? similar;
+        } on Object {
+          return exact ?? similar;
+        }
       }
       return exact ?? similar;
     }
@@ -147,11 +151,15 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
       return cached;
     }
     if (allowNetwork) {
-      final fresh = await _queue.enqueue(
-        key,
-        bypassCache: forceNetwork || stale,
-      );
-      return fresh ?? cached;
+      try {
+        final fresh = await _queue.enqueue(
+          key,
+          bypassCache: forceNetwork || stale,
+        );
+        return fresh ?? cached;
+      } on Object {
+        return cached;
+      }
     }
     return cached;
   }

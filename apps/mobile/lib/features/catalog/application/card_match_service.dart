@@ -73,25 +73,7 @@ class CardMatchService {
         replaceExisting: ignoreExistingScryfallId || forceNetwork || preferName,
       );
       if (prefetchImage) {
-        try {
-          await _images.ensureImage(
-            scryfallId: printing.id,
-            size: CardImageSize.small,
-            url: printing.imageSmallUrl,
-          );
-          if (printing.isMultiFace) {
-            for (var i = 1; i < printing.faces.length; i++) {
-              await _images.ensureImage(
-                scryfallId: printing.id,
-                size: CardImageSize.small,
-                url: printing.imageUrlForFace(i, normal: false),
-                faceIndex: i,
-              );
-            }
-          }
-        } on Object {
-          // Image cache is best-effort (path_provider may be unavailable in tests).
-        }
+        await _prefetchImages(printing);
       }
       return Result.success(printing);
     } on Object catch (error) {
@@ -177,15 +159,7 @@ class CardMatchService {
             await _bindAsset(asset, printing, replaceExisting: true);
             matched++;
           }
-          try {
-            await _images.ensureImage(
-              scryfallId: printing.id,
-              size: CardImageSize.small,
-              url: printing.imageSmallUrl,
-            );
-          } on Object {
-            // Image cache is best-effort.
-          }
+          await _prefetchImages(printing);
         }
         done++;
         onProgress?.call(done, total);
@@ -299,15 +273,7 @@ class CardMatchService {
             await _bindAsset(asset, printing);
             matched++;
           }
-          try {
-            await _images.ensureImage(
-              scryfallId: printing.id,
-              size: CardImageSize.small,
-              url: printing.imageSmallUrl,
-            );
-          } on Object {
-            // Image cache is best-effort.
-          }
+          await _prefetchImages(printing);
         }
         done++;
         onProgress?.call(done, total);
@@ -324,6 +290,25 @@ class CardMatchService {
     } on Object catch (error) {
       return Result.failure(
         Failure.unexpected(message: 'Failed to match cards', cause: error),
+      );
+    }
+  }
+
+  /// Cache small + normal art for offline thumbs and detail. Soft-fails.
+  Future<void> _prefetchImages(CardPrinting printing) async {
+    final faceCount = printing.isMultiFace ? printing.faces.length : 1;
+    for (var i = 0; i < faceCount; i++) {
+      await _images.ensureImage(
+        scryfallId: printing.id,
+        size: CardImageSize.small,
+        url: printing.imageUrlForFace(i, normal: false),
+        faceIndex: i,
+      );
+      await _images.ensureImage(
+        scryfallId: printing.id,
+        size: CardImageSize.normal,
+        url: printing.imageUrlForFace(i, normal: true),
+        faceIndex: i,
       );
     }
   }

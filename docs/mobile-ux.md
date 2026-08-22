@@ -170,6 +170,7 @@ These are roadmap items. Do not pull them forward to avoid UX-1…UX-5.
 | Deckbox / Moxfield | Done — auto-detected header dialects on the CSV surface | Adapter lands in the same import surface |
 | Scryfall | Done — Settings → MTG catalog; Match after import; container thumbs | Catalog off: where works; on: art/stats from local SQLite cache |
 | Themes + sub | Done — Settings → Themes; RevenueCat `compass` | Free Dark/Light/Gray; paid ambience + accent + bulk refetch |
+| Offline catalog art | Done — JPG cache + match prefetch small/normal | Airplane: show cached art; miss → placeholder (no crash) |
 | Offline-first sync | Next — see roadmap | Local graph remains source of truth; protocol TBD |
 
 Sync, household sharing, and the web collection browser stay later / undecided. Themes paywall stays a calm sheet only (never launch interstitial).

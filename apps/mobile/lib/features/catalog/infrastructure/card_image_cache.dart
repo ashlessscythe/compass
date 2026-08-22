@@ -7,13 +7,22 @@ import 'package:path_provider/path_provider.dart';
 enum CardImageSize { small, normal }
 
 /// On-disk image cache keyed by Scryfall card id (+ optional face index).
+///
+/// Hits survive airplane mode. Misses attempt HTTP once and soft-fail (no throw)
+/// so list/detail UI can show placeholders offline.
 class CardImageCache {
-  CardImageCache({http.Client? client}) : _client = client ?? http.Client();
+  CardImageCache({
+    http.Client? client,
+    Future<Directory> Function()? documentsDirectory,
+  })  : _client = client ?? http.Client(),
+        _documentsDirectory =
+            documentsDirectory ?? getApplicationDocumentsDirectory;
 
   final http.Client _client;
+  final Future<Directory> Function() _documentsDirectory;
 
   Future<Directory> _dir() async {
-    final root = await getApplicationDocumentsDirectory();
+    final root = await _documentsDirectory();
     final dir = Directory(p.join(root.path, 'cache', 'scryfall', 'images'));
     if (!await dir.exists()) {
       await dir.create(recursive: true);
@@ -53,30 +62,63 @@ class CardImageCache {
     return null;
   }
 
+  /// Return a cached file, or download [url] into the cache.
+  ///
+  /// Disk / network / IO failures return `null` (never throw) so airplane mode
+  /// and headless tests are safe.
   Future<File?> ensureImage({
     required String scryfallId,
     required CardImageSize size,
     required String? url,
     int faceIndex = 0,
   }) async {
-    final existing = await cachedFile(scryfallId, size, faceIndex: faceIndex);
-    if (existing != null) {
-      return existing;
-    }
-    if (url == null || url.isEmpty) {
+    try {
+      final existing = await cachedFile(scryfallId, size, faceIndex: faceIndex);
+      if (existing != null) {
+        return existing;
+      }
+      if (url == null || url.isEmpty) {
+        return null;
+      }
+      final response = await _client.get(Uri.parse(url));
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return null;
+      }
+      final file = await fileFor(scryfallId, size, faceIndex: faceIndex);
+      await file.writeAsBytes(response.bodyBytes, flush: true);
+      return file;
+    } on Object {
       return null;
     }
-    final response = await _client.get(Uri.parse(url));
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      return null;
+  }
+
+  /// Prefer [size]; if missing and size is normal, fall back to cached small.
+  Future<File?> ensureImageOrFallback({
+    required String scryfallId,
+    required CardImageSize size,
+    required String? url,
+    String? smallUrl,
+    int faceIndex = 0,
+  }) async {
+    final primary = await ensureImage(
+      scryfallId: scryfallId,
+      size: size,
+      url: url,
+      faceIndex: faceIndex,
+    );
+    if (primary != null || size == CardImageSize.small) {
+      return primary;
     }
-    final file = await fileFor(scryfallId, size, faceIndex: faceIndex);
-    await file.writeAsBytes(response.bodyBytes, flush: true);
-    return file;
+    return ensureImage(
+      scryfallId: scryfallId,
+      size: CardImageSize.small,
+      url: smallUrl,
+      faceIndex: faceIndex,
+    );
   }
 
   Future<void> clear() async {
-    final root = await getApplicationDocumentsDirectory();
+    final root = await _documentsDirectory();
     final dir = Directory(p.join(root.path, 'cache', 'scryfall', 'images'));
     if (await dir.exists()) {
       await dir.delete(recursive: true);

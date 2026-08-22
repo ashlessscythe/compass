@@ -216,10 +216,12 @@ Future<File?> loadCardImage(
         faceIndex,
         normal: size == CardImageSize.normal,
       );
-  return ref.read(cardImageCacheProvider).ensureImage(
+  final smallUrl = printing?.imageUrlForFace(faceIndex, normal: false);
+  return ref.read(cardImageCacheProvider).ensureImageOrFallback(
         scryfallId: scryfallId,
         size: size,
         url: url,
+        smallUrl: smallUrl,
         faceIndex: faceIndex,
       );
 }
@@ -235,8 +237,13 @@ Future<CardPrinting?> loadCardPrinting(WidgetRef ref, Asset asset) async {
     return local;
   }
   // Hydrate faces for printings cached before multi-face support.
-  final fresh = await catalog.resolve(scryfallId: id, allowNetwork: true);
-  return fresh ?? local;
+  // Soft-fail offline: prefer local stats/URLs over a hard error.
+  try {
+    final fresh = await catalog.resolve(scryfallId: id, allowNetwork: true);
+    return fresh ?? local;
+  } on Object {
+    return local;
+  }
 }
 
 Future<void> _runBusy(

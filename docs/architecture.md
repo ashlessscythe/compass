@@ -100,7 +100,7 @@ Source of truth is **on-device SQLite**, not the cloud.
 2. Conflict-aware sync when online (future; not gated to a plan yet — see Pricing)
 3. Read models optimized for “find by name → show path”
 4. NFC deep links resolve against local data first
-5. External catalogs (Scryfall, etc.) are **enrichment**. Core location workflows must work with them disabled or unreachable; cache fetched images/stats locally when enabled.
+5. External catalogs (Scryfall, etc.) are **enrichment**. Core location workflows must work with them disabled or unreachable; cache fetched images/stats locally when enabled. Matched printings store URLs + stats in SQLite; card art JPGs live under Documents `cache/scryfall/images/` and are prefetched (small + normal) on Match. Offline shows cached art; never-fetched art soft-falls to placeholders.
 
 ## Pricing / subscription
 
@@ -139,7 +139,7 @@ Rules:
 
 - Configurable: user can disable network catalog lookup, swap provider later, or run without it
 - Store identifiers as external ids (source + id). Until that table persists, they live in `Asset.metadata` (e.g. Scryfall oracle/card id). Do not put printings into core schema.
-- Images and stats are cached on device after fetch so search-by-location still works offline
+- Images and stats are cached on device after fetch so location search and previously matched art work offline (JPG cache under Documents; stats/URLs in SQLite). Unfetched art shows a placeholder until online again.
 - Compass answers *where* the card is; Scryfall answers *what it looks like / what it does*
 
 ## Web application
