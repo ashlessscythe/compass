@@ -129,6 +129,7 @@ flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 
 - Location graph persists in SQLite (Drift). Search by name shows the physical path.
 - Settings → Import CSV accepts Deckbox, Moxfield, and generic collection exports into a chosen container.
+- Settings → Themes: free Dark / Light / Gray; paid ambience, custom accent, and container Refetch all (see [docs/entitlements.md](docs/entitlements.md)).
 - NFC: on a physical iPhone, open a container → Pair NFC (stores chip UID). Home → Scan NFC opens that container. Simulator cannot exercise NFC.
 - MTG catalog (Settings): optional Scryfall enrichment. Download local card index (bulk), Match after CSV import, container thumbs + full art on asset detail. Pricing providers are stubbed separately.
 - Do not put business logic in widgets.

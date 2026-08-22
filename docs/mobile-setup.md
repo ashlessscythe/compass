@@ -125,6 +125,20 @@ flutter test
 flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 ```
 
+## App icons
+
+From the repo root, regenerate marketing + native icons from the site mark:
+
+```bash
+pnpm icons
+```
+
+iOS/macOS App Store icons must be opaque RGB (no alpha). Do not hand-edit PNGs in `AppIcon.appiconset` — change the SVG / generator instead.
+
+## TestFlight (manual)
+
+Bundle id: `app.compass.mobile`. Bump `version:` in `apps/mobile/pubspec.yaml` (`name+build`) before each upload. Home-screen label is `Compass Inventory` in `ios/Runner/Info.plist` (see [branding.md](./branding.md)). Automating Transporter is a Later roadmap item.
+
 ## What not to commit
 
 These are generated on `flutter pub get` / Xcode and are gitignored:

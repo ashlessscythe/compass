@@ -25,6 +25,10 @@ A modern, geometric compass mark:
 - Center point
 - Minimal stroke language
 
+Source SVG: `apps/web/public/icon.svg`. Regenerate web + iOS/macOS app icons with `pnpm icons` ([scripts/generate-icons.mjs](../scripts/generate-icons.mjs)). App Store icons are square opaque RGB (no alpha).
+
+**Home screen vs product name:** the in-app wordmark and marketing site stay **Compass**. iOS `CFBundleDisplayName` is **Compass Inventory** because App Store Connect rejects the short name `Compass` (ITMS-90129). Keep `CFBundleName` as `mobile` for continuity with existing TestFlight builds. Bundle id stays `app.compass.mobile`.
+
 Do **not** use fantasy, medieval, parchment, or TCG-ornament styling for the core brand. Vertical modules may use playful imagery in-product; the Compass brand itself stays premium software.
 
 ## Visual language

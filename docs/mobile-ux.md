@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** Themes + classy subscription (see [roadmap.md](./roadmap.md)); sync after.
+**Current milestone:** offline-first sync (see [roadmap.md](./roadmap.md)). Themes + subscription are done.
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -169,9 +169,10 @@ These are roadmap items. Do not pull them forward to avoid UX-1…UX-5.
 | CSV import | Done — Settings → Import CSV | File in → items searchable with a path |
 | Deckbox / Moxfield | Done — auto-detected header dialects on the CSV surface | Adapter lands in the same import surface |
 | Scryfall | Done — Settings → MTG catalog; Match after import; container thumbs | Catalog off: where works; on: art/stats from local SQLite cache |
-| Themes + sub | In progress — Settings → Themes; RevenueCat `compass` | Free Dark/Light/Gray; paid ambience + accent + bulk refetch |
+| Themes + sub | Done — Settings → Themes; RevenueCat `compass` | Free Dark/Light/Gray; paid ambience + accent + bulk refetch |
+| Offline-first sync | Next — see roadmap | Local graph remains source of truth; protocol TBD |
 
-Sync, household sharing, and the web collection browser stay later / undecided. Billing for themes is in flight (classy sheet only — never launch interstitial).
+Sync, household sharing, and the web collection browser stay later / undecided. Themes paywall stays a calm sheet only (never launch interstitial).
 
 ---
 

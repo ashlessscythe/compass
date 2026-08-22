@@ -104,7 +104,7 @@ Source of truth is **on-device SQLite**, not the cloud.
 
 ## Pricing / subscription
 
-First paid surface (v1): a ~$2/mo **Compass** subscription via RevenueCat (`entitlement: compass`).
+First paid surface (v1, shipped): a ~$2/mo **Compass** subscription via RevenueCat (`entitlement: compass`). Setup notes: [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md).
 
 **Included with subscription**
 

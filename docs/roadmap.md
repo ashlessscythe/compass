@@ -13,7 +13,7 @@
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
-iOS UI craft for the location graph is through UX-6 (stills). Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Next product work: offline-first sync.
+iOS UI craft for the location graph is through UX-6 (stills). Themes + subscription shipped. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Next product work: offline-first sync.
 
 ## Next — MTG MVP
 
@@ -25,10 +25,12 @@ iOS UI craft for the location graph is through UX-6 (stills). Sequence and exit 
 - [x] Import from CSV (Deckbox / Moxfield / generic headers → container; Settings → Import CSV)
 - [x] Import adapters for Deckbox and Moxfield (header dialects on the shared CSV surface)
 - [x] Scryfall catalog for MTG images/stats (CardMetadataProvider; local SQLite + bulk; thumbs / full art)
-- [ ] Themes + subscription (Dark/Light/Gray free; ambience skins, custom accent, container refetch ~$2/mo via RevenueCat)
+- [x] Themes + subscription (Dark/Light/Gray free; ambience skins, custom accent, container refetch ~$2/mo via RevenueCat)
 - [ ] Offline-first sync protocol (v0)
 
-Pricing: first paid surface is **appearance + bulk refetch** — see [architecture.md](./architecture.md). Sync / household / web remain undecided and are not gated on the Themes sub yet.
+Pricing: first paid surface is **appearance + bulk refetch** — see [architecture.md](./architecture.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). Sync / household / web remain undecided and are not gated on the Themes sub.
+
+Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home-screen label is **Compass Inventory** (ASC rejects bare `Compass`); in-app title stays Compass. Automating uploads is Later.
 
 ## Later — Platform
 
