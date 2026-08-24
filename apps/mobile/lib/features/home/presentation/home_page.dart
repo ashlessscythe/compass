@@ -258,20 +258,25 @@ class _HomeSearchField extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = useTextEditingController();
     final focusNode = useFocusNode();
-    final focused = useListenable(focusNode);
+    useListenable(controller);
 
     return TextField(
       key: const Key('home_search_field'),
+      controller: controller,
       focusNode: focusNode,
       decoration: InputDecoration(
         hintText: 'Search by name',
         prefixIcon: const Icon(Icons.search),
-        suffixIcon: focused.hasFocus
+        suffixIcon: controller.text.isNotEmpty
             ? IconButton(
-                tooltip: 'Hide keyboard',
-                onPressed: () => focusNode.unfocus(),
-                icon: const Icon(Icons.keyboard_arrow_down),
+                tooltip: 'Clear',
+                onPressed: () {
+                  controller.clear();
+                  onChanged('');
+                },
+                icon: const Icon(Icons.close),
               )
             : null,
       ),
