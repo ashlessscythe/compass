@@ -5,7 +5,7 @@ import 'package:compass/widgets/name_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Calm unlock sheet — Subscribe / Restore / Not now.
+/// Calm unlock sheet — Unlock Pro / Restore / Not now.
 Future<void> showUnlockSheet(
   BuildContext context,
   WidgetRef ref, {
@@ -52,7 +52,7 @@ Future<void> showUnlockSheet(
                   }
                   _toastForResult(context, result, restore: false);
                 },
-                child: const Text('Subscribe'),
+                child: const Text('Unlock Pro'),
               ),
               const SizedBox(height: AppSpacing.sm),
               TextButton(
@@ -92,8 +92,8 @@ void _toastForResult(
       restore ? 'Purchases restored' : 'Thank you for supporting Compass',
     EntitlementActionResult.cancelled => null,
     EntitlementActionResult.unavailable => restore
-        ? 'No subscription found to restore'
-        : 'Subscription is unavailable right now',
+        ? 'No purchase found to restore'
+        : 'Purchases are unavailable right now',
     EntitlementActionResult.failed =>
       restore ? 'Could not restore purchases' : 'Purchase did not complete',
   };
@@ -101,7 +101,9 @@ void _toastForResult(
     return;
   }
   if (result == EntitlementActionResult.success) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   } else {
     showFailureSnackBar(context, message);
   }
@@ -113,9 +115,8 @@ Future<void> showThemesUnlockSheet(BuildContext context, WidgetRef ref) {
     ref,
     title: 'Unlock ambience themes',
     body:
-        'Subscribe for a few dollars a month to unlock ambience skins, '
-        'a custom accent, and bulk container refetch. '
-        'Dark, Light, and Gray stay free.',
+        'Compass Pro unlocks ambience skins, a custom accent, and bulk '
+        'container refetch permanently. Dark, Light, and Gray stay free.',
   );
 }
 
@@ -125,7 +126,7 @@ Future<void> showRefetchUnlockSheet(BuildContext context, WidgetRef ref) {
     ref,
     title: 'Refresh this container',
     body:
-        'Bulk refetch is a subscriber perk. You can still match cards one '
-        'at a time — thanks for considering supporting Compass.',
+        'Bulk refetch is a Compass Pro feature. You can still match cards '
+        'one at a time — thanks for considering supporting Compass.',
   );
 }

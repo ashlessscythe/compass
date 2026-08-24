@@ -1,41 +1,51 @@
 import 'dart:async';
 
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
 import 'package:compass/features/entitlements/domain/entitlement_service.dart';
+import 'package:compass/features/entitlements/domain/product_catalog.dart';
 
-/// In-memory entitlement for tests and local development without StoreKit.
+/// In-memory entitlements for tests and local development without StoreKit.
 class FakeEntitlementService implements EntitlementService {
-  FakeEntitlementService({bool initiallySubscribed = false})
-      : _subscribed = initiallySubscribed;
+  FakeEntitlementService({EntitlementTier initialTier = EntitlementTier.free})
+      : _tier = initialTier,
+        _features = ProductFeatureMap.featuresForTier(initialTier);
 
-  bool _subscribed;
-  final _controller = StreamController<bool>.broadcast();
+  EntitlementTier _tier;
+  Set<CompassFeature> _features;
+  final _controller = StreamController<Set<CompassFeature>>.broadcast();
 
-  @override
-  bool get isSubscribed => _subscribed;
+  EntitlementTier get tier => _tier;
 
-  @override
-  Stream<bool> get subscriptionChanges => _controller.stream;
-
-  void setSubscribed({required bool value}) {
-    if (_subscribed == value) {
+  void setTier(EntitlementTier tier) {
+    if (_tier == tier) {
       return;
     }
-    _subscribed = value;
-    _controller.add(value);
+    _tier = tier;
+    _features = ProductFeatureMap.featuresForTier(tier);
+    _controller.add(Set<CompassFeature>.of(_features));
   }
 
   @override
+  bool canUse(CompassFeature feature) => _features.contains(feature);
+
+  @override
+  Set<CompassFeature> get activeFeatures => Set<CompassFeature>.of(_features);
+
+  @override
+  Stream<Set<CompassFeature>> get featureChanges => _controller.stream;
+
+  @override
   Future<EntitlementActionResult> purchase() async {
-    setSubscribed(value: true);
+    setTier(EntitlementTier.pro);
     return EntitlementActionResult.success;
   }
 
   @override
   Future<EntitlementActionResult> restore() async {
-    // Fake restore keeps current state; tests toggle via [setSubscribed].
-    return _subscribed
-        ? EntitlementActionResult.success
-        : EntitlementActionResult.unavailable;
+    if (_tier == EntitlementTier.free) {
+      return EntitlementActionResult.unavailable;
+    }
+    return EntitlementActionResult.success;
   }
 
   void dispose() {

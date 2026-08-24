@@ -4,9 +4,10 @@ import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
-import 'package:compass/features/entitlements/application/entitlement_providers.dart';
-import 'package:compass/features/entitlements/presentation/unlock_sheet.dart';
 import 'package:compass/features/containers/application/container_service.dart';
+import 'package:compass/features/entitlements/application/entitlement_providers.dart';
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
+import 'package:compass/features/entitlements/presentation/unlock_sheet.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/nfc/application/nfc_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
@@ -68,11 +69,15 @@ class ContainerDetailPage extends ConsumerWidget {
       actions: [
         if (heldAssets.isNotEmpty)
           IconButton(
-            tooltip: ref.watch(isSubscribedSyncProvider)
+            tooltip: ref.watch(
+              canUseFeatureProvider(CompassFeature.bulkRefresh),
+            )
                 ? 'Refetch all'
-                : 'Refetch all · Subscriber',
+                : 'Refetch all · Pro',
             onPressed: () async {
-              if (!ref.read(isSubscribedSyncProvider)) {
+              if (!ref.read(
+                canUseFeatureProvider(CompassFeature.bulkRefresh),
+              )) {
                 await showRefetchUnlockSheet(context, ref);
                 return;
               }

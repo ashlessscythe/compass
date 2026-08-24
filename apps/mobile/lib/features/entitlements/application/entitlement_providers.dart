@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
 import 'package:compass/features/entitlements/domain/entitlement_service.dart';
 import 'package:compass/features/entitlements/infrastructure/fake_entitlement_service.dart';
 import 'package:compass/features/entitlements/infrastructure/revenue_cat_entitlement_service.dart';
@@ -19,21 +18,26 @@ final entitlementServiceProvider = Provider<EntitlementService>((ref) {
   return service;
 });
 
-/// Live subscription flag for UI gates.
-final isSubscribedProvider =
-    NotifierProvider<IsSubscribedController, bool>(IsSubscribedController.new);
+/// Live set of granted features for UI gates.
+final activeFeaturesProvider =
+    NotifierProvider<ActiveFeaturesController, Set<CompassFeature>>(
+  ActiveFeaturesController.new,
+);
 
-class IsSubscribedController extends Notifier<bool> {
+class ActiveFeaturesController extends Notifier<Set<CompassFeature>> {
   @override
-  bool build() {
+  Set<CompassFeature> build() {
     final service = ref.watch(entitlementServiceProvider);
-    final sub = service.subscriptionChanges.listen((value) {
+    final sub = service.featureChanges.listen((value) {
       state = value;
     });
     ref.onDispose(sub.cancel);
-    return service.isSubscribed;
+    return service.activeFeatures;
   }
 }
 
-/// Alias for older call sites.
-final isSubscribedSyncProvider = isSubscribedProvider;
+/// Whether the given feature is currently granted.
+final ProviderFamily<bool, CompassFeature> canUseFeatureProvider =
+    Provider.family<bool, CompassFeature>((ref, feature) {
+  return ref.watch(activeFeaturesProvider).contains(feature);
+});

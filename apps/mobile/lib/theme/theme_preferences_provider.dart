@@ -1,4 +1,5 @@
 import 'package:compass/features/entitlements/application/entitlement_providers.dart';
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
 import 'package:compass/theme/color_utils.dart';
 import 'package:compass/theme/compass_theme_id.dart';
 import 'package:compass/theme/theme_preferences.dart';
@@ -56,14 +57,17 @@ class ThemePreferencesController extends Notifier<ThemePreferences> {
 /// Effective theme after entitlement gating (paid id falls back while locked).
 final effectiveThemePreferencesProvider = Provider<ThemePreferences>((ref) {
   final prefs = ref.watch(themePreferencesProvider);
-  final subscribed = ref.watch(isSubscribedSyncProvider);
-  if (prefs.themeId.requiresSubscription && !subscribed) {
+  final canThemes =
+      ref.watch(canUseFeatureProvider(CompassFeature.advancedThemes));
+  final canAccent =
+      ref.watch(canUseFeatureProvider(CompassFeature.customAccent));
+  if (prefs.themeId.requiresPro && !canThemes) {
     return prefs.copyWith(
       themeId: CompassThemeId.dark,
       clearAccent: true,
     );
   }
-  if (!subscribed && prefs.customAccent != null) {
+  if (!canAccent && prefs.customAccent != null) {
     return prefs.copyWith(clearAccent: true);
   }
   return prefs;

@@ -34,7 +34,8 @@ extension CompassThemeIdX on CompassThemeId {
         _ => false,
       };
 
-  bool get requiresSubscription => !isFree;
+  /// Ambience skins need Pro (`advancedThemes`).
+  bool get requiresPro => !isFree;
 
   Brightness get brightness => switch (this) {
         CompassThemeId.light => Brightness.light,

@@ -1,11 +1,16 @@
-/// Subscription entitlement for Compass (themes + bulk refetch).
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
+
+/// Resolves which [CompassFeature]s the user may use.
+///
+/// Feature UI must call [canUse] — never product or plan names.
 abstract interface class EntitlementService {
-  /// Whether the `compass` entitlement is active.
-  bool get isSubscribed;
+  bool canUse(CompassFeature feature);
 
-  Stream<bool> get subscriptionChanges;
+  Set<CompassFeature> get activeFeatures;
 
-  /// Starts purchase flow for the monthly subscription.
+  Stream<Set<CompassFeature>> get featureChanges;
+
+  /// Starts purchase for Pro (transitional store product until lifetime IAP).
   Future<EntitlementActionResult> purchase();
 
   /// Restores prior purchases.
@@ -17,10 +22,4 @@ enum EntitlementActionResult {
   cancelled,
   unavailable,
   failed,
-}
-
-/// Product / entitlement identifiers (RevenueCat / App Store).
-abstract final class EntitlementIds {
-  static const entitlement = 'compass';
-  static const monthlyProduct = 'compass_monthly';
 }

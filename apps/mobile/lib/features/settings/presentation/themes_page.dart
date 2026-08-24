@@ -1,5 +1,7 @@
 import 'package:compass/features/entitlements/application/entitlement_providers.dart';
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
 import 'package:compass/features/entitlements/domain/entitlement_service.dart';
+import 'package:compass/features/entitlements/domain/product_catalog.dart';
 import 'package:compass/features/entitlements/infrastructure/fake_entitlement_service.dart';
 import 'package:compass/features/entitlements/presentation/unlock_sheet.dart';
 import 'package:compass/theme/app_colors.dart';
@@ -13,14 +15,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Settings → Themes: free trio, paid ambience, gated accent.
+/// Settings → Themes: free trio, Pro ambience, gated accent.
 class ThemesPage extends ConsumerWidget {
   const ThemesPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(themePreferencesProvider);
-    final subscribed = ref.watch(isSubscribedSyncProvider);
+    final canThemes =
+        ref.watch(canUseFeatureProvider(CompassFeature.advancedThemes));
+    final canAccent =
+        ref.watch(canUseFeatureProvider(CompassFeature.customAccent));
     final theme = Theme.of(context);
     final entitlement = ref.watch(entitlementServiceProvider);
 
@@ -51,10 +56,10 @@ class ThemesPage extends ConsumerWidget {
               Expanded(
                 child: Text('Ambience', style: theme.textTheme.titleMedium),
               ),
-              if (!subscribed)
+              if (!canThemes)
                 TextButton(
                   onPressed: () => showThemesUnlockSheet(context, ref),
-                  child: const Text(r'Subscribe · $2/mo'),
+                  child: const Text('Unlock Pro'),
                 ),
             ],
           ),
@@ -66,10 +71,10 @@ class ThemesPage extends ConsumerWidget {
               for (final id in CompassThemeIdX.paidThemes)
                 _ThemePreviewCard(
                   id: id,
-                  selected: prefs.themeId == id && subscribed,
-                  locked: !subscribed,
+                  selected: prefs.themeId == id && canThemes,
+                  locked: !canThemes,
                   onTap: () async {
-                    if (!subscribed) {
+                    if (!canThemes) {
                       await showThemesUnlockSheet(context, ref);
                       return;
                     }
@@ -83,7 +88,7 @@ class ThemesPage extends ConsumerWidget {
           const SizedBox(height: AppSpacing.xl),
           Text('Accent', style: theme.textTheme.titleMedium),
           const SizedBox(height: AppSpacing.sm),
-          if (!subscribed)
+          if (!canAccent)
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const CircleAvatar(
@@ -91,7 +96,7 @@ class ThemesPage extends ConsumerWidget {
                 radius: 14,
               ),
               title: const Text('Cool steel'),
-              subtitle: const Text('Custom accents unlock with a subscription'),
+              subtitle: const Text('Custom accents unlock with Compass Pro'),
               onTap: () => showThemesUnlockSheet(context, ref),
             )
           else ...[
@@ -133,10 +138,10 @@ class ThemesPage extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: AppSpacing.xl),
-          if (subscribed)
+          if (canThemes)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Subscribed'),
+              title: const Text('Compass Pro'),
               subtitle: const Text('Themes and bulk refetch unlocked'),
               trailing: TextButton(
                 onPressed: () async {
@@ -161,7 +166,7 @@ class ThemesPage extends ConsumerWidget {
           else
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Support Compass'),
+              title: const Text('Unlock Compass Pro'),
               subtitle: const Text(
                 'Ambience themes, custom accent, and container refetch',
               ),
@@ -169,18 +174,38 @@ class ThemesPage extends ConsumerWidget {
               onTap: () => showThemesUnlockSheet(context, ref),
             ),
           if (kDebugMode && entitlement is FakeEntitlementService)
-            SwitchListTile(
+            ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Debug: subscribed'),
-              value: subscribed,
-              onChanged: (value) {
-                entitlement.setSubscribed(value: value);
-              },
+              title: const Text('Debug tier'),
+              subtitle: Text(_tierLabel(entitlement.tier)),
+              trailing: DropdownButton<EntitlementTier>(
+                value: entitlement.tier,
+                onChanged: (value) {
+                  if (value == null) {
+                    return;
+                  }
+                  entitlement.setTier(value);
+                },
+                items: [
+                  for (final tier in EntitlementTier.values)
+                    DropdownMenuItem(
+                      value: tier,
+                      child: Text(_tierLabel(tier)),
+                    ),
+                ],
+              ),
             ),
         ],
       ),
     );
   }
+
+  static String _tierLabel(EntitlementTier tier) => switch (tier) {
+        EntitlementTier.free => 'Free',
+        EntitlementTier.pro => 'Pro',
+        EntitlementTier.sync => 'Sync',
+        EntitlementTier.syncPlus => 'Sync+',
+      };
 
   Future<void> _pickCustomAccent(
     BuildContext context,

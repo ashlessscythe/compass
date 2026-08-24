@@ -1,4 +1,6 @@
 import 'package:compass/features/entitlements/application/entitlement_providers.dart';
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
+import 'package:compass/features/entitlements/domain/product_catalog.dart';
 import 'package:compass/features/entitlements/infrastructure/fake_entitlement_service.dart';
 import 'package:compass/theme/compass_theme_id.dart';
 import 'package:compass/theme/theme_backdrop_specs.dart';
@@ -16,11 +18,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  test('free themes do not require subscription', () {
+  test('free themes do not require Pro', () {
     expect(CompassThemeId.dark.isFree, isTrue);
     expect(CompassThemeId.light.isFree, isTrue);
     expect(CompassThemeId.gray.isFree, isTrue);
-    expect(CompassThemeId.steelMist.requiresSubscription, isTrue);
+    expect(CompassThemeId.steelMist.requiresPro, isTrue);
   });
 
   test('paid skins declare gradient or pattern backdrops', () {
@@ -33,13 +35,30 @@ void main() {
     );
   });
 
+  test('legacy compass entitlement maps to Pro features', () {
+    final features = ProductFeatureMap.featuresForProduct(
+      ProductIds.legacyCompassEntitlement,
+    );
+    expect(features, contains(CompassFeature.advancedThemes));
+    expect(features, contains(CompassFeature.customAccent));
+    expect(features, contains(CompassFeature.bulkRefresh));
+    expect(features, isNot(contains(CompassFeature.cloudSync)));
+  });
+
+  test('Sync tier does not grant Pro features', () {
+    final features =
+        ProductFeatureMap.featuresForTier(EntitlementTier.sync);
+    expect(features, contains(CompassFeature.cloudBackup));
+    expect(features, isNot(contains(CompassFeature.advancedThemes)));
+  });
+
   test('theme preferences persist theme id and accent', () async {
     final container = ProviderContainer(
       overrides: [
         entitlementServiceProvider.overrideWithValue(
-          FakeEntitlementService(initiallySubscribed: true),
+          FakeEntitlementService(initialTier: EntitlementTier.pro),
         ),
-        isSubscribedProvider.overrideWith(_AlwaysSubscribed.new),
+        activeFeaturesProvider.overrideWith(_ProFeatures.new),
       ],
     );
     addTearDown(container.dispose);
@@ -62,7 +81,7 @@ void main() {
     final locked = ProviderContainer(
       overrides: [
         entitlementServiceProvider.overrideWithValue(FakeEntitlementService()),
-        isSubscribedProvider.overrideWith(_NeverSubscribed.new),
+        activeFeaturesProvider.overrideWith(_FreeFeatures.new),
         themePreferencesProvider.overrideWith(_SeededThemePrefs.new),
       ],
     );
@@ -75,9 +94,9 @@ void main() {
     final unlocked = ProviderContainer(
       overrides: [
         entitlementServiceProvider.overrideWithValue(
-          FakeEntitlementService(initiallySubscribed: true),
+          FakeEntitlementService(initialTier: EntitlementTier.pro),
         ),
-        isSubscribedProvider.overrideWith(_AlwaysSubscribed.new),
+        activeFeaturesProvider.overrideWith(_ProFeatures.new),
         themePreferencesProvider.overrideWith(_SeededThemePrefs.new),
       ],
     );
@@ -96,12 +115,12 @@ class _SeededThemePrefs extends ThemePreferencesController {
   }
 }
 
-class _AlwaysSubscribed extends IsSubscribedController {
+class _ProFeatures extends ActiveFeaturesController {
   @override
-  bool build() => true;
+  Set<CompassFeature> build() => ProductFeatureMap.proFeatures;
 }
 
-class _NeverSubscribed extends IsSubscribedController {
+class _FreeFeatures extends ActiveFeaturesController {
   @override
-  bool build() => false;
+  Set<CompassFeature> build() => const {};
 }

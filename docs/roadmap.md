@@ -13,7 +13,7 @@
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
-iOS UI craft for the location graph is through UX-6 (stills). Themes + subscription shipped. Offline catalog art hardened. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Next product work: offline-first sync protocol.
+iOS UI craft for the location graph is through UX-6 (stills). Themes shipped under a transitional monthly SKU (now mapped to Pro features). Offline catalog art hardened. Feature entitlements (Free / Pro / Sync) are in place. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Monetization model: [monetization.md](./monetization.md). Next product work: offline-first sync protocol.
 
 ## Next — MTG MVP
 
@@ -25,11 +25,13 @@ iOS UI craft for the location graph is through UX-6 (stills). Themes + subscript
 - [x] Import from CSV (Deckbox / Moxfield / generic headers → container; Settings → Import CSV)
 - [x] Import adapters for Deckbox and Moxfield (header dialects on the shared CSV surface)
 - [x] Scryfall catalog for MTG images/stats (CardMetadataProvider; local SQLite + bulk; thumbs / full art)
-- [x] Themes + subscription (Dark/Light/Gray free; ambience skins, custom accent, container refetch ~$2/mo via RevenueCat)
+- [x] Themes + transitional subscription (Dark/Light/Gray free; ambience + accent + bulk refetch via RevenueCat `compass` → Pro features)
 - [x] Offline catalog art (match prefetches small+normal; soft-fail + small fallback when airplane)
-- [ ] Offline-first sync protocol (v0)
+- [x] Monetization architecture + feature entitlements (Free / Pro / Sync; mock tier provider; see [monetization.md](./monetization.md))
+- [x] Remap Themes / bulk refetch gates from binary `compass` monthly checks → Pro `canUse(Feature)`
+- [ ] Offline-first sync protocol (v0) — local graph remains source of truth; grants Sync entitlements when cloud ships
 
-Pricing: first paid surface is **appearance + bulk refetch** — see [architecture.md](./architecture.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). Sync / household / web remain undecided and are not gated on the Themes sub.
+Pricing model: **Free** = complete local app; **Pro** = lifetime advanced software; **Sync** = cloud subscription. See [monetization.md](./monetization.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). The shipped ~$2/mo Themes SKU is transitional and maps to Pro features until Pro lifetime / Sync products exist.
 
 Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home-screen label is **Compass Inventory** (ASC rejects bare `Compass`); in-app title stays Compass. Automating store uploads for iOS and Android testing is Later.
 
@@ -37,6 +39,10 @@ Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home
 
 Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add domain columns to core Asset.
 
+- [ ] Store product cutover — `compass_pro_lifetime`, `compass_sync_monthly` / yearly (replace transitional `compass_monthly`)
+- [ ] CSV export (free; data ownership)
+- [ ] Monetization analytics events (paywall / purchase / restore; no inventory contents)
+- [ ] Sync Plus tier (shared collections, advanced cloud history) — only when needed
 - [ ] MTG schema + Scryfall / importers / pricing providers (persist attributes when catalog needs them)
 - [ ] Taxonomy model, versioning, external taxonomy import, reference entities
 - [ ] Domain packs (jewelry, tools, clothing, collectibles, …)

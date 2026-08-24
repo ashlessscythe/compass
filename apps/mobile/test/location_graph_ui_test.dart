@@ -219,13 +219,13 @@ void main() {
     expect(find.byTooltip('Refetch all'), findsNothing);
 
     await _addNamed(tester, buttonLabel: 'Add asset', name: 'Lightning Bolt');
-    expect(find.byTooltip('Refetch all · Subscriber'), findsOneWidget);
+    expect(find.byTooltip('Refetch all · Pro'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Refetch all · Subscriber'));
+    await tester.tap(find.byTooltip('Refetch all · Pro'));
     await tester.pumpAndSettle();
     expect(find.text('Refresh this container'), findsOneWidget);
     expect(
-      find.textContaining('Bulk refetch is a subscriber perk'),
+      find.textContaining('Bulk refetch is a Compass Pro feature'),
       findsOneWidget,
     );
     await tester.tap(find.text('Not now'));

@@ -97,39 +97,27 @@ Source of truth is **on-device SQLite**, not the cloud.
 ## Offline-first strategy
 
 1. Local-first writes on device
-2. Conflict-aware sync when online (future; not gated to a plan yet — see Pricing)
+2. Conflict-aware sync when online (future; Sync subscription — see [monetization.md](./monetization.md))
 3. Read models optimized for “find by name → show path”
 4. NFC deep links resolve against local data first
 5. External catalogs (Scryfall, etc.) are **enrichment**. Core location workflows must work with them disabled or unreachable; cache fetched images/stats locally when enabled. Matched printings store URLs + stats in SQLite; card art JPGs live under Documents `cache/scryfall/images/` and are prefetched (small + normal) on Match. Offline shows cached art; never-fetched art soft-falls to placeholders.
 
-## Pricing / subscription
+## Pricing / entitlements
 
-First paid surface (v1, shipped): a ~$2/mo **Compass** subscription via RevenueCat (`entitlement: compass`). Setup notes: [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md).
+Source of truth: [monetization.md](./monetization.md). Mobile wiring: [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md).
 
-**Included with subscription**
+**Model**
 
-- Ambience themes (gradients / quiet patterns / restrained fractals)
-- Custom accent color
-- Container **Refetch all** (bulk Scryfall rematch)
+- **Free** — complete local inventory (graph, NFC, CSV import, search, Dark/Light/Gray, per-card Match)
+- **Pro** (lifetime) — advanced local software: ambience themes, custom accent, bulk refetch, future bulk / search power tools
+- **Sync** (subscription) — cloud backup and multi-device sync (protocol still Next on the roadmap)
+- **Sync Plus** — Later only (shared collections, etc.)
 
-**Free forever (local app)**
+Feature UI calls `canUse(Feature)`, never product or plan names. Product→feature mapping is centralized so pricing can change without rewriting gates.
 
-- Full location graph, NFC, CSV import, search
-- Themes: **Dark**, **Light**, **Gray** (brand steel accent)
-- Per-card Match / Rematch
+**Transitional v1 store surface:** RevenueCat entitlement `compass` + `compass_monthly` (~$2/mo) still unlocks the **Pro** feature set for existing TestFlight subscribers until Pro lifetime / Sync SKUs ship. That monthly Themes SKU is not the long-term model.
 
-Paywall tone: calm sheet only when tapping a locked theme or locked refetch — never on launch or core graph flows. Copy stays grateful, not pushy.
-
-Sync, household sharing, and the web collection browser remain **undecided** and are **not** gated on this subscription yet.
-
-Open questions (still):
-
-- Does free stay local-only forever?
-- Is cloud sync / backup a paid tier later?
-- Is household sharing paid?
-- Is the web collection browser paid?
-
-A reasonable default if we lock sync later: **free = full local app; paid sync tier can stack or merge with Compass subscription.** That keeps the iOS MVP unblocked.
+Paywall tone: calm contextual sheet only — never launch interstitial. Export and core local flows stay free; Sync expiry must not degrade the offline app.
 
 ## MTG catalog (Scryfall)
 

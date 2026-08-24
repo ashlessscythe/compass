@@ -1,19 +1,24 @@
 import 'dart:async';
 
+import 'package:compass/features/entitlements/domain/compass_feature.dart';
 import 'package:compass/features/entitlements/domain/entitlement_service.dart';
+import 'package:compass/features/entitlements/domain/product_catalog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-/// RevenueCat-backed entitlements. Safe no-op when API key is missing.
+/// RevenueCat-backed entitlements.
+///
+/// Active legacy entitlement [ProductIds.legacyCompassEntitlement] grants the
+/// **Pro** feature set until Pro lifetime / Sync products ship.
 class RevenueCatEntitlementService implements EntitlementService {
   RevenueCatEntitlementService({required this.apiKey});
 
   final String apiKey;
 
   bool _ready = false;
-  bool _subscribed = false;
-  final _controller = StreamController<bool>.broadcast();
+  Set<CompassFeature> _features = const {};
+  final _controller = StreamController<Set<CompassFeature>>.broadcast();
 
   Future<void> initialize() async {
     if (apiKey.isEmpty) {
@@ -34,20 +39,33 @@ class RevenueCatEntitlementService implements EntitlementService {
   void _onCustomerInfo(CustomerInfo info) => _apply(info);
 
   void _apply(CustomerInfo info) {
-    final active =
-        info.entitlements.active.containsKey(EntitlementIds.entitlement);
-    if (_subscribed == active) {
+    final activeIds = <String>{};
+    for (final key in info.entitlements.active.keys) {
+      activeIds.add(key);
+    }
+    final next = ProductFeatureMap.featuresForProducts(activeIds);
+    if (_sameFeatures(_features, next)) {
       return;
     }
-    _subscribed = active;
-    _controller.add(active);
+    _features = next;
+    _controller.add(Set<CompassFeature>.of(_features));
+  }
+
+  static bool _sameFeatures(Set<CompassFeature> a, Set<CompassFeature> b) {
+    if (a.length != b.length) {
+      return false;
+    }
+    return a.containsAll(b);
   }
 
   @override
-  bool get isSubscribed => _subscribed;
+  bool canUse(CompassFeature feature) => _features.contains(feature);
 
   @override
-  Stream<bool> get subscriptionChanges => _controller.stream;
+  Set<CompassFeature> get activeFeatures => Set<CompassFeature>.of(_features);
+
+  @override
+  Stream<Set<CompassFeature>> get featureChanges => _controller.stream;
 
   @override
   Future<EntitlementActionResult> purchase() async {
@@ -56,7 +74,8 @@ class RevenueCatEntitlementService implements EntitlementService {
     }
     try {
       final offerings = await Purchases.getOfferings();
-      final packages = offerings.current?.availablePackages ?? const <Package>[];
+      final packages =
+          offerings.current?.availablePackages ?? const <Package>[];
       final package = offerings.current?.monthly ??
           (packages.isEmpty ? null : packages.first);
       if (package == null) {
@@ -66,7 +85,7 @@ class RevenueCatEntitlementService implements EntitlementService {
         PurchaseParams.package(package),
       );
       _apply(result.customerInfo);
-      return _subscribed
+      return canUse(CompassFeature.advancedThemes)
           ? EntitlementActionResult.success
           : EntitlementActionResult.failed;
     } on PlatformException catch (e) {
@@ -88,7 +107,7 @@ class RevenueCatEntitlementService implements EntitlementService {
     try {
       final info = await Purchases.restorePurchases();
       _apply(info);
-      return _subscribed
+      return _features.isNotEmpty
           ? EntitlementActionResult.success
           : EntitlementActionResult.unavailable;
     } on Object {
