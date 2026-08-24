@@ -43,6 +43,6 @@ Full location graph, NFC, CSV import, search, Dark / Light / Gray, per-card Matc
 
 Ambience themes, custom accent, container **Refetch all**.
 
-## Sync (reserved)
+## Sync (gated)
 
-`cloudBackup` / `cloudSync` exist on the feature enum and debug Sync tier; no cloud UI yet.
+`cloudBackup` / `cloudSync` — Settings → Sync (sign-in, sync now). Protocol: [docs/sync-protocol.md](../../../docs/sync-protocol.md). Debug Sync / Sync+ tier exercises the gate without a Sync SKU. Store Sync products remain Later.

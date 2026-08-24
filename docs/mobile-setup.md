@@ -147,4 +147,6 @@ These are generated on `flutter pub get` / Xcode and are gitignored:
 - `ios/Flutter/ephemeral/`, `macos/Flutter/ephemeral/`
 - `apps/mobile/build/`, `.dart_tool/`
 
-Keep `pubspec.lock` in git. Do not add a `Podfile` unless a plugin actually requires CocoaPods.
+Keep `pubspec.lock` in git. `ios/Podfile` is required while `sign_in_with_apple` uses CocoaPods (SPM not supported yet).
+
+Sync / API env for local and Production: [environment.md](./environment.md).

@@ -2,12 +2,15 @@ import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/domain/repositories/location_repository.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/database/mappers.dart';
+import 'package:compass/features/sync/domain/sync_change.dart';
+import 'package:compass/features/sync/infrastructure/sync_local_store.dart';
 import 'package:drift/drift.dart';
 
 class DriftLocationRepository implements LocationRepository {
-  DriftLocationRepository(this._db);
+  DriftLocationRepository(this._db, this._sync);
 
   final AppDatabase _db;
+  final SyncLocalStore _sync;
 
   Location _toDomain(LocationRow row) {
     return Location(
@@ -60,19 +63,46 @@ class DriftLocationRepository implements LocationRepository {
 
   @override
   Future<Location> create(Location location) async {
-    await _db.into(_db.locations).insert(_toCompanion(location));
+    await _db.transaction(() async {
+      await _db.into(_db.locations).insert(_toCompanion(location));
+      await _sync.enqueue(
+        entityType: SyncEntityType.location,
+        entityId: location.id,
+        op: SyncOp.upsert,
+        updatedAt: location.updatedAt,
+        payload: location.toJson(),
+      );
+    });
     return location;
   }
 
   @override
   Future<Location> update(Location location) async {
-    await _db.update(_db.locations).replace(_toCompanion(location));
+    await _db.transaction(() async {
+      await _db.update(_db.locations).replace(_toCompanion(location));
+      await _sync.enqueue(
+        entityType: SyncEntityType.location,
+        entityId: location.id,
+        op: SyncOp.upsert,
+        updatedAt: location.updatedAt,
+        payload: location.toJson(),
+      );
+    });
     return location;
   }
 
   @override
   Future<void> delete(String id) async {
-    await (_db.delete(_db.locations)..where((t) => t.id.equals(id))).go();
+    final now = DateTime.now().toUtc();
+    await _db.transaction(() async {
+      await (_db.delete(_db.locations)..where((t) => t.id.equals(id))).go();
+      await _sync.enqueue(
+        entityType: SyncEntityType.location,
+        entityId: id,
+        op: SyncOp.delete,
+        updatedAt: now,
+      );
+    });
   }
 
   @override

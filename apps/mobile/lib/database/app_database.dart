@@ -6,6 +6,7 @@ import 'package:compass/database/tables/assets.dart';
 import 'package:compass/database/tables/card_printings.dart';
 import 'package:compass/database/tables/containers.dart';
 import 'package:compass/database/tables/locations.dart';
+import 'package:compass/database/tables/sync_tables.dart';
 import 'package:drift/drift.dart';
 
 part 'app_database.g.dart';
@@ -19,6 +20,8 @@ part 'app_database.g.dart';
     Assets,
     CardPrintings,
     CatalogMeta,
+    SyncOutbox,
+    SyncState,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -50,6 +53,10 @@ class AppDatabase extends _$AppDatabase {
             if (from < 5) {
               await m.addColumn(cardPrintings, cardPrintings.layout);
               await m.addColumn(cardPrintings, cardPrintings.facesJson);
+            }
+            if (from < 6) {
+              await m.createTable(syncOutbox);
+              await m.createTable(syncState);
             }
           }
         },

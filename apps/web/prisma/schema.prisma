@@ -18,3 +18,123 @@ model WaitlistEntry {
   @@index([createdAt(sort: Desc)])
   @@map("waitlist_entries")
 }
+
+/// Sync account (Apple sub or dev device). Inventory replica owner.
+model SyncUser {
+  id        String   @id @default(uuid()) @db.Uuid
+  appleSub  String?  @unique @map("apple_sub")
+  devKey    String?  @unique @map("dev_key")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sessions   SyncSession[]
+  locations  SyncLocation[]
+  containers SyncContainer[]
+  assets     SyncAsset[]
+  assetTypes SyncAssetType[]
+  tombstones SyncTombstone[]
+
+  @@map("sync_users")
+}
+
+model SyncSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user SyncUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sync_sessions")
+}
+
+model SyncLocation {
+  userId           String   @map("user_id") @db.Uuid
+  id               String
+  name             String
+  parentLocationId String?  @map("parent_location_id")
+  path             String?
+  nfcTagId         String?  @map("nfc_tag_id")
+  notes            String?
+  metadataJson     String   @default("{}") @map("metadata_json")
+  createdAt        DateTime @map("created_at")
+  updatedAt        DateTime @map("updated_at")
+
+  user SyncUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, id])
+  @@index([userId, updatedAt])
+  @@map("sync_locations")
+}
+
+model SyncContainer {
+  userId            String   @map("user_id") @db.Uuid
+  id                String
+  name              String
+  parentContainerId String?  @map("parent_container_id")
+  locationId        String?  @map("location_id")
+  nfcTagId          String?  @map("nfc_tag_id")
+  notes             String?
+  metadataJson      String   @default("{}") @map("metadata_json")
+  createdAt         DateTime @map("created_at")
+  updatedAt         DateTime @map("updated_at")
+
+  user SyncUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, id])
+  @@index([userId, updatedAt])
+  @@map("sync_containers")
+}
+
+model SyncAsset {
+  userId       String   @map("user_id") @db.Uuid
+  id           String
+  name         String
+  assetTypeId  String   @map("asset_type_id")
+  quantity     Int      @default(1)
+  containerId  String?  @map("container_id")
+  locationId   String?  @map("location_id")
+  notes        String?
+  metadataJson String   @default("{}") @map("metadata_json")
+  createdAt    DateTime @map("created_at")
+  updatedAt    DateTime @map("updated_at")
+
+  user SyncUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, id])
+  @@index([userId, updatedAt])
+  @@map("sync_assets")
+}
+
+model SyncAssetType {
+  userId       String   @map("user_id") @db.Uuid
+  id           String
+  name         String
+  moduleId     String   @map("module_id")
+  parentId     String?  @map("parent_id")
+  description  String?
+  metadataJson String   @default("{}") @map("metadata_json")
+  createdAt    DateTime @map("created_at")
+  updatedAt    DateTime @map("updated_at")
+
+  user SyncUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, id])
+  @@index([userId, updatedAt])
+  @@map("sync_asset_types")
+}
+
+model SyncTombstone {
+  userId     String   @map("user_id") @db.Uuid
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  deletedAt  DateTime @map("deleted_at")
+
+  user SyncUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, entityType, entityId])
+  @@index([userId, deletedAt])
+  @@map("sync_tombstones")
+}

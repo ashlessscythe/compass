@@ -2,12 +2,15 @@ import 'package:compass/core/domain/entities/container.dart';
 import 'package:compass/core/domain/repositories/container_repository.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/database/mappers.dart';
+import 'package:compass/features/sync/domain/sync_change.dart';
+import 'package:compass/features/sync/infrastructure/sync_local_store.dart';
 import 'package:drift/drift.dart';
 
 class DriftContainerRepository implements ContainerRepository {
-  DriftContainerRepository(this._db);
+  DriftContainerRepository(this._db, this._sync);
 
   final AppDatabase _db;
+  final SyncLocalStore _sync;
 
   Container _toDomain(ContainerRow row) {
     return Container(
@@ -60,19 +63,46 @@ class DriftContainerRepository implements ContainerRepository {
 
   @override
   Future<Container> create(Container container) async {
-    await _db.into(_db.containers).insert(_toCompanion(container));
+    await _db.transaction(() async {
+      await _db.into(_db.containers).insert(_toCompanion(container));
+      await _sync.enqueue(
+        entityType: SyncEntityType.container,
+        entityId: container.id,
+        op: SyncOp.upsert,
+        updatedAt: container.updatedAt,
+        payload: container.toJson(),
+      );
+    });
     return container;
   }
 
   @override
   Future<Container> update(Container container) async {
-    await _db.update(_db.containers).replace(_toCompanion(container));
+    await _db.transaction(() async {
+      await _db.update(_db.containers).replace(_toCompanion(container));
+      await _sync.enqueue(
+        entityType: SyncEntityType.container,
+        entityId: container.id,
+        op: SyncOp.upsert,
+        updatedAt: container.updatedAt,
+        payload: container.toJson(),
+      );
+    });
     return container;
   }
 
   @override
   Future<void> delete(String id) async {
-    await (_db.delete(_db.containers)..where((t) => t.id.equals(id))).go();
+    final now = DateTime.now().toUtc();
+    await _db.transaction(() async {
+      await (_db.delete(_db.containers)..where((t) => t.id.equals(id))).go();
+      await _sync.enqueue(
+        entityType: SyncEntityType.container,
+        entityId: id,
+        op: SyncOp.delete,
+        updatedAt: now,
+      );
+    });
   }
 
   @override

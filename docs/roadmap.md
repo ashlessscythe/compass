@@ -13,7 +13,7 @@
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
-iOS UI craft for the location graph is through UX-6 (stills). Themes shipped under a transitional monthly SKU (now mapped to Pro features). Offline catalog art hardened. Feature entitlements (Free / Pro / Sync) are in place. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Monetization model: [monetization.md](./monetization.md). Next product work: offline-first sync protocol.
+iOS UI craft for the location graph is through UX-6 (stills). Themes shipped under a transitional monthly SKU (now mapped to Pro features). Offline catalog art hardened. Feature entitlements (Free / Pro / Sync) are in place. Offline-first sync protocol (v0) ships structured Postgres replica + client outbox. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Monetization model: [monetization.md](./monetization.md). Sync protocol: [sync-protocol.md](./sync-protocol.md).
 
 ## Next — MTG MVP
 
@@ -29,7 +29,7 @@ iOS UI craft for the location graph is through UX-6 (stills). Themes shipped und
 - [x] Offline catalog art (match prefetches small+normal; soft-fail + small fallback when airplane)
 - [x] Monetization architecture + feature entitlements (Free / Pro / Sync; mock tier provider; see [monetization.md](./monetization.md))
 - [x] Remap Themes / bulk refetch gates from binary `compass` monthly checks → Pro `canUse(Feature)`
-- [ ] Offline-first sync protocol (v0) — local graph remains source of truth; grants Sync entitlements when cloud ships
+- [x] Offline-first sync protocol (v0) — local graph remains source of truth; Postgres replica + push/pull; Sync-gated (see [sync-protocol.md](./sync-protocol.md))
 
 Pricing model: **Free** = complete local app; **Pro** = lifetime advanced software; **Sync** = cloud subscription. See [monetization.md](./monetization.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). The shipped ~$2/mo Themes SKU is transitional and maps to Pro features until Pro lifetime / Sync products exist.
 

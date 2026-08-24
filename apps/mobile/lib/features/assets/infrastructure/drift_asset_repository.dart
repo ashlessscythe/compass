@@ -2,12 +2,15 @@ import 'package:compass/core/domain/entities/asset.dart';
 import 'package:compass/core/domain/repositories/asset_repository.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/database/mappers.dart';
+import 'package:compass/features/sync/domain/sync_change.dart';
+import 'package:compass/features/sync/infrastructure/sync_local_store.dart';
 import 'package:drift/drift.dart';
 
 class DriftAssetRepository implements AssetRepository {
-  DriftAssetRepository(this._db);
+  DriftAssetRepository(this._db, this._sync);
 
   final AppDatabase _db;
+  final SyncLocalStore _sync;
 
   Asset _toDomain(AssetRow row) {
     return Asset(
@@ -62,19 +65,46 @@ class DriftAssetRepository implements AssetRepository {
 
   @override
   Future<Asset> create(Asset asset) async {
-    await _db.into(_db.assets).insert(_toCompanion(asset));
+    await _db.transaction(() async {
+      await _db.into(_db.assets).insert(_toCompanion(asset));
+      await _sync.enqueue(
+        entityType: SyncEntityType.asset,
+        entityId: asset.id,
+        op: SyncOp.upsert,
+        updatedAt: asset.updatedAt,
+        payload: asset.toJson(),
+      );
+    });
     return asset;
   }
 
   @override
   Future<Asset> update(Asset asset) async {
-    await _db.update(_db.assets).replace(_toCompanion(asset));
+    await _db.transaction(() async {
+      await _db.update(_db.assets).replace(_toCompanion(asset));
+      await _sync.enqueue(
+        entityType: SyncEntityType.asset,
+        entityId: asset.id,
+        op: SyncOp.upsert,
+        updatedAt: asset.updatedAt,
+        payload: asset.toJson(),
+      );
+    });
     return asset;
   }
 
   @override
   Future<void> delete(String id) async {
-    await (_db.delete(_db.assets)..where((t) => t.id.equals(id))).go();
+    final now = DateTime.now().toUtc();
+    await _db.transaction(() async {
+      await (_db.delete(_db.assets)..where((t) => t.id.equals(id))).go();
+      await _sync.enqueue(
+        entityType: SyncEntityType.asset,
+        entityId: id,
+        op: SyncOp.delete,
+        updatedAt: now,
+      );
+    });
   }
 
   @override

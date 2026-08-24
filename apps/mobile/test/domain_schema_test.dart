@@ -4,6 +4,7 @@ import 'package:compass/core/utils/result.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/assets/infrastructure/drift_asset_type_repository.dart';
+import 'package:compass/features/sync/infrastructure/sync_local_store.dart';
 import 'package:compass/shared/providers/database_provider.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -145,7 +146,10 @@ void main() {
     });
 
     test('asset types persist a parent hierarchy', () async {
-      final types = DriftAssetTypeRepository(database);
+      final types = DriftAssetTypeRepository(
+        database,
+        SyncLocalStore(database),
+      );
       final now = DateTime.now().toUtc();
       await types.create(
         AssetType(

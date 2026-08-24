@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** offline-first sync (see [roadmap.md](./roadmap.md) and [monetization.md](./monetization.md)). Feature entitlements (Free / Pro / Sync) are in place; Themes / bulk refetch gate on Pro.
+**Current milestone:** store product cutover / Later platform work (see [roadmap.md](./roadmap.md)). Offline-first sync v0 is in place ([sync-protocol.md](./sync-protocol.md)). Feature entitlements (Free / Pro / Sync); Themes / bulk refetch gate on Pro; Sync gates cloud push/pull.
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 
@@ -172,7 +172,7 @@ These are roadmap items. Do not pull them forward to avoid UX-1…UX-5.
 | Themes + sub | Done (transitional) — Settings → Themes; `compass` → Pro features | Free Dark/Light/Gray; Pro ambience + accent + bulk refetch |
 | Offline catalog art | Done — JPG cache + match prefetch small/normal | Airplane: show cached art; miss → placeholder (no crash) |
 | Feature entitlements | Done — monetization.md; `canUse(Feature)`; mock Free/Pro/Sync | Themes + bulk refetch gate on Pro features |
-| Offline-first sync | Next — see roadmap | Local graph remains source of truth; Sync subscription |
+| Offline-first sync | Done — sync-protocol.md; Settings → Sync | Local SoT; outbox + Postgres push/pull; Sync-gated |
 
 Sync Plus, household sharing, and the web collection browser stay Later. Themes / Pro paywall stays a calm sheet only (never launch interstitial).
 

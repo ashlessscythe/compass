@@ -2,12 +2,15 @@ import 'package:compass/core/domain/entities/asset_type.dart';
 import 'package:compass/core/domain/repositories/asset_type_repository.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/database/mappers.dart';
+import 'package:compass/features/sync/domain/sync_change.dart';
+import 'package:compass/features/sync/infrastructure/sync_local_store.dart';
 import 'package:drift/drift.dart';
 
 class DriftAssetTypeRepository implements AssetTypeRepository {
-  DriftAssetTypeRepository(this._db);
+  DriftAssetTypeRepository(this._db, this._sync);
 
   final AppDatabase _db;
+  final SyncLocalStore _sync;
 
   AssetType _toDomain(AssetTypeRow row) {
     return AssetType(
@@ -58,18 +61,45 @@ class DriftAssetTypeRepository implements AssetTypeRepository {
 
   @override
   Future<AssetType> create(AssetType assetType) async {
-    await _db.into(_db.assetTypes).insert(_toCompanion(assetType));
+    await _db.transaction(() async {
+      await _db.into(_db.assetTypes).insert(_toCompanion(assetType));
+      await _sync.enqueue(
+        entityType: SyncEntityType.assetType,
+        entityId: assetType.id,
+        op: SyncOp.upsert,
+        updatedAt: assetType.updatedAt,
+        payload: assetType.toJson(),
+      );
+    });
     return assetType;
   }
 
   @override
   Future<AssetType> update(AssetType assetType) async {
-    await _db.update(_db.assetTypes).replace(_toCompanion(assetType));
+    await _db.transaction(() async {
+      await _db.update(_db.assetTypes).replace(_toCompanion(assetType));
+      await _sync.enqueue(
+        entityType: SyncEntityType.assetType,
+        entityId: assetType.id,
+        op: SyncOp.upsert,
+        updatedAt: assetType.updatedAt,
+        payload: assetType.toJson(),
+      );
+    });
     return assetType;
   }
 
   @override
   Future<void> delete(String id) async {
-    await (_db.delete(_db.assetTypes)..where((t) => t.id.equals(id))).go();
+    final now = DateTime.now().toUtc();
+    await _db.transaction(() async {
+      await (_db.delete(_db.assetTypes)..where((t) => t.id.equals(id))).go();
+      await _sync.enqueue(
+        entityType: SyncEntityType.assetType,
+        entityId: id,
+        op: SyncOp.delete,
+        updatedAt: now,
+      );
+    });
   }
 }

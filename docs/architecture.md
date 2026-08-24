@@ -33,13 +33,13 @@ compass/
          │                       │
    ┌─────▼─────┐          ┌──────▼──────┐
    │ Local DB  │◄─ sync ─►│ Cloud API   │
-   │ (offline) │          │ (future)    │
+   │ (offline) │          │ (Postgres)  │
    └───────────┘          └─────────────┘
 ```
 
 ## Core domain model
 
-Mobile is the source of truth for this split. `packages/api` mirrors the generic Asset / AssetType / Container / attribute contracts; the Cloud API is not implemented yet.
+Mobile is the source of truth for this split. `packages/api` mirrors the generic Asset / AssetType / Container / attribute contracts and sync DTOs. Cloud sync API (v0) lives on `apps/web` — see [sync-protocol.md](./sync-protocol.md).
 
 How verticals attach without widening Asset: [taxonomy.md](./taxonomy.md).
 
@@ -91,13 +91,13 @@ Source of truth is **on-device SQLite**, not the cloud.
 - Seeded `AssetType`: id `asset-type-item`, name `Item`, module `collectibles`. MTG types come later.
 - Location `path` is stored and recomputed on rename/move. Container and asset paths are derived at read time (`Office / Desk / Binder / Lightning Bolt`).
 - Name search is case-insensitive SQL `LIKE` (no FTS5 yet).
-- Cloud API is a **sync replica**, not required for “where is it?”
-- **Website Postgres** (waitlist, marketing/account tables) is a separate database from inventory. Prisma schema: `apps/web/prisma/schema.prisma`. Migrations: `apps/web/prisma/migrations/`. Secrets: `apps/web/.env.local` (`DATABASE_URL` pooled, `DIRECT_URL` unpooled). Template: `apps/web/.env.example`. Local: `pnpm --filter @compass/web db:migrate`. Deploy runs `prisma migrate deploy` (Vercel build command; Docker entrypoint).
+- Cloud API is a **sync replica**, not required for “where is it?” Protocol: [sync-protocol.md](./sync-protocol.md).
+- **Website Postgres** holds waitlist/marketing tables **and** Sync replica tables (`sync_*`); inventory truth stays on-device SQLite. Prisma schema: `apps/web/prisma/schema.prisma`. Migrations: `apps/web/prisma/migrations/`. Secrets: `apps/web/.env.local` (`DATABASE_URL` pooled, `DIRECT_URL` unpooled). Template: `apps/web/.env.example`. Local: `pnpm --filter @compass/web db:migrate`. Deploy runs `prisma migrate deploy` (Vercel build command; Docker entrypoint).
 
 ## Offline-first strategy
 
 1. Local-first writes on device
-2. Conflict-aware sync when online (future; Sync subscription — see [monetization.md](./monetization.md))
+2. Conflict-aware sync when online (Sync subscription; LWW on `updatedAt` — see [sync-protocol.md](./sync-protocol.md) and [monetization.md](./monetization.md))
 3. Read models optimized for “find by name → show path”
 4. NFC deep links resolve against local data first
 5. External catalogs (Scryfall, etc.) are **enrichment**. Core location workflows must work with them disabled or unreachable; cache fetched images/stats locally when enabled. Matched printings store URLs + stats in SQLite; card art JPGs live under Documents `cache/scryfall/images/` and are prefetched (small + normal) on Match. Offline shows cached art; never-fetched art soft-falls to placeholders.
@@ -110,7 +110,7 @@ Source of truth: [monetization.md](./monetization.md). Mobile wiring: [apps/mobi
 
 - **Free** — complete local inventory (graph, NFC, CSV import, search, Dark/Light/Gray, per-card Match)
 - **Pro** (lifetime) — advanced local software: ambience themes, custom accent, bulk refetch, future bulk / search power tools
-- **Sync** (subscription) — cloud backup and multi-device sync (protocol still Next on the roadmap)
+- **Sync** (subscription) — cloud backup and multi-device sync ([sync-protocol.md](./sync-protocol.md))
 - **Sync Plus** — Later only (shared collections, etc.)
 
 Feature UI calls `canUse(Feature)`, never product or plan names. Product→feature mapping is centralized so pricing can change without rewriting gates.
@@ -136,8 +136,8 @@ Rules:
 
 - App Router, TypeScript, Tailwind, shadcn/ui
 - Waitlist API route (`/api/waitlist`)
-- Env: `apps/web/.env.example` (committed) → copy to `apps/web/.env.local` (secrets)
-- Prisma + Postgres for website data (`WaitlistEntry`); not mobile inventory
+- Env: `apps/web/.env.example` (committed) → copy to `apps/web/.env.local` (secrets). Production (Vercel) setup: [environment.md](./environment.md).
+- Prisma + Postgres for waitlist **and** Sync replica tables (`sync_*`); inventory truth stays on-device SQLite
 - SEO: metadata, Open Graph, Twitter cards, robots, sitemap
 
 Future web surfaces (account, collection browser) can grow in the same app or as additional apps under `apps/`.

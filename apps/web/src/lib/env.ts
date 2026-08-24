@@ -4,7 +4,8 @@
  * Do not import this module from client components. `NEXT_PUBLIC_*` is already
  * inlined; everything else (DATABASE_URL, API keys) must stay on the server.
  *
- * Inventory is not this database. Inventory is on-device SQLite.
+ * Inventory truth is on-device SQLite. This database also holds Sync replica
+ * tables (`sync_*`) when the sync protocol is enabled — see docs/sync-protocol.md.
  */
 
 function optional(name: string): string | undefined {
@@ -18,6 +19,10 @@ export const env = {
   resendApiKey: optional("RESEND_API_KEY"),
   waitlistNotifyTo: optional("WAITLIST_NOTIFY_TO"),
   compassApiSecret: optional("COMPASS_API_SECRET"),
+  /** Apple Services ID or iOS bundle id used as JWT audience. */
+  appleClientId: optional("APPLE_CLIENT_ID"),
+  /** Enables POST /api/auth/dev for simulator sync testing. */
+  syncDevSecret: optional("COMPASS_SYNC_DEV_SECRET"),
 } as const;
 
 export const hasDatabase = Boolean(env.databaseUrl);
