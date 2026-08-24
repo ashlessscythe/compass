@@ -31,7 +31,7 @@ iOS UI craft for the location graph is through UX-6 (stills). Themes + subscript
 
 Pricing: first paid surface is **appearance + bulk refetch** — see [architecture.md](./architecture.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). Sync / household / web remain undecided and are not gated on the Themes sub.
 
-Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home-screen label is **Compass Inventory** (ASC rejects bare `Compass`); in-app title stays Compass. Automating uploads is Later.
+Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home-screen label is **Compass Inventory** (ASC rejects bare `Compass`); in-app title stays Compass. Automating store uploads for iOS and Android testing is Later.
 
 ## Later — Platform
 
@@ -45,7 +45,7 @@ Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add dom
 - [ ] Web collection browser
 - [ ] Public API for power users
 - [ ] Hardware partnerships (NFC labels, storage kits)
-- [ ] Automate iOS build → TestFlight (fastlane or GitHub Actions `macos` + App Store Connect API; replace manual Transporter)
+- [ ] Automate release builds for tester distribution — iOS → TestFlight (fastlane or GitHub Actions `macos` + App Store Connect API; replace manual Transporter); Android → Play internal testing / closed track (or Firebase App Distribution) via CI signing + Play Developer API
 
 ## Branching strategy
 
