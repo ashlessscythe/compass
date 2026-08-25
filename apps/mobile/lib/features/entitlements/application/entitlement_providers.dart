@@ -1,3 +1,4 @@
+import 'package:compass/core/constants/sync_build_config.dart';
 import 'package:compass/features/entitlements/domain/compass_feature.dart';
 import 'package:compass/features/entitlements/domain/entitlement_service.dart';
 import 'package:compass/features/entitlements/infrastructure/fake_entitlement_service.dart';
@@ -39,5 +40,8 @@ class ActiveFeaturesController extends Notifier<Set<CompassFeature>> {
 /// Whether the given feature is currently granted.
 final ProviderFamily<bool, CompassFeature> canUseFeatureProvider =
     Provider.family<bool, CompassFeature>((ref, feature) {
+  if (devSyncGrantsFeature(feature)) {
+    return true;
+  }
   return ref.watch(activeFeaturesProvider).contains(feature);
 });

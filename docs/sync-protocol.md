@@ -76,6 +76,10 @@ Both “devices” that use `test-user-1` share one `sync_users` row (`dev:test-
 
 Production Apple Sign In already uses a stable `apple_sub` across devices — no fixed id needed.
 
+### TestFlight / release builds
+
+When `COMPASS_SYNC_DEV_SECRET` is baked into the app at build time (`--dart-define`), Sync entitlements unlock and Dev sign-in works in release IPA/APK. See [environment.md](./environment.md) for build commands and cleanup.
+
 ## Auth
 
 - **Production:** Sign in with Apple. Server verifies the identity token against Apple’s JWKS (`aud` = Apple Services ID / bundle id).

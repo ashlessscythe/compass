@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:compass/core/constants/sync_build_config.dart';
 import 'package:compass/features/catalog/application/catalog_prefs.dart';
 import 'package:compass/features/catalog/application/catalog_providers.dart';
 import 'package:compass/features/catalog/domain/card_printing.dart';
@@ -50,6 +51,16 @@ class SettingsPage extends ConsumerWidget {
             style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
+          if (isDevSyncBuild) ...[
+            Text(
+              'Test build: Sync unlocked via dev secret. '
+              'Remove before App Store release.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
           ..._syncTiles(
             context,
             ref,
@@ -196,7 +207,11 @@ class SettingsPage extends ConsumerWidget {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.bug_report_outlined),
                 title: const Text('Dev sign-in'),
-                subtitle: const Text('Simulator / local API'),
+                subtitle: Text(
+                  kDebugMode
+                      ? 'Simulator / local API'
+                      : 'Test build dev auth',
+                ),
                 onTap: () => _signInDev(context, ref),
               ),
             );

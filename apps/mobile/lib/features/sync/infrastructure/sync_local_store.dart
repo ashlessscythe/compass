@@ -7,6 +7,7 @@ import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/utils/display_path.dart';
 import 'package:compass/database/app_database.dart';
 import 'package:compass/database/mappers.dart';
+import 'package:compass/features/sync/domain/sync_apply_order.dart';
 import 'package:compass/features/sync/domain/sync_change.dart';
 import 'package:drift/drift.dart';
 
@@ -176,15 +177,50 @@ class SyncLocalStore {
   }
 
   Future<void> applyRemote(SyncChange change) async {
-    switch (change.op) {
-      case SyncOp.delete:
-        await _deleteLocal(change.entityType, change.entityId);
-      case SyncOp.upsert:
+    await applyRemoteChanges([change]);
+  }
+
+  /// Apply pull batch in dependency order with retries for missing FK parents.
+  Future<void> applyRemoteChanges(List<SyncChange> changes) async {
+    if (changes.isEmpty) {
+      return;
+    }
+    final ordered = sortChangesForApply(changes);
+    final upserts =
+        ordered.where((change) => change.op == SyncOp.upsert).toList();
+    final deletes =
+        ordered.where((change) => change.op == SyncOp.delete).toList();
+
+    final appliedUpserts = <String>{};
+    for (var pass = 0; pass < upserts.length + 1; pass++) {
+      var progress = false;
+      for (final change in upserts) {
+        final key = '${change.entityType.wire}:${change.entityId}';
+        if (appliedUpserts.contains(key)) {
+          continue;
+        }
         final payload = change.payload;
         if (payload == null) {
-          return;
+          appliedUpserts.add(key);
+          continue;
         }
-        await _upsertLocal(change.entityType, change.updatedAt, payload);
+        final applied = await _tryApplyUpsert(
+          change.entityType,
+          change.updatedAt,
+          payload,
+        );
+        if (applied) {
+          appliedUpserts.add(key);
+          progress = true;
+        }
+      }
+      if (!progress) {
+        break;
+      }
+    }
+
+    for (final change in deletes) {
+      await _deleteLocal(change.entityType, change.entityId);
     }
   }
 
@@ -235,24 +271,42 @@ class SyncLocalStore {
     }
   }
 
-  Future<void> _upsertLocal(
+  Future<bool> _tryApplyUpsert(
     SyncEntityType type,
     DateTime remoteUpdatedAt,
     Map<String, dynamic> payload,
   ) async {
     switch (type) {
-      case SyncEntityType.location:
-        await _upsertLocation(remoteUpdatedAt, payload);
-      case SyncEntityType.container:
-        await _upsertContainer(remoteUpdatedAt, payload);
-      case SyncEntityType.asset:
-        await _upsertAsset(remoteUpdatedAt, payload);
       case SyncEntityType.assetType:
-        await _upsertAssetType(remoteUpdatedAt, payload);
+        return _upsertAssetType(remoteUpdatedAt, payload);
+      case SyncEntityType.location:
+        return _upsertLocation(remoteUpdatedAt, payload);
+      case SyncEntityType.container:
+        return _upsertContainer(remoteUpdatedAt, payload);
+      case SyncEntityType.asset:
+        return _upsertAsset(remoteUpdatedAt, payload);
     }
   }
 
-  Future<void> _upsertLocation(
+  Future<bool> _locationExists(String id) async {
+    return (_db.select(_db.locations)..where((t) => t.id.equals(id)))
+            .getSingleOrNull()
+        .then((row) => row != null);
+  }
+
+  Future<bool> _containerExists(String id) async {
+    return (_db.select(_db.containers)..where((t) => t.id.equals(id)))
+            .getSingleOrNull()
+        .then((row) => row != null);
+  }
+
+  Future<bool> _assetTypeExists(String id) async {
+    return (_db.select(_db.assetTypes)..where((t) => t.id.equals(id)))
+            .getSingleOrNull()
+        .then((row) => row != null);
+  }
+
+  Future<bool> _upsertLocation(
     DateTime remoteUpdatedAt,
     Map<String, dynamic> payload,
   ) async {
@@ -262,7 +316,13 @@ class SyncLocalStore {
         .getSingleOrNull();
     if (existing != null &&
         existing.updatedAt.toUtc().isAfter(remoteUpdatedAt.toUtc())) {
-      return;
+      return true;
+    }
+    final parentId = entity.parentLocationId;
+    if (parentId != null &&
+        parentId != entity.id &&
+        !await _locationExists(parentId)) {
+      return false;
     }
     await _db.into(_db.locations).insertOnConflictUpdate(
           LocationsCompanion.insert(
@@ -277,9 +337,10 @@ class SyncLocalStore {
             updatedAt: entity.updatedAt,
           ),
         );
+    return true;
   }
 
-  Future<void> _upsertContainer(
+  Future<bool> _upsertContainer(
     DateTime remoteUpdatedAt,
     Map<String, dynamic> payload,
   ) async {
@@ -289,7 +350,17 @@ class SyncLocalStore {
         .getSingleOrNull();
     if (existing != null &&
         existing.updatedAt.toUtc().isAfter(remoteUpdatedAt.toUtc())) {
-      return;
+      return true;
+    }
+    final parentContainerId = entity.parentContainerId;
+    if (parentContainerId != null &&
+        parentContainerId != entity.id &&
+        !await _containerExists(parentContainerId)) {
+      return false;
+    }
+    final locationId = entity.locationId;
+    if (locationId != null && !await _locationExists(locationId)) {
+      return false;
     }
     await _db.into(_db.containers).insertOnConflictUpdate(
           ContainersCompanion.insert(
@@ -304,9 +375,10 @@ class SyncLocalStore {
             updatedAt: entity.updatedAt,
           ),
         );
+    return true;
   }
 
-  Future<void> _upsertAsset(
+  Future<bool> _upsertAsset(
     DateTime remoteUpdatedAt,
     Map<String, dynamic> payload,
   ) async {
@@ -316,7 +388,18 @@ class SyncLocalStore {
         .getSingleOrNull();
     if (existing != null &&
         existing.updatedAt.toUtc().isAfter(remoteUpdatedAt.toUtc())) {
-      return;
+      return true;
+    }
+    if (!await _assetTypeExists(entity.assetTypeId)) {
+      return false;
+    }
+    final containerId = entity.containerId;
+    if (containerId != null && !await _containerExists(containerId)) {
+      return false;
+    }
+    final locationId = entity.locationId;
+    if (locationId != null && !await _locationExists(locationId)) {
+      return false;
     }
     await _db.into(_db.assets).insertOnConflictUpdate(
           AssetsCompanion.insert(
@@ -332,9 +415,10 @@ class SyncLocalStore {
             updatedAt: entity.updatedAt,
           ),
         );
+    return true;
   }
 
-  Future<void> _upsertAssetType(
+  Future<bool> _upsertAssetType(
     DateTime remoteUpdatedAt,
     Map<String, dynamic> payload,
   ) async {
@@ -344,7 +428,13 @@ class SyncLocalStore {
         .getSingleOrNull();
     if (existing != null &&
         existing.updatedAt.toUtc().isAfter(remoteUpdatedAt.toUtc())) {
-      return;
+      return true;
+    }
+    final parentId = entity.parentId;
+    if (parentId != null &&
+        parentId != entity.id &&
+        !await _assetTypeExists(parentId)) {
+      return false;
     }
     await _db.into(_db.assetTypes).insertOnConflictUpdate(
           AssetTypesCompanion.insert(
@@ -358,6 +448,7 @@ class SyncLocalStore {
             updatedAt: entity.updatedAt,
           ),
         );
+    return true;
   }
 
   Location _locationFromRow(LocationRow row) => Location(

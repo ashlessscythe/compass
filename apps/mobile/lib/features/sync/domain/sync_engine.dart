@@ -86,11 +86,11 @@ class SyncEngine {
           .toList(growable: false);
 
       var sawLocation = false;
+      await _store.applyRemoteChanges(changes);
       for (final change in changes) {
         if (change.entityType == SyncEntityType.location) {
           sawLocation = true;
         }
-        await _store.applyRemote(change);
       }
       if (sawLocation) {
         await _store.recomputeAllLocationPaths();

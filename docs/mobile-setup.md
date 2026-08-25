@@ -139,6 +139,8 @@ iOS/macOS App Store icons must be opaque RGB (no alpha). Do not hand-edit PNGs i
 
 Bundle id: `app.compass.mobile`. Bump `version:` in `apps/mobile/pubspec.yaml` (`name+build`) before each upload. Home-screen label is `Compass Inventory` in `ios/Runner/Info.plist` (see [branding.md](./branding.md)). Automating Transporter is a Later roadmap item.
 
+Temporary Sync testing on TestFlight (dev secret baked in): [environment.md](./environment.md#testflight--apk-dev-sync-temporary).
+
 ## What not to commit
 
 These are generated on `flutter pub get` / Xcode and are gitignored:

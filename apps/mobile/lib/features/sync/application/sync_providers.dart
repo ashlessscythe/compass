@@ -1,22 +1,11 @@
+import 'package:compass/core/constants/sync_build_config.dart';
 import 'package:compass/core/utils/id_generator.dart';
 import 'package:compass/features/sync/domain/sync_engine.dart';
 import 'package:compass/features/sync/infrastructure/sync_api_client.dart';
 import 'package:compass/shared/providers/repository_providers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-
-/// `--dart-define=COMPASS_API_BASE_URL=http://localhost:3000`
-const compassApiBaseUrl = String.fromEnvironment('COMPASS_API_BASE_URL');
-
-/// `--dart-define=COMPASS_SYNC_DEV_SECRET=local-dev-only`
-const compassSyncDevSecret = String.fromEnvironment('COMPASS_SYNC_DEV_SECRET');
-
-/// Shared Dev sync identity across installs (simulates same Apple account).
-/// `--dart-define=COMPASS_SYNC_DEV_DEVICE_ID=my-test-user`
-const compassSyncDevDeviceId =
-    String.fromEnvironment('COMPASS_SYNC_DEV_DEVICE_ID');
 
 const _deviceIdKey = 'compass_sync_device_id';
 
@@ -62,10 +51,7 @@ class SyncAuthController {
 
   final Ref _ref;
 
-  bool get canUseDevAuth =>
-      kDebugMode &&
-      compassSyncDevSecret.isNotEmpty &&
-      compassApiBaseUrl.isNotEmpty;
+  bool get canUseDevAuth => isDevSyncAuthEnabled;
 
   Future<String> _deviceId() async {
     if (compassSyncDevDeviceId.isNotEmpty) {

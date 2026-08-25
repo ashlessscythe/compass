@@ -30,6 +30,32 @@ Match `COMPASS_SYNC_DEV_SECRET` to the value in `.env.local`. Use a fixed `COMPA
 
 Do **not** bake secrets into committed xcconfigs or source. Pass them only via `--dart-define` / CI secrets.
 
+### TestFlight / APK dev sync (temporary)
+
+To test Sync on release builds before the Sync store SKU ships, bake the same dev secret the server expects. This unlocks Sync entitlements and **Dev sign-in** in IPA/APK (no Debug tier needed).
+
+**Server:** set `COMPASS_SYNC_DEV_SECRET` on the deploy env (must match the build). Remove when testing ends.
+
+**iOS:**
+```bash
+flutter build ipa \
+  --dart-define=COMPASS_API_BASE_URL=https://getcompass.space \
+  --dart-define=COMPASS_SYNC_DEV_SECRET=your-secret-here \
+  --dart-define=COMPASS_SYNC_DEV_DEVICE_ID=test-user-1
+```
+
+**Android:**
+```bash
+flutter build apk --release \
+  --dart-define=COMPASS_API_BASE_URL=https://getcompass.space \
+  --dart-define=COMPASS_SYNC_DEV_SECRET=your-secret-here \
+  --dart-define=COMPASS_SYNC_DEV_DEVICE_ID=test-user-1
+```
+
+In app: **Settings → Sync → Dev sign-in → Sync now**.
+
+**Security:** the secret is extractable from the binary. Remove it from **both** build args and production server before a public App Store release. Do not commit the secret to git.
+
 ## Production (Vercel + Neon)
 
 Set these in the Vercel project → **Settings → Environment Variables** for Production (and Preview if you use Preview DBs).
@@ -40,7 +66,7 @@ Set these in the Vercel project → **Settings → Environment Variables** for P
 | `DIRECT_URL` | Yes | Neon **unpooled** URL (no `-pooler`). Used by Prisma migrate. |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Canonical site URL, e.g. `https://getcompass.space`. |
 | `APPLE_CLIENT_ID` | Yes for Sync | JWT `aud` for Sign in with Apple — iOS bundle id `app.compass.mobile` or your Services ID. |
-| `COMPASS_SYNC_DEV_SECRET` | **No** | Leave **unset** in Production so `/api/auth/dev` returns 404. Local/simulator only. |
+| `COMPASS_SYNC_DEV_SECRET` | **No** | Temporary only: enables `/api/auth/dev` for TestFlight sync testing. Remove before public release. |
 | `COMPASS_API_SECRET` | No | Reserved; unused in v0. |
 | `RESEND_API_KEY` / `WAITLIST_NOTIFY_TO` | No | Waitlist email (not wired yet). |
 
@@ -56,6 +82,11 @@ After changing schema, run migrations against Production (CI, Vercel build `db:d
 
 - `apps/web/.env.local`, `.env`, or any file with real `DATABASE_URL` / API keys
 - Production Neon passwords, RevenueCat live keys, Apple private keys
-- `COMPASS_SYNC_DEV_SECRET` in Production env (disable Dev auth)
+- `COMPASS_SYNC_DEV_SECRET` on production (disable Dev auth when testing ends)
 
 Safe to commit: `.env.example` with placeholders only (`user:password@localhost`, commented optional keys).
+
+## Cleanup after dev sync testing
+
+1. Remove `COMPASS_SYNC_DEV_SECRET` from Vercel / production env.
+2. Ship IPA/APK **without** `--dart-define=COMPASS_SYNC_DEV_SECRET`.
