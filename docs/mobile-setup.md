@@ -139,6 +139,33 @@ iOS/macOS App Store icons must be opaque RGB (no alpha). Do not hand-edit PNGs i
 
 Bundle id: `app.compass.mobile`. Bump `version:` in `apps/mobile/pubspec.yaml` (`name+build`) before each upload. Home-screen label is `Compass Inventory` in `ios/Runner/Info.plist` (see [branding.md](./branding.md)). Automating Transporter is a Later roadmap item.
 
+```bash
+cd apps/mobile
+chmod +x tool/build_ipa.sh   # once
+./tool/build_ipa.sh \
+  --dart-define=COMPASS_API_BASE_URL=https://getcompass.space
+```
+
+Uses `ios/ExportOptions.plist` (team `LJU4593RX3`, App Store Connect export).
+
+### IPA export failed: “No Accounts” / “No signing certificate iOS Distribution”
+
+`flutter build ipa` archives successfully, then export fails when Xcode has no Apple ID or no **Apple Distribution** certificate in the login keychain (Development-only is not enough for TestFlight).
+
+**Fix (one time):**
+
+1. Open **Xcode** (or Xcode-beta) → **Settings → Accounts** → add your Apple ID for team `LJU4593RX3`.
+2. Select the team → **Manage Certificates…** → **+** → **Apple Distribution**.
+3. Re-run `./tool/build_ipa.sh` (or `flutter build ipa --export-options-plist=ios/ExportOptions.plist …`).
+
+**Workaround:** if `build/ios/archive/Runner.xcarchive` already exists, export from Organizer (Xcode may create the Distribution cert during the flow):
+
+```bash
+open build/ios/archive/Runner.xcarchive
+```
+
+Then **Distribute App → App Store Connect → Upload**.
+
 Temporary Sync testing on TestFlight (dev secret baked in): [environment.md](./environment.md#testflight--apk-dev-sync-temporary).
 
 ## What not to commit
