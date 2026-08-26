@@ -27,7 +27,17 @@ flutter run -d "iPhone 17 Pro" \
   --dart-define=REVENUECAT_API_KEY=appl_xxx
 ```
 
-TestFlight / IPA: pass the same `appl_` define to `flutter build ipa` / [`tool/build_ipa.sh`](../../tool/build_ipa.sh). Do not commit the key or bake it into xcconfigs.
+**Key prefixes**
+
+| Prefix | What it is | Simulator |
+|--------|------------|-----------|
+| `appl_` | Apple public SDK key | Real StoreKit. `flutter run` does **not** load the Xcode StoreKit config — Run from Xcode, or use Test Store. |
+| `test_` | RevenueCat Test Store | No Apple sheet. SDK shows a Success / Fail / Cancel modal. Products must exist **on the Test Store app** in the dashboard (same IDs), attached to `pro` / `sync`. Tap **successful purchase**. |
+| `sk_` | Secret REST key | Never pass to Flutter. |
+
+Project Settings → **Audit logs** are dashboard edits (`entitlement_created`, …), not SDK traffic. SDK configure/purchase shows up under **Customers** and **Overview**, and as `flutter: RevenueCat:` lines in the run console.
+
+TestFlight / IPA: pass the **`appl_`** define to `flutter build ipa` / [`tool/build_ipa.sh`](../../tool/build_ipa.sh). Do not commit the key or bake it into xcconfigs. Do not ship `test_`.
 
 A RevenueCat **secret** REST key (`sk_…`) may live in `apps/web/.env.local` / Vercel for later server checks. Unused in v0. Never dart-define it; never `NEXT_PUBLIC_`.
 

@@ -123,6 +123,11 @@ class RevenueCatEntitlementService implements EntitlementService {
       final offerings = await Purchases.getOfferings();
       final package = packageForProduct(offerings, productId);
       if (package == null) {
+        debugPrint(
+          'RevenueCat: no package for $productId '
+          '(current=${offerings.current?.identifier} '
+          'all=${offerings.all.keys.toList()})',
+        );
         return EntitlementActionResult.unavailable;
       }
       final result = await Purchases.purchase(
@@ -133,16 +138,25 @@ class RevenueCatEntitlementService implements EntitlementService {
       if (expected.isEmpty) {
         return EntitlementActionResult.failed;
       }
-      return expected.every(canUse)
-          ? EntitlementActionResult.success
-          : EntitlementActionResult.failed;
+      if (expected.every(canUse)) {
+        return EntitlementActionResult.success;
+      }
+      debugPrint(
+        'RevenueCat: purchase returned but features missing for $productId. '
+        'entitlements=${result.customerInfo.entitlements.active.keys.toList()} '
+        'subs=${result.customerInfo.activeSubscriptions} '
+        'nonSubs=${result.customerInfo.nonSubscriptionTransactions.map((t) => t.productIdentifier).toList()}',
+      );
+      return EntitlementActionResult.failed;
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
       if (code == PurchasesErrorCode.purchaseCancelledError) {
         return EntitlementActionResult.cancelled;
       }
+      debugPrint('RevenueCat: purchase failed ($code) ${e.message}');
       return EntitlementActionResult.failed;
-    } on Object {
+    } on Object catch (error, stack) {
+      debugPrint('RevenueCat: purchase failed $error\n$stack');
       return EntitlementActionResult.failed;
     }
   }
