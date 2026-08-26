@@ -89,8 +89,8 @@ pnpm format       # Prettier
 High level:
 
 1. **Foundation** — monorepo, marketing site, shared packages, Flutter scaffold
-2. **MTG MVP** — local location graph and name search are in; iOS UX pass next ([milestones](./docs/mobile-ux.md)), then NFC, imports, Scryfall
-3. **Platform** — additional modules, sync, web app surfaces
+2. **MTG MVP** — location graph, NFC, import, Scryfall, Pro lifetime / Sync store products
+3. **Platform** — CSV export, domain packs, web collection browser
 
 Details: [docs/roadmap.md](./docs/roadmap.md)
 

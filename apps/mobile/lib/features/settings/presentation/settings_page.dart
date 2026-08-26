@@ -6,6 +6,7 @@ import 'package:compass/features/catalog/application/catalog_providers.dart';
 import 'package:compass/features/catalog/domain/card_printing.dart';
 import 'package:compass/features/entitlements/application/entitlement_providers.dart';
 import 'package:compass/features/entitlements/domain/compass_feature.dart';
+import 'package:compass/features/entitlements/presentation/unlock_sheet.dart';
 import 'package:compass/features/sync/application/sync_providers.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
@@ -130,9 +131,7 @@ class SettingsPage extends ConsumerWidget {
             title: const Text('Download / update catalog'),
             subtitle: const Text('Wi‑Fi recommended — large download'),
             enabled: catalogEnabled,
-            onTap: catalogEnabled
-                ? () => _downloadCatalog(context, ref)
-                : null,
+            onTap: catalogEnabled ? () => _downloadCatalog(context, ref) : null,
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -162,7 +161,7 @@ class SettingsPage extends ConsumerWidget {
             'Backup and multi-device sync — requires Sync',
           ),
           trailing: const Icon(Icons.lock_outline),
-          onTap: () => _showSyncPaywall(context),
+          onTap: () => showSyncUnlockSheet(context, ref),
         ),
       ];
     }
@@ -181,8 +180,8 @@ class SettingsPage extends ConsumerWidget {
             subtitle: Text(
               session.lastSuccessAt == null
                   ? (session.apiConfigured
-                      ? 'Sign in to push and pull your graph'
-                      : 'Set COMPASS_API_BASE_URL to enable sync')
+                        ? 'Sign in to push and pull your graph'
+                        : 'Set COMPASS_API_BASE_URL to enable sync')
                   : 'Last synced ${session.lastSuccessAt!.toLocal()}',
             ),
           ),
@@ -208,9 +207,7 @@ class SettingsPage extends ConsumerWidget {
                 leading: const Icon(Icons.bug_report_outlined),
                 title: const Text('Dev sign-in'),
                 subtitle: Text(
-                  kDebugMode
-                      ? 'Simulator / local API'
-                      : 'Test build dev auth',
+                  kDebugMode ? 'Simulator / local API' : 'Test build dev auth',
                 ),
                 onTap: () => _signInDev(context, ref),
               ),
@@ -251,54 +248,8 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _showSyncPaywall(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.sm,
-              AppSpacing.lg,
-              AppSpacing.xl,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Compass Sync',
-                  style: Theme.of(sheetContext).textTheme.titleLarge,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Keep your collection synchronized and backed up across '
-                  'devices. Local inventory always works offline.'
-                  '${kDebugMode ? ' Debug: Themes → Debug tier → Sync.' : ''}',
-                  style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(sheetContext)
-                            .colorScheme
-                            .onSurfaceVariant,
-                      ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                TextButton(
-                  onPressed: () => Navigator.of(sheetContext).pop(),
-                  child: const Text('Not now'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Future<void> _signInApple(BuildContext context, WidgetRef ref) async {
-    final error =
-        await ref.read(syncAuthControllerProvider).signInWithApple();
+    final error = await ref.read(syncAuthControllerProvider).signInWithApple();
     if (!context.mounted) {
       return;
     }

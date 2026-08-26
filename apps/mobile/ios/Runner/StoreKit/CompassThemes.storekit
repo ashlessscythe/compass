@@ -1,7 +1,24 @@
 {
   "identifier" : "CompassThemesConfig",
-  "nonRenewingSubscriptions" : [],
+  "nonRenewingSubscriptions" : [
+
+  ],
   "products" : [
+    {
+      "displayPrice" : "12.99",
+      "familyShareable" : false,
+      "internalID" : "compass_pro_lifetime_local",
+      "localizations" : [
+        {
+          "description" : "Unlock advanced Compass features permanently",
+          "displayName" : "Compass Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "compass_pro_lifetime",
+      "referenceName" : "Compass Pro Lifetime",
+      "type" : "NonConsumable"
+    },
     {
       "displayPrice" : "2.00",
       "familyShareable" : false,
@@ -14,13 +31,15 @@
         }
       ],
       "productID" : "compass_monthly",
-      "referenceName" : "Compass Monthly",
+      "referenceName" : "Compass Monthly (legacy)",
       "type" : "RecurringSubscription"
     }
   ],
   "settings" : {
     "_failTransactionsEnabled" : false,
-    "_storeKitErrors" : []
+    "_storeKitErrors" : [
+
+    ]
   },
   "subscriptionGroups" : [
     {
@@ -28,13 +47,17 @@
       "localizations" : [
         {
           "locale" : "en_US",
-          "name" : "Compass"
+          "name" : "Compass Themes (legacy)"
         }
       ],
       "subscriptions" : [
         {
-          "adHocOffers" : [],
-          "codeOffers" : [],
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
           "displayPrice" : "2.00",
           "internalID" : "compass_monthly_local",
           "localizations" : [
@@ -46,8 +69,63 @@
           ],
           "productID" : "compass_monthly",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Compass Monthly",
+          "referenceName" : "Compass Monthly (legacy)",
           "subscriptionGroupID" : "compass_group",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    },
+    {
+      "id" : "compass_sync",
+      "localizations" : [
+        {
+          "locale" : "en_US",
+          "name" : "Compass Sync"
+        }
+      ],
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "internalID" : "compass_sync_monthly_local",
+          "localizations" : [
+            {
+              "description" : "Keep your collection synchronized and backed up across devices",
+              "displayName" : "Compass Sync Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "compass_sync_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Compass Sync Monthly",
+          "subscriptionGroupID" : "compass_sync",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "internalID" : "compass_sync_yearly_local",
+          "localizations" : [
+            {
+              "description" : "Keep your collection synchronized and backed up across devices",
+              "displayName" : "Compass Sync Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "compass_sync_yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Compass Sync Yearly",
+          "subscriptionGroupID" : "compass_sync",
           "type" : "RecurringSubscription"
         }
       ]

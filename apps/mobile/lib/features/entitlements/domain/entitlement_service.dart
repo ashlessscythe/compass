@@ -10,8 +10,11 @@ abstract interface class EntitlementService {
 
   Stream<Set<CompassFeature>> get featureChanges;
 
-  /// Starts purchase for Pro (transitional store product until lifetime IAP).
-  Future<EntitlementActionResult> purchase();
+  /// Starts purchase for a store [productId] (not a feature or plan name).
+  Future<EntitlementActionResult> purchaseProduct(String productId);
+
+  /// Localized store price for [productId], or null if unknown / unavailable.
+  Future<String?> priceLabel(String productId);
 
   /// Restores prior purchases.
   Future<EntitlementActionResult> restore();

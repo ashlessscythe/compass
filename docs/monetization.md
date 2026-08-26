@@ -121,7 +121,7 @@ compass_sync_plus_monthly
 compass_sync_plus_yearly
 ```
 
-**Transitional v1:** RevenueCat entitlement `compass` + product `compass_monthly` (~$2/mo Themes) still ships for TestFlight. Active `compass` maps to the **Pro** feature set until a real Pro lifetime IAP cutover. Do not treat that monthly SKU as the long-term model.
+**Cutover:** current offering sells `compass_pro_lifetime` (Pro) and `compass_sync_monthly` / `compass_sync_yearly` (Sync). Legacy entitlement `compass` + product `compass_monthly` stay mapped to **Pro** for existing TestFlight subscribers; that SKU is not in the current offering. Dashboard steps: [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). Catalog fields (prints, colors, costs, pricing) can still change after cutover — only product IDs and IAP types are sticky.
 
 ---
 
@@ -193,7 +193,7 @@ Do **not** send private inventory contents to analytics.
 2. **Pro** — lifetime advanced local features  
 3. **Sync** — ~$2.99/mo cloud  
 
-Defer Sync Plus. Build the feature entitlement layer (with a mock Free / Pro / Sync / Sync+ provider) before wiring new App Store products.
+Defer Sync Plus. Feature entitlement layer is in place; store products are `compass_pro_lifetime` and `compass_sync_monthly` / yearly.
 
 ---
 

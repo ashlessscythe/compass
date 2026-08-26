@@ -97,4 +97,4 @@ Cloud replica data is retained for **30 days** after Sync entitlement lapses. Af
 
 ## Explicitly out of v0
 
-Firebase, SQLite file upload, photo object storage, Sync Plus / sharing, web collection browser, App Store Sync SKU cutover, manual conflict UI, CRDTs.
+Firebase, SQLite file upload, photo object storage, Sync Plus / sharing, web collection browser, RevenueCat server entitlement checks, manual conflict UI, CRDTs.

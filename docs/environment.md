@@ -30,9 +30,20 @@ Match `COMPASS_SYNC_DEV_SECRET` to the value in `.env.local`. Use a fixed `COMPA
 
 Do **not** bake secrets into committed xcconfigs or source. Pass them only via `--dart-define` / CI secrets.
 
+### Mobile (RevenueCat public SDK key)
+
+The Apple public SDK key (`appl_…`) is **not** loaded from `apps/web/.env.local`. Pass it at compile time:
+
+```bash
+flutter run -d "iPhone 17 Pro" \
+  --dart-define=REVENUECAT_API_KEY=appl_xxx
+```
+
+Without this define, the app uses Fake entitlements (Debug tier). Details: [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md).
+
 ### TestFlight / APK dev sync (temporary)
 
-To test Sync on release builds before the Sync store SKU ships, bake the same dev secret the server expects. This unlocks Sync entitlements and **Dev sign-in** in IPA/APK (no Debug tier needed).
+To test Sync on release builds without a store purchase, bake the same dev secret the server expects. This unlocks Sync entitlements and **Dev sign-in** in IPA/APK (no Debug tier needed). Purchasable Sync (`compass_sync_monthly` / yearly) is the real path; keep the secret only until a public release.
 
 **Server:** set `COMPASS_SYNC_DEV_SECRET` on the deploy env (must match the build). Remove when testing ends.
 
@@ -81,7 +92,7 @@ After changing schema, run migrations against Production (CI, Vercel build `db:d
 ### What must never be committed
 
 - `apps/web/.env.local`, `.env`, or any file with real `DATABASE_URL` / API keys
-- Production Neon passwords, RevenueCat live keys, Apple private keys
+- Production Neon passwords, RevenueCat live **secret** (`sk_`) keys, Apple private keys
 - `COMPASS_SYNC_DEV_SECRET` on production (disable Dev auth when testing ends)
 
 Safe to commit: `.env.example` with placeholders only (`user:password@localhost`, commented optional keys).

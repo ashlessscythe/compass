@@ -13,7 +13,7 @@
 
 The Flutter client (`apps/mobile`) ships Clean Architecture layers, domain entities, Riverpod, GoRouter, and an on-device Drift location graph (places, containers, assets) with name search.
 
-iOS UI craft for the location graph is through UX-6 (stills). Themes shipped under a transitional monthly SKU (now mapped to Pro features). Offline catalog art hardened. Feature entitlements (Free / Pro / Sync) are in place. Offline-first sync protocol (v0) ships structured Postgres replica + client outbox. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Monetization model: [monetization.md](./monetization.md). Sync protocol: [sync-protocol.md](./sync-protocol.md).
+iOS UI craft for the location graph is through UX-6 (stills). Store products are Pro lifetime + Sync monthly/yearly (legacy `compass_monthly` still grants Pro). Offline catalog art hardened. Feature entitlements (Free / Pro / Sync) are in place. Offline-first sync protocol (v0) ships structured Postgres replica + client outbox. Sequence and exit criteria: [mobile-ux.md](./mobile-ux.md). Monetization model: [monetization.md](./monetization.md). Sync protocol: [sync-protocol.md](./sync-protocol.md).
 
 ## Next — MTG MVP
 
@@ -31,7 +31,7 @@ iOS UI craft for the location graph is through UX-6 (stills). Themes shipped und
 - [x] Remap Themes / bulk refetch gates from binary `compass` monthly checks → Pro `canUse(Feature)`
 - [x] Offline-first sync protocol (v0) — local graph remains source of truth; Postgres replica + push/pull; Sync-gated (see [sync-protocol.md](./sync-protocol.md))
 
-Pricing model: **Free** = complete local app; **Pro** = lifetime advanced software; **Sync** = cloud subscription. See [monetization.md](./monetization.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). The shipped ~$2/mo Themes SKU is transitional and maps to Pro features until Pro lifetime / Sync products exist.
+Pricing model: **Free** = complete local app; **Pro** = lifetime advanced software; **Sync** = cloud subscription. See [monetization.md](./monetization.md) and [apps/mobile/docs/entitlements.md](../apps/mobile/docs/entitlements.md). Legacy `compass_monthly` remains mapped to Pro for existing TestFlight subscribers; it is not in the current offering.
 
 Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home-screen label is **Compass Inventory** (ASC rejects bare `Compass`); in-app title stays Compass. Automating store uploads for iOS and Android testing is Later.
 
@@ -39,7 +39,7 @@ Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home
 
 Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add domain columns to core Asset.
 
-- [ ] Store product cutover — `compass_pro_lifetime`, `compass_sync_monthly` / yearly (replace transitional `compass_monthly`)
+- [x] Store product cutover — `compass_pro_lifetime`, `compass_sync_monthly` / yearly (replace transitional `compass_monthly`)
 - [ ] CSV export (free; data ownership)
 - [ ] Monetization analytics events (paywall / purchase / restore; no inventory contents)
 - [ ] Sync Plus tier (shared collections, advanced cloud history) — only when needed

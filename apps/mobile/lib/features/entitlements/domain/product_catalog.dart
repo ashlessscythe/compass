@@ -11,10 +11,16 @@ abstract final class ProductIds {
   static const syncPlusMonthly = 'compass_sync_plus_monthly';
   static const syncPlusYearly = 'compass_sync_plus_yearly';
 
-  /// Transitional RevenueCat entitlement (Themes v1 monthly).
+  /// RevenueCat entitlement attached to [proLifetime].
+  static const proEntitlement = 'pro';
+
+  /// RevenueCat entitlement attached to Sync monthly / yearly.
+  static const syncEntitlement = 'sync';
+
+  /// Legacy RevenueCat entitlement (Themes v1 monthly). Still grants Pro.
   static const legacyCompassEntitlement = 'compass';
 
-  /// Transitional App Store / RevenueCat product.
+  /// Legacy App Store / RevenueCat product. Not in the current offering.
   static const legacyMonthlyProduct = 'compass_monthly';
 }
 
@@ -52,17 +58,30 @@ abstract final class ProductFeatureMap {
   /// Features granted by a store product or entitlement id.
   static Set<CompassFeature> featuresForProduct(String productOrEntitlementId) {
     return switch (productOrEntitlementId) {
+      ProductIds.proEntitlement ||
       ProductIds.proLifetime ||
       ProductIds.legacyCompassEntitlement ||
-      ProductIds.legacyMonthlyProduct =>
-        Set<CompassFeature>.of(proFeatures),
-      ProductIds.syncMonthly || ProductIds.syncYearly =>
-        Set<CompassFeature>.of(syncFeatures),
+      ProductIds.legacyMonthlyProduct => Set<CompassFeature>.of(proFeatures),
+      ProductIds.syncEntitlement ||
+      ProductIds.syncMonthly ||
+      ProductIds.syncYearly => Set<CompassFeature>.of(syncFeatures),
       ProductIds.syncPlusMonthly || ProductIds.syncPlusYearly => {
-          ...syncFeatures,
-          ...syncPlusExtras,
-        },
+        ...syncFeatures,
+        ...syncPlusExtras,
+      },
       _ => const <CompassFeature>{},
+    };
+  }
+
+  /// Exclusive Fake / debug picker tier for a purchase product id.
+  static EntitlementTier? tierForPurchase(String productId) {
+    return switch (productId) {
+      ProductIds.proLifetime ||
+      ProductIds.legacyMonthlyProduct => EntitlementTier.pro,
+      ProductIds.syncMonthly || ProductIds.syncYearly => EntitlementTier.sync,
+      ProductIds.syncPlusMonthly ||
+      ProductIds.syncPlusYearly => EntitlementTier.syncPlus,
+      _ => null,
     };
   }
 
@@ -73,9 +92,9 @@ abstract final class ProductFeatureMap {
       EntitlementTier.pro => Set<CompassFeature>.of(proFeatures),
       EntitlementTier.sync => Set<CompassFeature>.of(syncFeatures),
       EntitlementTier.syncPlus => {
-          ...syncFeatures,
-          ...syncPlusExtras,
-        },
+        ...syncFeatures,
+        ...syncPlusExtras,
+      },
     };
   }
 

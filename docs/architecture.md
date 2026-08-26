@@ -115,7 +115,7 @@ Source of truth: [monetization.md](./monetization.md). Mobile wiring: [apps/mobi
 
 Feature UI calls `canUse(Feature)`, never product or plan names. Product→feature mapping is centralized so pricing can change without rewriting gates.
 
-**Transitional v1 store surface:** RevenueCat entitlement `compass` + `compass_monthly` (~$2/mo) still unlocks the **Pro** feature set for existing TestFlight subscribers until Pro lifetime / Sync SKUs ship. That monthly Themes SKU is not the long-term model.
+**Store surface:** current offering is `compass_pro_lifetime` (Pro) plus `compass_sync_monthly` / yearly (Sync). Legacy RevenueCat entitlement `compass` + `compass_monthly` still unlocks the **Pro** feature set for existing TestFlight subscribers; that monthly SKU is not sold from the current offering.
 
 Paywall tone: calm contextual sheet only — never launch interstitial. Export and core local flows stay free; Sync expiry must not degrade the offline app.
 

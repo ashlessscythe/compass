@@ -22,8 +22,8 @@ final entitlementServiceProvider = Provider<EntitlementService>((ref) {
 /// Live set of granted features for UI gates.
 final activeFeaturesProvider =
     NotifierProvider<ActiveFeaturesController, Set<CompassFeature>>(
-  ActiveFeaturesController.new,
-);
+      ActiveFeaturesController.new,
+    );
 
 class ActiveFeaturesController extends Notifier<Set<CompassFeature>> {
   @override
@@ -40,8 +40,8 @@ class ActiveFeaturesController extends Notifier<Set<CompassFeature>> {
 /// Whether the given feature is currently granted.
 final ProviderFamily<bool, CompassFeature> canUseFeatureProvider =
     Provider.family<bool, CompassFeature>((ref, feature) {
-  if (devSyncGrantsFeature(feature)) {
-    return true;
-  }
-  return ref.watch(activeFeaturesProvider).contains(feature);
-});
+      if (devSyncGrantsFeature(feature)) {
+        return true;
+      }
+      return ref.watch(activeFeaturesProvider).contains(feature);
+    });

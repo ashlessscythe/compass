@@ -9,8 +9,9 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// RevenueCat-backed entitlements.
 ///
-/// Active legacy entitlement [ProductIds.legacyCompassEntitlement] grants the
-/// **Pro** feature set until Pro lifetime / Sync products ship.
+/// Current offering sells [ProductIds.proLifetime] and Sync monthly / yearly.
+/// Legacy entitlement [ProductIds.legacyCompassEntitlement] still grants Pro
+/// for existing `compass_monthly` subscribers.
 class RevenueCatEntitlementService implements EntitlementService {
   RevenueCatEntitlementService({required this.apiKey});
 
@@ -39,9 +40,12 @@ class RevenueCatEntitlementService implements EntitlementService {
   void _onCustomerInfo(CustomerInfo info) => _apply(info);
 
   void _apply(CustomerInfo info) {
-    final activeIds = <String>{};
-    for (final key in info.entitlements.active.keys) {
-      activeIds.add(key);
+    final activeIds = <String>{
+      ...info.entitlements.active.keys,
+      ...info.activeSubscriptions,
+    };
+    for (final txn in info.nonSubscriptionTransactions) {
+      activeIds.add(txn.productIdentifier);
     }
     final next = ProductFeatureMap.featuresForProducts(activeIds);
     if (_sameFeatures(_features, next)) {
@@ -58,6 +62,36 @@ class RevenueCatEntitlementService implements EntitlementService {
     return a.containsAll(b);
   }
 
+  /// Package whose store product id matches [productId].
+  ///
+  /// Prefers the current offering, then searches every offering.
+  @visibleForTesting
+  static Package? packageForProduct(Offerings offerings, String productId) {
+    Package? inOffering(Offering? offering) {
+      if (offering == null) {
+        return null;
+      }
+      for (final package in offering.availablePackages) {
+        if (package.storeProduct.identifier == productId) {
+          return package;
+        }
+      }
+      return null;
+    }
+
+    final fromCurrent = inOffering(offerings.current);
+    if (fromCurrent != null) {
+      return fromCurrent;
+    }
+    for (final offering in offerings.all.values) {
+      final match = inOffering(offering);
+      if (match != null) {
+        return match;
+      }
+    }
+    return null;
+  }
+
   @override
   bool canUse(CompassFeature feature) => _features.contains(feature);
 
@@ -68,16 +102,26 @@ class RevenueCatEntitlementService implements EntitlementService {
   Stream<Set<CompassFeature>> get featureChanges => _controller.stream;
 
   @override
-  Future<EntitlementActionResult> purchase() async {
+  Future<String?> priceLabel(String productId) async {
+    if (!_ready) {
+      return null;
+    }
+    try {
+      final offerings = await Purchases.getOfferings();
+      return packageForProduct(offerings, productId)?.storeProduct.priceString;
+    } on Object {
+      return null;
+    }
+  }
+
+  @override
+  Future<EntitlementActionResult> purchaseProduct(String productId) async {
     if (!_ready) {
       return EntitlementActionResult.unavailable;
     }
     try {
       final offerings = await Purchases.getOfferings();
-      final packages =
-          offerings.current?.availablePackages ?? const <Package>[];
-      final package = offerings.current?.monthly ??
-          (packages.isEmpty ? null : packages.first);
+      final package = packageForProduct(offerings, productId);
       if (package == null) {
         return EntitlementActionResult.unavailable;
       }
@@ -85,7 +129,11 @@ class RevenueCatEntitlementService implements EntitlementService {
         PurchaseParams.package(package),
       );
       _apply(result.customerInfo);
-      return canUse(CompassFeature.advancedThemes)
+      final expected = ProductFeatureMap.featuresForProduct(productId);
+      if (expected.isEmpty) {
+        return EntitlementActionResult.failed;
+      }
+      return expected.every(canUse)
           ? EntitlementActionResult.success
           : EntitlementActionResult.failed;
     } on PlatformException catch (e) {

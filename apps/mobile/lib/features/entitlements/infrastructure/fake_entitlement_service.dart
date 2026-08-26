@@ -7,8 +7,8 @@ import 'package:compass/features/entitlements/domain/product_catalog.dart';
 /// In-memory entitlements for tests and local development without StoreKit.
 class FakeEntitlementService implements EntitlementService {
   FakeEntitlementService({EntitlementTier initialTier = EntitlementTier.free})
-      : _tier = initialTier,
-        _features = ProductFeatureMap.featuresForTier(initialTier);
+    : _tier = initialTier,
+      _features = ProductFeatureMap.featuresForTier(initialTier);
 
   EntitlementTier _tier;
   Set<CompassFeature> _features;
@@ -35,10 +35,17 @@ class FakeEntitlementService implements EntitlementService {
   Stream<Set<CompassFeature>> get featureChanges => _controller.stream;
 
   @override
-  Future<EntitlementActionResult> purchase() async {
-    setTier(EntitlementTier.pro);
+  Future<EntitlementActionResult> purchaseProduct(String productId) async {
+    final tier = ProductFeatureMap.tierForPurchase(productId);
+    if (tier == null) {
+      return EntitlementActionResult.unavailable;
+    }
+    setTier(tier);
     return EntitlementActionResult.success;
   }
+
+  @override
+  Future<String?> priceLabel(String productId) async => null;
 
   @override
   Future<EntitlementActionResult> restore() async {

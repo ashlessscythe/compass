@@ -143,10 +143,11 @@ Bundle id: `app.compass.mobile`. Bump `version:` in `apps/mobile/pubspec.yaml` (
 cd apps/mobile
 chmod +x tool/build_ipa.sh   # once
 ./tool/build_ipa.sh \
-  --dart-define=COMPASS_API_BASE_URL=https://getcompass.space
+  --dart-define=COMPASS_API_BASE_URL=https://getcompass.space \
+  --dart-define=REVENUECAT_API_KEY=appl_xxx
 ```
 
-Uses `ios/ExportOptions.plist` (team `LJU4593RX3`, App Store Connect export).
+Uses `ios/ExportOptions.plist` (team `LJU4593RX3`, App Store Connect export). Pass the public RevenueCat Apple SDK key (`appl_`), not the secret REST key. Simulator StoreKit testing: [ios/Runner/StoreKit/CompassThemes.storekit](../apps/mobile/ios/Runner/StoreKit/CompassThemes.storekit) is attached to the Runner scheme.
 
 ### IPA export failed: “No Accounts” / “No signing certificate iOS Distribution”
 

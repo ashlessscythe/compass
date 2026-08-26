@@ -1,5 +1,6 @@
 import 'package:compass/features/entitlements/application/entitlement_providers.dart';
 import 'package:compass/features/entitlements/domain/compass_feature.dart';
+import 'package:compass/features/entitlements/domain/entitlement_service.dart';
 import 'package:compass/features/entitlements/domain/product_catalog.dart';
 import 'package:compass/features/entitlements/infrastructure/fake_entitlement_service.dart';
 import 'package:compass/theme/compass_theme_id.dart';
@@ -45,9 +46,63 @@ void main() {
     expect(features, isNot(contains(CompassFeature.cloudSync)));
   });
 
+  test('pro lifetime maps to Pro features not Sync', () {
+    final features = ProductFeatureMap.featuresForProduct(
+      ProductIds.proLifetime,
+    );
+    expect(features, contains(CompassFeature.advancedThemes));
+    expect(features, isNot(contains(CompassFeature.cloudSync)));
+    expect(
+      ProductFeatureMap.featuresForProduct(ProductIds.proEntitlement),
+      contains(CompassFeature.bulkRefresh),
+    );
+  });
+
+  test('Sync products and entitlement map to Sync not Pro', () {
+    for (final id in [
+      ProductIds.syncMonthly,
+      ProductIds.syncYearly,
+      ProductIds.syncEntitlement,
+    ]) {
+      final features = ProductFeatureMap.featuresForProduct(id);
+      expect(features, contains(CompassFeature.cloudSync));
+      expect(features, contains(CompassFeature.cloudBackup));
+      expect(features, isNot(contains(CompassFeature.advancedThemes)));
+    }
+  });
+
+  test('Fake purchaseProduct grants matching exclusive tier', () async {
+    final fake = FakeEntitlementService();
+    addTearDown(fake.dispose);
+
+    expect(
+      await fake.purchaseProduct(ProductIds.proLifetime),
+      EntitlementActionResult.success,
+    );
+    expect(fake.canUse(CompassFeature.advancedThemes), isTrue);
+    expect(fake.canUse(CompassFeature.cloudSync), isFalse);
+
+    expect(
+      await fake.purchaseProduct(ProductIds.syncMonthly),
+      EntitlementActionResult.success,
+    );
+    expect(fake.canUse(CompassFeature.cloudSync), isTrue);
+    expect(fake.canUse(CompassFeature.advancedThemes), isFalse);
+
+    expect(
+      await fake.purchaseProduct(ProductIds.syncYearly),
+      EntitlementActionResult.success,
+    );
+    expect(fake.tier, EntitlementTier.sync);
+
+    expect(
+      await fake.purchaseProduct('unknown_sku'),
+      EntitlementActionResult.unavailable,
+    );
+  });
+
   test('Sync tier does not grant Pro features', () {
-    final features =
-        ProductFeatureMap.featuresForTier(EntitlementTier.sync);
+    final features = ProductFeatureMap.featuresForTier(EntitlementTier.sync);
     expect(features, contains(CompassFeature.cloudBackup));
     expect(features, isNot(contains(CompassFeature.advancedThemes)));
   });
