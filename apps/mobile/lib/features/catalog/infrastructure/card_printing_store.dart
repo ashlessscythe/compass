@@ -105,6 +105,16 @@ class CardPrintingStore {
     return _toDomain(rows.first);
   }
 
+  Future<List<CardPrinting>> findByOracleId(String oracleId) async {
+    if (oracleId.isEmpty) {
+      return const [];
+    }
+    final rows = await (_db.select(_db.cardPrintings)
+          ..where((t) => t.oracleId.equals(oracleId)))
+        .get();
+    return [for (final row in rows) _toDomain(row)];
+  }
+
   Future<void> upsert(CardPrinting printing) async {
     await _db
         .into(_db.cardPrintings)
@@ -131,6 +141,7 @@ class CardPrintingStore {
   }
 
   CardPrintingsCompanion _toCompanion(CardPrinting printing) {
+    final details = printing.details;
     return CardPrintingsCompanion.insert(
       id: printing.id,
       oracleId: Value(printing.oracleId),
@@ -141,9 +152,25 @@ class CardPrintingStore {
       layout: Value(printing.layout),
       typeLine: Value(printing.typeLine),
       manaCost: Value(printing.manaCost),
+      oracleText: Value(printing.oracleText),
+      colorsJson: Value(CardPrinting.encodeStringList(printing.colors)),
+      colorIdentityJson: Value(
+        CardPrinting.encodeStringList(printing.colorIdentity),
+      ),
+      cmc: Value(printing.cmc),
+      rarity: Value(printing.rarity),
+      artist: Value(printing.artist),
+      setName: Value(printing.setName),
+      power: Value(printing.power),
+      toughness: Value(printing.toughness),
+      loyalty: Value(printing.loyalty),
+      defense: Value(printing.defense),
       imageSmallUrl: Value(printing.imageSmallUrl),
       imageNormalUrl: Value(printing.imageNormalUrl),
       facesJson: Value(CardPrinting.encodeFaces(printing.faces)),
+      detailsJson: Value(
+        details == null ? null : CardPrinting.encodeDetails(details),
+      ),
       fetchedAt: printing.fetchedAt,
     );
   }
@@ -158,9 +185,21 @@ class CardPrintingStore {
       layout: row.layout,
       typeLine: row.typeLine,
       manaCost: row.manaCost,
+      oracleText: row.oracleText,
+      colors: CardPrinting.decodeStringList(row.colorsJson),
+      colorIdentity: CardPrinting.decodeStringList(row.colorIdentityJson),
+      cmc: row.cmc,
+      rarity: row.rarity,
+      artist: row.artist,
+      setName: row.setName,
+      power: row.power,
+      toughness: row.toughness,
+      loyalty: row.loyalty,
+      defense: row.defense,
       imageSmallUrl: row.imageSmallUrl,
       imageNormalUrl: row.imageNormalUrl,
       faces: CardPrinting.decodeFaces(row.facesJson),
+      details: CardPrinting.decodeDetails(row.detailsJson),
       fetchedAt: row.fetchedAt,
     );
   }

@@ -110,6 +110,54 @@ class ScryfallHttpClient {
     throw StateError('Scryfall bulk-data missing default_cards');
   }
 
+  /// All printings that share [oracleId], oldest→newest by Scryfall default.
+  ///
+  /// Follows `has_more` / `next_page`. [pageDelay] spaces pages to stay
+  /// inside Scryfall's rate limit (tests pass [Duration.zero]).
+  Future<List<CardPrinting>> searchPrints(
+    String oracleId, {
+    Duration pageDelay = const Duration(milliseconds: 120),
+  }) async {
+    var uri = Uri.parse('$_apiBase/cards/search').replace(
+      queryParameters: {
+        'q': 'oracleid:$oracleId',
+        'unique': 'prints',
+        'order': 'released',
+      },
+    );
+    final results = <CardPrinting>[];
+    var first = true;
+    while (true) {
+      if (!first && pageDelay > Duration.zero) {
+        await Future<void>.delayed(pageDelay);
+      }
+      first = false;
+      final response = await _client.get(uri, headers: _headers);
+      if (response.statusCode == 404) {
+        break;
+      }
+      _ensureOk(response);
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final data = body['data'] as List<dynamic>? ?? const [];
+      for (final item in data) {
+        if (item is! Map) {
+          continue;
+        }
+        final printing = printingFromJson(Map<String, dynamic>.from(item));
+        if (printing != null) {
+          results.add(printing);
+        }
+      }
+      final hasMore = body['has_more'] == true;
+      final next = _stringOf(body['next_page']);
+      if (!hasMore || next == null || next.isEmpty) {
+        break;
+      }
+      uri = Uri.parse(next);
+    }
+    return results;
+  }
+
   Future<List<int>> downloadBytes(
     Uri uri, {
     void Function(int received, int? total)? onBytes,
@@ -159,22 +207,7 @@ class ScryfallHttpClient {
         if (item is! Map) {
           continue;
         }
-        final face = Map<String, dynamic>.from(item);
-        Map<String, dynamic>? faceUris;
-        final rawFaceUris = face['image_uris'];
-        if (rawFaceUris is Map) {
-          faceUris = Map<String, dynamic>.from(rawFaceUris);
-        }
-        faces.add(
-          CardFace(
-            name: _stringOf(face['name']) ?? '',
-            typeLine: _stringOf(face['type_line']),
-            manaCost: _stringOf(face['mana_cost']),
-            imageSmallUrl: faceUris == null ? null : _stringOf(faceUris['small']),
-            imageNormalUrl:
-                faceUris == null ? null : _stringOf(faceUris['normal']),
-          ),
-        );
+        faces.add(_faceFromJson(Map<String, dynamic>.from(item)));
       }
     }
 
@@ -185,6 +218,13 @@ class ScryfallHttpClient {
           name: _stringOf(json['name']) ?? '',
           typeLine: _stringOf(json['type_line']),
           manaCost: _stringOf(json['mana_cost']),
+          oracleText: _stringOf(json['oracle_text']),
+          colors: _stringListOf(json['colors']),
+          power: _stringOf(json['power']),
+          toughness: _stringOf(json['toughness']),
+          loyalty: _stringOf(json['loyalty']),
+          defense: _stringOf(json['defense']),
+          flavorText: _stringOf(json['flavor_text']),
           imageSmallUrl:
               topImages == null ? null : _stringOf(topImages['small']),
           imageNormalUrl:
@@ -199,10 +239,7 @@ class ScryfallHttpClient {
         final face = faces[i];
         if ((face.imageSmallUrl == null || face.imageSmallUrl!.isEmpty) &&
             small != null) {
-          faces[i] = CardFace(
-            name: face.name,
-            typeLine: face.typeLine,
-            manaCost: face.manaCost,
+          faces[i] = face.copyWith(
             imageSmallUrl: small,
             imageNormalUrl: face.imageNormalUrl ?? normal,
           );
@@ -217,6 +254,7 @@ class ScryfallHttpClient {
     final imageNormal = topImages == null
         ? front.imageNormalUrl
         : _stringOf(topImages['normal']) ?? front.imageNormalUrl;
+    final colors = _stringListOf(json['colors']);
 
     return CardPrinting(
       id: id,
@@ -227,11 +265,105 @@ class ScryfallHttpClient {
       layout: _stringOf(json['layout']),
       typeLine: _stringOf(json['type_line']) ?? front.typeLine,
       manaCost: _stringOf(json['mana_cost']) ?? front.manaCost,
+      oracleText: _stringOf(json['oracle_text']) ?? front.oracleText,
+      colors: colors.isNotEmpty ? colors : front.colors,
+      colorIdentity: _stringListOf(json['color_identity']),
+      cmc: _doubleOf(json['cmc']),
+      rarity: _stringOf(json['rarity']),
+      artist: _stringOf(json['artist']),
+      setName: _stringOf(json['set_name']),
+      power: _stringOf(json['power']) ?? front.power,
+      toughness: _stringOf(json['toughness']) ?? front.toughness,
+      loyalty: _stringOf(json['loyalty']) ?? front.loyalty,
+      defense: _stringOf(json['defense']) ?? front.defense,
       imageSmallUrl: imageSmall,
       imageNormalUrl: imageNormal,
       faces: faces,
+      details: _detailsFromJson(json),
       fetchedAt: DateTime.now().toUtc(),
     );
+  }
+
+  static CardFace _faceFromJson(Map<String, dynamic> face) {
+    Map<String, dynamic>? faceUris;
+    final rawFaceUris = face['image_uris'];
+    if (rawFaceUris is Map) {
+      faceUris = Map<String, dynamic>.from(rawFaceUris);
+    }
+    return CardFace(
+      name: _stringOf(face['name']) ?? '',
+      typeLine: _stringOf(face['type_line']),
+      manaCost: _stringOf(face['mana_cost']),
+      oracleText: _stringOf(face['oracle_text']),
+      colors: _stringListOf(face['colors']),
+      power: _stringOf(face['power']),
+      toughness: _stringOf(face['toughness']),
+      loyalty: _stringOf(face['loyalty']),
+      defense: _stringOf(face['defense']),
+      flavorText: _stringOf(face['flavor_text']),
+      imageSmallUrl: faceUris == null ? null : _stringOf(faceUris['small']),
+      imageNormalUrl: faceUris == null ? null : _stringOf(faceUris['normal']),
+    );
+  }
+
+  static CardPrintingDetails _detailsFromJson(Map<String, dynamic> json) {
+    var prices = <String, String>{};
+    final rawPrices = json['prices'];
+    if (rawPrices is Map) {
+      prices = {
+        for (final entry in rawPrices.entries)
+          if (entry.value != null) entry.key.toString(): entry.value.toString(),
+      };
+    }
+    var legalities = <String, String>{};
+    final rawLegalities = json['legalities'];
+    if (rawLegalities is Map) {
+      legalities = {
+        for (final entry in rawLegalities.entries)
+          if (entry.value != null) entry.key.toString(): entry.value.toString(),
+      };
+    }
+    return CardPrintingDetails(
+      flavorText: _stringOf(json['flavor_text']),
+      keywords: _stringListOf(json['keywords']),
+      finishes: _stringListOf(json['finishes']),
+      promoTypes: _stringListOf(json['promo_types']),
+      frameEffects: _stringListOf(json['frame_effects']),
+      producedMana: _stringListOf(json['produced_mana']),
+      legalities: legalities,
+      promo: json['promo'] == true,
+      reprint: json['reprint'] == true,
+      variation: json['variation'] == true,
+      fullArt: json['full_art'] == true,
+      textless: json['textless'] == true,
+      oversized: json['oversized'] == true,
+      reserved: json['reserved'] == true,
+      digital: json['digital'] == true,
+      frame: _stringOf(json['frame']),
+      borderColor: _stringOf(json['border_color']),
+      lang: _stringOf(json['lang']),
+      releasedAt: _stringOf(json['released_at']),
+      setType: _stringOf(json['set_type']),
+      illustrationId: _stringOf(json['illustration_id']),
+      usd: prices['usd'],
+      usdFoil: prices['usd_foil'],
+      eur: prices['eur'],
+      tix: prices['tix'],
+    );
+  }
+
+  static List<String> _stringListOf(Object? value) {
+    return CardPrinting.decodeStringList(value);
+  }
+
+  static double? _doubleOf(Object? value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is num) {
+      return value.toDouble();
+    }
+    return double.tryParse(value.toString());
   }
 
   static String? _stringOf(Object? value) {

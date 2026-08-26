@@ -58,6 +58,27 @@ class AppDatabase extends _$AppDatabase {
               await m.createTable(syncOutbox);
               await m.createTable(syncState);
             }
+            if (from < 7) {
+              await m.addColumn(cardPrintings, cardPrintings.oracleText);
+              await m.addColumn(cardPrintings, cardPrintings.colorsJson);
+              await m.addColumn(
+                cardPrintings,
+                cardPrintings.colorIdentityJson,
+              );
+              await m.addColumn(cardPrintings, cardPrintings.cmc);
+              await m.addColumn(cardPrintings, cardPrintings.rarity);
+              await m.addColumn(cardPrintings, cardPrintings.artist);
+              await m.addColumn(cardPrintings, cardPrintings.setName);
+              await m.addColumn(cardPrintings, cardPrintings.power);
+              await m.addColumn(cardPrintings, cardPrintings.toughness);
+              await m.addColumn(cardPrintings, cardPrintings.loyalty);
+              await m.addColumn(cardPrintings, cardPrintings.defense);
+              await m.addColumn(cardPrintings, cardPrintings.detailsJson);
+              await customStatement(
+                'CREATE INDEX IF NOT EXISTS '
+                'card_printings_oracle_id_idx ON card_printings (oracle_id)',
+              );
+            }
           }
         },
         beforeOpen: (details) async {

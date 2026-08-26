@@ -5,6 +5,13 @@ import 'package:flutter/material.dart';
 class ManaCostRow extends StatelessWidget {
   const ManaCostRow(this.manaCost, {super.key, this.size = 22});
 
+  /// Color / color-identity letters such as `['U', 'R']`.
+  ManaCostRow.fromSymbols(
+    List<String> symbols, {
+    super.key,
+    this.size = 18,
+  }) : manaCost = symbols.map((s) => '{$s}').join();
+
   final String manaCost;
   final double size;
 

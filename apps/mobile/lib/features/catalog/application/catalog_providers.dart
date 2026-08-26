@@ -42,6 +42,7 @@ final mtgCardCatalogProvider = Provider<CardMetadataProvider>((ref) {
     store: ref.watch(cardPrintingStoreProvider),
     queue: ref.watch(scryfallRateLimitedQueueProvider),
     bulkImporter: ref.watch(scryfallBulkImporterProvider),
+    client: ref.watch(scryfallHttpClientProvider),
   );
 });
 

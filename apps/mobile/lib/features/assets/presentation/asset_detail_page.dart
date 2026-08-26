@@ -10,6 +10,8 @@ import 'package:compass/features/catalog/application/catalog_prefs.dart';
 import 'package:compass/features/catalog/domain/card_printing.dart';
 import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
 import 'package:compass/features/catalog/infrastructure/card_image_cache.dart';
+import 'package:compass/features/catalog/presentation/card_details_sheet.dart';
+import 'package:compass/features/catalog/presentation/card_printings_sheet.dart';
 import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
@@ -400,6 +402,8 @@ class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
         final typeLine = face?.typeLine ?? printing.typeLine;
         final manaCost = face?.manaCost ?? printing.manaCost;
         final faceName = multi ? (face?.name ?? printing.name) : null;
+        final oracleText = face?.oracleText ?? printing.oracleText;
+        final combat = printing.combatStatsForFace(safeIndex);
         final theme = Theme.of(context);
 
         final artFaces = <Widget>[
@@ -457,28 +461,150 @@ class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
                     Text(faceName, style: theme.textTheme.titleMedium),
                   if (typeLine != null)
                     Text(typeLine, style: theme.textTheme.bodyLarge),
-                  if (manaCost != null && manaCost.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.xs),
-                    ManaCostRow(manaCost),
+                  const SizedBox(height: AppSpacing.xs),
+                  _ManaAndColorRow(
+                    manaCost: manaCost,
+                    cmc: printing.cmc,
+                    colors: (face != null && face.colors.isNotEmpty)
+                        ? face.colors
+                        : printing.colors,
+                    colorIdentity: printing.colorIdentity,
+                  ),
+                  if (oracleText != null && oracleText.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(oracleText, style: theme.textTheme.bodyMedium),
+                  ],
+                  if (combat != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(combat, style: theme.textTheme.titleMedium),
                   ],
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               [
-                printing.setCode.toUpperCase(),
+                if (printing.setName != null && printing.setName!.isNotEmpty)
+                  printing.setName!
+                else
+                  printing.setCode.toUpperCase(),
                 '#${printing.collectorNumber}',
-                if (printing.layout != null && printing.layout!.isNotEmpty)
-                  printing.layout!,
+                if (printing.rarity != null && printing.rarity!.isNotEmpty)
+                  titleCase(printing.rarity!),
               ].join(' · '),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
+            if (printing.artist != null && printing.artist!.isNotEmpty)
+              Text(
+                printing.artist!,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.sm,
+              children: [
+                TextButton(
+                  onPressed: () => showCardDetailsSheet(
+                    context,
+                    printing: printing,
+                    face: face,
+                  ),
+                  child: const Text('Details'),
+                ),
+                if (printing.oracleId != null &&
+                    printing.oracleId!.isNotEmpty)
+                  TextButton(
+                    onPressed: () => showCardPrintingsSheet(
+                      context,
+                      ref,
+                      asset: widget.asset,
+                      current: printing,
+                      catalogEnabled: widget.catalogEnabled,
+                    ),
+                    child: const Text('Other printings'),
+                  ),
+              ],
+            ),
           ],
         );
       },
+    );
+  }
+}
+
+class _ManaAndColorRow extends StatelessWidget {
+  const _ManaAndColorRow({
+    required this.manaCost,
+    required this.cmc,
+    required this.colors,
+    required this.colorIdentity,
+  });
+
+  final String? manaCost;
+  final double? cmc;
+  final List<String> colors;
+  final List<String> colorIdentity;
+
+  bool get _identityDiffers {
+    if (colorIdentity.isEmpty) {
+      return false;
+    }
+    if (colors.length != colorIdentity.length) {
+      return true;
+    }
+    for (var i = 0; i < colors.length; i++) {
+      if (colors[i] != colorIdentity[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final hasMana = manaCost != null && manaCost!.isNotEmpty;
+    final cmcLabel = formatCmc(cmc);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            if (hasMana) ManaCostRow(manaCost!),
+            if (cmcLabel.isNotEmpty) Text('CMC $cmcLabel', style: muted),
+          ],
+        ),
+        if (colors.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Row(
+            children: [
+              Text('Color', style: muted),
+              const SizedBox(width: AppSpacing.xs),
+              ManaCostRow.fromSymbols(colors),
+            ],
+          ),
+        ],
+        if (_identityDiffers) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Row(
+            children: [
+              Text('Identity', style: muted),
+              const SizedBox(width: AppSpacing.xs),
+              ManaCostRow.fromSymbols(colorIdentity),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }

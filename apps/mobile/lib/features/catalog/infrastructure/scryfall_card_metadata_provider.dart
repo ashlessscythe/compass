@@ -3,6 +3,7 @@ import 'package:compass/features/catalog/domain/card_printing.dart';
 import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
 import 'package:compass/features/catalog/infrastructure/card_printing_store.dart';
 import 'package:compass/features/catalog/infrastructure/scryfall_bulk_importer.dart';
+import 'package:compass/features/catalog/infrastructure/scryfall_http_client.dart';
 import 'package:compass/features/catalog/infrastructure/scryfall_rate_limited_queue.dart';
 
 /// Scryfall-backed [CardMetadataProvider]: SQLite first, then queue.
@@ -11,13 +12,16 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
     required CardPrintingStore store,
     required ScryfallRateLimitedQueue queue,
     required ScryfallBulkImporter bulkImporter,
+    required ScryfallHttpClient client,
   })  : _store = store,
         _queue = queue,
-        _bulk = bulkImporter;
+        _bulk = bulkImporter,
+        _client = client;
 
   final CardPrintingStore _store;
   final ScryfallRateLimitedQueue _queue;
   final ScryfallBulkImporter _bulk;
+  final ScryfallHttpClient _client;
 
   @override
   Future<CatalogStatus> status() => _store.status();
@@ -112,13 +116,13 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
       final exact = await _store.findByExactName(trimmed);
       if (exact != null &&
           !forceNetwork &&
-          !exact.needsFaceHydration) {
+          !exact.needsCatalogHydration) {
         return exact;
       }
-      final similar = forceNetwork || (exact?.needsFaceHydration ?? false)
+      final similar = forceNetwork || (exact?.needsCatalogHydration ?? false)
           ? null
           : await _store.findSimilarName(trimmed);
-      if (similar != null && !similar.needsFaceHydration) {
+      if (similar != null && !similar.needsCatalogHydration) {
         return similar;
       }
       if (allowNetwork) {
@@ -126,8 +130,8 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
           final fresh = await _queue.enqueue(
             CatalogMatchKey.name(trimmed),
             bypassCache: forceNetwork ||
-                (exact?.needsFaceHydration ?? false) ||
-                (similar?.needsFaceHydration ?? false),
+                (exact?.needsCatalogHydration ?? false) ||
+                (similar?.needsCatalogHydration ?? false),
           );
           return fresh ?? exact ?? similar;
         } on Object {
@@ -146,7 +150,7 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
     required bool forceNetwork,
   }) async {
     final cached = await local();
-    final stale = cached?.needsFaceHydration ?? false;
+    final stale = cached?.needsCatalogHydration ?? false;
     if (cached != null && !forceNetwork && !stale) {
       return cached;
     }
@@ -162,5 +166,26 @@ class ScryfallCardMetadataProvider implements CardMetadataProvider {
       }
     }
     return cached;
+  }
+
+  @override
+  Future<List<CardPrinting>> listPrints(
+    String oracleId, {
+    bool allowNetwork = true,
+  }) async {
+    final local = await _store.findByOracleId(oracleId);
+    if (!allowNetwork) {
+      return local;
+    }
+    try {
+      final remote = await _client.searchPrints(oracleId);
+      if (remote.isEmpty) {
+        return local;
+      }
+      await _store.upsertAll(remote);
+      return remote;
+    } on Object {
+      return local;
+    }
   }
 }

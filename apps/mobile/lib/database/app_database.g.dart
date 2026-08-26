@@ -2382,6 +2382,120 @@ class $CardPrintingsTable extends CardPrintings
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _oracleTextMeta = const VerificationMeta(
+    'oracleText',
+  );
+  @override
+  late final GeneratedColumn<String> oracleText = GeneratedColumn<String>(
+    'oracle_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _colorsJsonMeta = const VerificationMeta(
+    'colorsJson',
+  );
+  @override
+  late final GeneratedColumn<String> colorsJson = GeneratedColumn<String>(
+    'colors_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _colorIdentityJsonMeta = const VerificationMeta(
+    'colorIdentityJson',
+  );
+  @override
+  late final GeneratedColumn<String> colorIdentityJson =
+      GeneratedColumn<String>(
+        'color_identity_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _cmcMeta = const VerificationMeta('cmc');
+  @override
+  late final GeneratedColumn<double> cmc = GeneratedColumn<double>(
+    'cmc',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _rarityMeta = const VerificationMeta('rarity');
+  @override
+  late final GeneratedColumn<String> rarity = GeneratedColumn<String>(
+    'rarity',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _artistMeta = const VerificationMeta('artist');
+  @override
+  late final GeneratedColumn<String> artist = GeneratedColumn<String>(
+    'artist',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _setNameMeta = const VerificationMeta(
+    'setName',
+  );
+  @override
+  late final GeneratedColumn<String> setName = GeneratedColumn<String>(
+    'set_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _powerMeta = const VerificationMeta('power');
+  @override
+  late final GeneratedColumn<String> power = GeneratedColumn<String>(
+    'power',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _toughnessMeta = const VerificationMeta(
+    'toughness',
+  );
+  @override
+  late final GeneratedColumn<String> toughness = GeneratedColumn<String>(
+    'toughness',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _loyaltyMeta = const VerificationMeta(
+    'loyalty',
+  );
+  @override
+  late final GeneratedColumn<String> loyalty = GeneratedColumn<String>(
+    'loyalty',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _defenseMeta = const VerificationMeta(
+    'defense',
+  );
+  @override
+  late final GeneratedColumn<String> defense = GeneratedColumn<String>(
+    'defense',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _imageSmallUrlMeta = const VerificationMeta(
     'imageSmallUrl',
   );
@@ -2416,6 +2530,17 @@ class $CardPrintingsTable extends CardPrintings
     requiredDuringInsert: false,
     defaultValue: const Constant('[]'),
   );
+  static const VerificationMeta _detailsJsonMeta = const VerificationMeta(
+    'detailsJson',
+  );
+  @override
+  late final GeneratedColumn<String> detailsJson = GeneratedColumn<String>(
+    'details_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _fetchedAtMeta = const VerificationMeta(
     'fetchedAt',
   );
@@ -2438,9 +2563,21 @@ class $CardPrintingsTable extends CardPrintings
     layout,
     typeLine,
     manaCost,
+    oracleText,
+    colorsJson,
+    colorIdentityJson,
+    cmc,
+    rarity,
+    artist,
+    setName,
+    power,
+    toughness,
+    loyalty,
+    defense,
     imageSmallUrl,
     imageNormalUrl,
     facesJson,
+    detailsJson,
     fetchedAt,
   ];
   @override
@@ -2522,6 +2659,75 @@ class $CardPrintingsTable extends CardPrintings
         manaCost.isAcceptableOrUnknown(data['mana_cost']!, _manaCostMeta),
       );
     }
+    if (data.containsKey('oracle_text')) {
+      context.handle(
+        _oracleTextMeta,
+        oracleText.isAcceptableOrUnknown(data['oracle_text']!, _oracleTextMeta),
+      );
+    }
+    if (data.containsKey('colors_json')) {
+      context.handle(
+        _colorsJsonMeta,
+        colorsJson.isAcceptableOrUnknown(data['colors_json']!, _colorsJsonMeta),
+      );
+    }
+    if (data.containsKey('color_identity_json')) {
+      context.handle(
+        _colorIdentityJsonMeta,
+        colorIdentityJson.isAcceptableOrUnknown(
+          data['color_identity_json']!,
+          _colorIdentityJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cmc')) {
+      context.handle(
+        _cmcMeta,
+        cmc.isAcceptableOrUnknown(data['cmc']!, _cmcMeta),
+      );
+    }
+    if (data.containsKey('rarity')) {
+      context.handle(
+        _rarityMeta,
+        rarity.isAcceptableOrUnknown(data['rarity']!, _rarityMeta),
+      );
+    }
+    if (data.containsKey('artist')) {
+      context.handle(
+        _artistMeta,
+        artist.isAcceptableOrUnknown(data['artist']!, _artistMeta),
+      );
+    }
+    if (data.containsKey('set_name')) {
+      context.handle(
+        _setNameMeta,
+        setName.isAcceptableOrUnknown(data['set_name']!, _setNameMeta),
+      );
+    }
+    if (data.containsKey('power')) {
+      context.handle(
+        _powerMeta,
+        power.isAcceptableOrUnknown(data['power']!, _powerMeta),
+      );
+    }
+    if (data.containsKey('toughness')) {
+      context.handle(
+        _toughnessMeta,
+        toughness.isAcceptableOrUnknown(data['toughness']!, _toughnessMeta),
+      );
+    }
+    if (data.containsKey('loyalty')) {
+      context.handle(
+        _loyaltyMeta,
+        loyalty.isAcceptableOrUnknown(data['loyalty']!, _loyaltyMeta),
+      );
+    }
+    if (data.containsKey('defense')) {
+      context.handle(
+        _defenseMeta,
+        defense.isAcceptableOrUnknown(data['defense']!, _defenseMeta),
+      );
+    }
     if (data.containsKey('image_small_url')) {
       context.handle(
         _imageSmallUrlMeta,
@@ -2544,6 +2750,15 @@ class $CardPrintingsTable extends CardPrintings
       context.handle(
         _facesJsonMeta,
         facesJson.isAcceptableOrUnknown(data['faces_json']!, _facesJsonMeta),
+      );
+    }
+    if (data.containsKey('details_json')) {
+      context.handle(
+        _detailsJsonMeta,
+        detailsJson.isAcceptableOrUnknown(
+          data['details_json']!,
+          _detailsJsonMeta,
+        ),
       );
     }
     if (data.containsKey('fetched_at')) {
@@ -2599,6 +2814,50 @@ class $CardPrintingsTable extends CardPrintings
         DriftSqlType.string,
         data['${effectivePrefix}mana_cost'],
       ),
+      oracleText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}oracle_text'],
+      ),
+      colorsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}colors_json'],
+      ),
+      colorIdentityJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_identity_json'],
+      ),
+      cmc: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}cmc'],
+      ),
+      rarity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rarity'],
+      ),
+      artist: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}artist'],
+      ),
+      setName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}set_name'],
+      ),
+      power: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}power'],
+      ),
+      toughness: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}toughness'],
+      ),
+      loyalty: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}loyalty'],
+      ),
+      defense: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}defense'],
+      ),
       imageSmallUrl: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}image_small_url'],
@@ -2611,6 +2870,10 @@ class $CardPrintingsTable extends CardPrintings
         DriftSqlType.string,
         data['${effectivePrefix}faces_json'],
       )!,
+      detailsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}details_json'],
+      ),
       fetchedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}fetched_at'],
@@ -2634,9 +2897,21 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
   final String? layout;
   final String? typeLine;
   final String? manaCost;
+  final String? oracleText;
+  final String? colorsJson;
+  final String? colorIdentityJson;
+  final double? cmc;
+  final String? rarity;
+  final String? artist;
+  final String? setName;
+  final String? power;
+  final String? toughness;
+  final String? loyalty;
+  final String? defense;
   final String? imageSmallUrl;
   final String? imageNormalUrl;
   final String facesJson;
+  final String? detailsJson;
   final DateTime fetchedAt;
   const CardPrintingRow({
     required this.id,
@@ -2648,9 +2923,21 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     this.layout,
     this.typeLine,
     this.manaCost,
+    this.oracleText,
+    this.colorsJson,
+    this.colorIdentityJson,
+    this.cmc,
+    this.rarity,
+    this.artist,
+    this.setName,
+    this.power,
+    this.toughness,
+    this.loyalty,
+    this.defense,
     this.imageSmallUrl,
     this.imageNormalUrl,
     required this.facesJson,
+    this.detailsJson,
     required this.fetchedAt,
   });
   @override
@@ -2673,6 +2960,39 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     if (!nullToAbsent || manaCost != null) {
       map['mana_cost'] = Variable<String>(manaCost);
     }
+    if (!nullToAbsent || oracleText != null) {
+      map['oracle_text'] = Variable<String>(oracleText);
+    }
+    if (!nullToAbsent || colorsJson != null) {
+      map['colors_json'] = Variable<String>(colorsJson);
+    }
+    if (!nullToAbsent || colorIdentityJson != null) {
+      map['color_identity_json'] = Variable<String>(colorIdentityJson);
+    }
+    if (!nullToAbsent || cmc != null) {
+      map['cmc'] = Variable<double>(cmc);
+    }
+    if (!nullToAbsent || rarity != null) {
+      map['rarity'] = Variable<String>(rarity);
+    }
+    if (!nullToAbsent || artist != null) {
+      map['artist'] = Variable<String>(artist);
+    }
+    if (!nullToAbsent || setName != null) {
+      map['set_name'] = Variable<String>(setName);
+    }
+    if (!nullToAbsent || power != null) {
+      map['power'] = Variable<String>(power);
+    }
+    if (!nullToAbsent || toughness != null) {
+      map['toughness'] = Variable<String>(toughness);
+    }
+    if (!nullToAbsent || loyalty != null) {
+      map['loyalty'] = Variable<String>(loyalty);
+    }
+    if (!nullToAbsent || defense != null) {
+      map['defense'] = Variable<String>(defense);
+    }
     if (!nullToAbsent || imageSmallUrl != null) {
       map['image_small_url'] = Variable<String>(imageSmallUrl);
     }
@@ -2680,6 +3000,9 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       map['image_normal_url'] = Variable<String>(imageNormalUrl);
     }
     map['faces_json'] = Variable<String>(facesJson);
+    if (!nullToAbsent || detailsJson != null) {
+      map['details_json'] = Variable<String>(detailsJson);
+    }
     map['fetched_at'] = Variable<DateTime>(fetchedAt);
     return map;
   }
@@ -2703,6 +3026,37 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       manaCost: manaCost == null && nullToAbsent
           ? const Value.absent()
           : Value(manaCost),
+      oracleText: oracleText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oracleText),
+      colorsJson: colorsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(colorsJson),
+      colorIdentityJson: colorIdentityJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(colorIdentityJson),
+      cmc: cmc == null && nullToAbsent ? const Value.absent() : Value(cmc),
+      rarity: rarity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rarity),
+      artist: artist == null && nullToAbsent
+          ? const Value.absent()
+          : Value(artist),
+      setName: setName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(setName),
+      power: power == null && nullToAbsent
+          ? const Value.absent()
+          : Value(power),
+      toughness: toughness == null && nullToAbsent
+          ? const Value.absent()
+          : Value(toughness),
+      loyalty: loyalty == null && nullToAbsent
+          ? const Value.absent()
+          : Value(loyalty),
+      defense: defense == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defense),
       imageSmallUrl: imageSmallUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(imageSmallUrl),
@@ -2710,6 +3064,9 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
           ? const Value.absent()
           : Value(imageNormalUrl),
       facesJson: Value(facesJson),
+      detailsJson: detailsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(detailsJson),
       fetchedAt: Value(fetchedAt),
     );
   }
@@ -2729,9 +3086,23 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       layout: serializer.fromJson<String?>(json['layout']),
       typeLine: serializer.fromJson<String?>(json['typeLine']),
       manaCost: serializer.fromJson<String?>(json['manaCost']),
+      oracleText: serializer.fromJson<String?>(json['oracleText']),
+      colorsJson: serializer.fromJson<String?>(json['colorsJson']),
+      colorIdentityJson: serializer.fromJson<String?>(
+        json['colorIdentityJson'],
+      ),
+      cmc: serializer.fromJson<double?>(json['cmc']),
+      rarity: serializer.fromJson<String?>(json['rarity']),
+      artist: serializer.fromJson<String?>(json['artist']),
+      setName: serializer.fromJson<String?>(json['setName']),
+      power: serializer.fromJson<String?>(json['power']),
+      toughness: serializer.fromJson<String?>(json['toughness']),
+      loyalty: serializer.fromJson<String?>(json['loyalty']),
+      defense: serializer.fromJson<String?>(json['defense']),
       imageSmallUrl: serializer.fromJson<String?>(json['imageSmallUrl']),
       imageNormalUrl: serializer.fromJson<String?>(json['imageNormalUrl']),
       facesJson: serializer.fromJson<String>(json['facesJson']),
+      detailsJson: serializer.fromJson<String?>(json['detailsJson']),
       fetchedAt: serializer.fromJson<DateTime>(json['fetchedAt']),
     );
   }
@@ -2748,9 +3119,21 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       'layout': serializer.toJson<String?>(layout),
       'typeLine': serializer.toJson<String?>(typeLine),
       'manaCost': serializer.toJson<String?>(manaCost),
+      'oracleText': serializer.toJson<String?>(oracleText),
+      'colorsJson': serializer.toJson<String?>(colorsJson),
+      'colorIdentityJson': serializer.toJson<String?>(colorIdentityJson),
+      'cmc': serializer.toJson<double?>(cmc),
+      'rarity': serializer.toJson<String?>(rarity),
+      'artist': serializer.toJson<String?>(artist),
+      'setName': serializer.toJson<String?>(setName),
+      'power': serializer.toJson<String?>(power),
+      'toughness': serializer.toJson<String?>(toughness),
+      'loyalty': serializer.toJson<String?>(loyalty),
+      'defense': serializer.toJson<String?>(defense),
       'imageSmallUrl': serializer.toJson<String?>(imageSmallUrl),
       'imageNormalUrl': serializer.toJson<String?>(imageNormalUrl),
       'facesJson': serializer.toJson<String>(facesJson),
+      'detailsJson': serializer.toJson<String?>(detailsJson),
       'fetchedAt': serializer.toJson<DateTime>(fetchedAt),
     };
   }
@@ -2765,9 +3148,21 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     Value<String?> layout = const Value.absent(),
     Value<String?> typeLine = const Value.absent(),
     Value<String?> manaCost = const Value.absent(),
+    Value<String?> oracleText = const Value.absent(),
+    Value<String?> colorsJson = const Value.absent(),
+    Value<String?> colorIdentityJson = const Value.absent(),
+    Value<double?> cmc = const Value.absent(),
+    Value<String?> rarity = const Value.absent(),
+    Value<String?> artist = const Value.absent(),
+    Value<String?> setName = const Value.absent(),
+    Value<String?> power = const Value.absent(),
+    Value<String?> toughness = const Value.absent(),
+    Value<String?> loyalty = const Value.absent(),
+    Value<String?> defense = const Value.absent(),
     Value<String?> imageSmallUrl = const Value.absent(),
     Value<String?> imageNormalUrl = const Value.absent(),
     String? facesJson,
+    Value<String?> detailsJson = const Value.absent(),
     DateTime? fetchedAt,
   }) => CardPrintingRow(
     id: id ?? this.id,
@@ -2779,6 +3174,19 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     layout: layout.present ? layout.value : this.layout,
     typeLine: typeLine.present ? typeLine.value : this.typeLine,
     manaCost: manaCost.present ? manaCost.value : this.manaCost,
+    oracleText: oracleText.present ? oracleText.value : this.oracleText,
+    colorsJson: colorsJson.present ? colorsJson.value : this.colorsJson,
+    colorIdentityJson: colorIdentityJson.present
+        ? colorIdentityJson.value
+        : this.colorIdentityJson,
+    cmc: cmc.present ? cmc.value : this.cmc,
+    rarity: rarity.present ? rarity.value : this.rarity,
+    artist: artist.present ? artist.value : this.artist,
+    setName: setName.present ? setName.value : this.setName,
+    power: power.present ? power.value : this.power,
+    toughness: toughness.present ? toughness.value : this.toughness,
+    loyalty: loyalty.present ? loyalty.value : this.loyalty,
+    defense: defense.present ? defense.value : this.defense,
     imageSmallUrl: imageSmallUrl.present
         ? imageSmallUrl.value
         : this.imageSmallUrl,
@@ -2786,6 +3194,7 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
         ? imageNormalUrl.value
         : this.imageNormalUrl,
     facesJson: facesJson ?? this.facesJson,
+    detailsJson: detailsJson.present ? detailsJson.value : this.detailsJson,
     fetchedAt: fetchedAt ?? this.fetchedAt,
   );
   CardPrintingRow copyWithCompanion(CardPrintingsCompanion data) {
@@ -2803,6 +3212,23 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
       layout: data.layout.present ? data.layout.value : this.layout,
       typeLine: data.typeLine.present ? data.typeLine.value : this.typeLine,
       manaCost: data.manaCost.present ? data.manaCost.value : this.manaCost,
+      oracleText: data.oracleText.present
+          ? data.oracleText.value
+          : this.oracleText,
+      colorsJson: data.colorsJson.present
+          ? data.colorsJson.value
+          : this.colorsJson,
+      colorIdentityJson: data.colorIdentityJson.present
+          ? data.colorIdentityJson.value
+          : this.colorIdentityJson,
+      cmc: data.cmc.present ? data.cmc.value : this.cmc,
+      rarity: data.rarity.present ? data.rarity.value : this.rarity,
+      artist: data.artist.present ? data.artist.value : this.artist,
+      setName: data.setName.present ? data.setName.value : this.setName,
+      power: data.power.present ? data.power.value : this.power,
+      toughness: data.toughness.present ? data.toughness.value : this.toughness,
+      loyalty: data.loyalty.present ? data.loyalty.value : this.loyalty,
+      defense: data.defense.present ? data.defense.value : this.defense,
       imageSmallUrl: data.imageSmallUrl.present
           ? data.imageSmallUrl.value
           : this.imageSmallUrl,
@@ -2810,6 +3236,9 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
           ? data.imageNormalUrl.value
           : this.imageNormalUrl,
       facesJson: data.facesJson.present ? data.facesJson.value : this.facesJson,
+      detailsJson: data.detailsJson.present
+          ? data.detailsJson.value
+          : this.detailsJson,
       fetchedAt: data.fetchedAt.present ? data.fetchedAt.value : this.fetchedAt,
     );
   }
@@ -2826,16 +3255,28 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
           ..write('layout: $layout, ')
           ..write('typeLine: $typeLine, ')
           ..write('manaCost: $manaCost, ')
+          ..write('oracleText: $oracleText, ')
+          ..write('colorsJson: $colorsJson, ')
+          ..write('colorIdentityJson: $colorIdentityJson, ')
+          ..write('cmc: $cmc, ')
+          ..write('rarity: $rarity, ')
+          ..write('artist: $artist, ')
+          ..write('setName: $setName, ')
+          ..write('power: $power, ')
+          ..write('toughness: $toughness, ')
+          ..write('loyalty: $loyalty, ')
+          ..write('defense: $defense, ')
           ..write('imageSmallUrl: $imageSmallUrl, ')
           ..write('imageNormalUrl: $imageNormalUrl, ')
           ..write('facesJson: $facesJson, ')
+          ..write('detailsJson: $detailsJson, ')
           ..write('fetchedAt: $fetchedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     oracleId,
     name,
@@ -2845,11 +3286,23 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
     layout,
     typeLine,
     manaCost,
+    oracleText,
+    colorsJson,
+    colorIdentityJson,
+    cmc,
+    rarity,
+    artist,
+    setName,
+    power,
+    toughness,
+    loyalty,
+    defense,
     imageSmallUrl,
     imageNormalUrl,
     facesJson,
+    detailsJson,
     fetchedAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2863,9 +3316,21 @@ class CardPrintingRow extends DataClass implements Insertable<CardPrintingRow> {
           other.layout == this.layout &&
           other.typeLine == this.typeLine &&
           other.manaCost == this.manaCost &&
+          other.oracleText == this.oracleText &&
+          other.colorsJson == this.colorsJson &&
+          other.colorIdentityJson == this.colorIdentityJson &&
+          other.cmc == this.cmc &&
+          other.rarity == this.rarity &&
+          other.artist == this.artist &&
+          other.setName == this.setName &&
+          other.power == this.power &&
+          other.toughness == this.toughness &&
+          other.loyalty == this.loyalty &&
+          other.defense == this.defense &&
           other.imageSmallUrl == this.imageSmallUrl &&
           other.imageNormalUrl == this.imageNormalUrl &&
           other.facesJson == this.facesJson &&
+          other.detailsJson == this.detailsJson &&
           other.fetchedAt == this.fetchedAt);
 }
 
@@ -2879,9 +3344,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
   final Value<String?> layout;
   final Value<String?> typeLine;
   final Value<String?> manaCost;
+  final Value<String?> oracleText;
+  final Value<String?> colorsJson;
+  final Value<String?> colorIdentityJson;
+  final Value<double?> cmc;
+  final Value<String?> rarity;
+  final Value<String?> artist;
+  final Value<String?> setName;
+  final Value<String?> power;
+  final Value<String?> toughness;
+  final Value<String?> loyalty;
+  final Value<String?> defense;
   final Value<String?> imageSmallUrl;
   final Value<String?> imageNormalUrl;
   final Value<String> facesJson;
+  final Value<String?> detailsJson;
   final Value<DateTime> fetchedAt;
   final Value<int> rowid;
   const CardPrintingsCompanion({
@@ -2894,9 +3371,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     this.layout = const Value.absent(),
     this.typeLine = const Value.absent(),
     this.manaCost = const Value.absent(),
+    this.oracleText = const Value.absent(),
+    this.colorsJson = const Value.absent(),
+    this.colorIdentityJson = const Value.absent(),
+    this.cmc = const Value.absent(),
+    this.rarity = const Value.absent(),
+    this.artist = const Value.absent(),
+    this.setName = const Value.absent(),
+    this.power = const Value.absent(),
+    this.toughness = const Value.absent(),
+    this.loyalty = const Value.absent(),
+    this.defense = const Value.absent(),
     this.imageSmallUrl = const Value.absent(),
     this.imageNormalUrl = const Value.absent(),
     this.facesJson = const Value.absent(),
+    this.detailsJson = const Value.absent(),
     this.fetchedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -2910,9 +3399,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     this.layout = const Value.absent(),
     this.typeLine = const Value.absent(),
     this.manaCost = const Value.absent(),
+    this.oracleText = const Value.absent(),
+    this.colorsJson = const Value.absent(),
+    this.colorIdentityJson = const Value.absent(),
+    this.cmc = const Value.absent(),
+    this.rarity = const Value.absent(),
+    this.artist = const Value.absent(),
+    this.setName = const Value.absent(),
+    this.power = const Value.absent(),
+    this.toughness = const Value.absent(),
+    this.loyalty = const Value.absent(),
+    this.defense = const Value.absent(),
     this.imageSmallUrl = const Value.absent(),
     this.imageNormalUrl = const Value.absent(),
     this.facesJson = const Value.absent(),
+    this.detailsJson = const Value.absent(),
     required DateTime fetchedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -2931,9 +3432,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     Expression<String>? layout,
     Expression<String>? typeLine,
     Expression<String>? manaCost,
+    Expression<String>? oracleText,
+    Expression<String>? colorsJson,
+    Expression<String>? colorIdentityJson,
+    Expression<double>? cmc,
+    Expression<String>? rarity,
+    Expression<String>? artist,
+    Expression<String>? setName,
+    Expression<String>? power,
+    Expression<String>? toughness,
+    Expression<String>? loyalty,
+    Expression<String>? defense,
     Expression<String>? imageSmallUrl,
     Expression<String>? imageNormalUrl,
     Expression<String>? facesJson,
+    Expression<String>? detailsJson,
     Expression<DateTime>? fetchedAt,
     Expression<int>? rowid,
   }) {
@@ -2947,9 +3460,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
       if (layout != null) 'layout': layout,
       if (typeLine != null) 'type_line': typeLine,
       if (manaCost != null) 'mana_cost': manaCost,
+      if (oracleText != null) 'oracle_text': oracleText,
+      if (colorsJson != null) 'colors_json': colorsJson,
+      if (colorIdentityJson != null) 'color_identity_json': colorIdentityJson,
+      if (cmc != null) 'cmc': cmc,
+      if (rarity != null) 'rarity': rarity,
+      if (artist != null) 'artist': artist,
+      if (setName != null) 'set_name': setName,
+      if (power != null) 'power': power,
+      if (toughness != null) 'toughness': toughness,
+      if (loyalty != null) 'loyalty': loyalty,
+      if (defense != null) 'defense': defense,
       if (imageSmallUrl != null) 'image_small_url': imageSmallUrl,
       if (imageNormalUrl != null) 'image_normal_url': imageNormalUrl,
       if (facesJson != null) 'faces_json': facesJson,
+      if (detailsJson != null) 'details_json': detailsJson,
       if (fetchedAt != null) 'fetched_at': fetchedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2965,9 +3490,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     Value<String?>? layout,
     Value<String?>? typeLine,
     Value<String?>? manaCost,
+    Value<String?>? oracleText,
+    Value<String?>? colorsJson,
+    Value<String?>? colorIdentityJson,
+    Value<double?>? cmc,
+    Value<String?>? rarity,
+    Value<String?>? artist,
+    Value<String?>? setName,
+    Value<String?>? power,
+    Value<String?>? toughness,
+    Value<String?>? loyalty,
+    Value<String?>? defense,
     Value<String?>? imageSmallUrl,
     Value<String?>? imageNormalUrl,
     Value<String>? facesJson,
+    Value<String?>? detailsJson,
     Value<DateTime>? fetchedAt,
     Value<int>? rowid,
   }) {
@@ -2981,9 +3518,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
       layout: layout ?? this.layout,
       typeLine: typeLine ?? this.typeLine,
       manaCost: manaCost ?? this.manaCost,
+      oracleText: oracleText ?? this.oracleText,
+      colorsJson: colorsJson ?? this.colorsJson,
+      colorIdentityJson: colorIdentityJson ?? this.colorIdentityJson,
+      cmc: cmc ?? this.cmc,
+      rarity: rarity ?? this.rarity,
+      artist: artist ?? this.artist,
+      setName: setName ?? this.setName,
+      power: power ?? this.power,
+      toughness: toughness ?? this.toughness,
+      loyalty: loyalty ?? this.loyalty,
+      defense: defense ?? this.defense,
       imageSmallUrl: imageSmallUrl ?? this.imageSmallUrl,
       imageNormalUrl: imageNormalUrl ?? this.imageNormalUrl,
       facesJson: facesJson ?? this.facesJson,
+      detailsJson: detailsJson ?? this.detailsJson,
       fetchedAt: fetchedAt ?? this.fetchedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -3019,6 +3568,39 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     if (manaCost.present) {
       map['mana_cost'] = Variable<String>(manaCost.value);
     }
+    if (oracleText.present) {
+      map['oracle_text'] = Variable<String>(oracleText.value);
+    }
+    if (colorsJson.present) {
+      map['colors_json'] = Variable<String>(colorsJson.value);
+    }
+    if (colorIdentityJson.present) {
+      map['color_identity_json'] = Variable<String>(colorIdentityJson.value);
+    }
+    if (cmc.present) {
+      map['cmc'] = Variable<double>(cmc.value);
+    }
+    if (rarity.present) {
+      map['rarity'] = Variable<String>(rarity.value);
+    }
+    if (artist.present) {
+      map['artist'] = Variable<String>(artist.value);
+    }
+    if (setName.present) {
+      map['set_name'] = Variable<String>(setName.value);
+    }
+    if (power.present) {
+      map['power'] = Variable<String>(power.value);
+    }
+    if (toughness.present) {
+      map['toughness'] = Variable<String>(toughness.value);
+    }
+    if (loyalty.present) {
+      map['loyalty'] = Variable<String>(loyalty.value);
+    }
+    if (defense.present) {
+      map['defense'] = Variable<String>(defense.value);
+    }
     if (imageSmallUrl.present) {
       map['image_small_url'] = Variable<String>(imageSmallUrl.value);
     }
@@ -3027,6 +3609,9 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
     }
     if (facesJson.present) {
       map['faces_json'] = Variable<String>(facesJson.value);
+    }
+    if (detailsJson.present) {
+      map['details_json'] = Variable<String>(detailsJson.value);
     }
     if (fetchedAt.present) {
       map['fetched_at'] = Variable<DateTime>(fetchedAt.value);
@@ -3049,9 +3634,21 @@ class CardPrintingsCompanion extends UpdateCompanion<CardPrintingRow> {
           ..write('layout: $layout, ')
           ..write('typeLine: $typeLine, ')
           ..write('manaCost: $manaCost, ')
+          ..write('oracleText: $oracleText, ')
+          ..write('colorsJson: $colorsJson, ')
+          ..write('colorIdentityJson: $colorIdentityJson, ')
+          ..write('cmc: $cmc, ')
+          ..write('rarity: $rarity, ')
+          ..write('artist: $artist, ')
+          ..write('setName: $setName, ')
+          ..write('power: $power, ')
+          ..write('toughness: $toughness, ')
+          ..write('loyalty: $loyalty, ')
+          ..write('defense: $defense, ')
           ..write('imageSmallUrl: $imageSmallUrl, ')
           ..write('imageNormalUrl: $imageNormalUrl, ')
           ..write('facesJson: $facesJson, ')
+          ..write('detailsJson: $detailsJson, ')
           ..write('fetchedAt: $fetchedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -4267,6 +4864,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'card_printings_name_idx',
     'CREATE INDEX card_printings_name_idx ON card_printings (name_normalized)',
   );
+  late final Index cardPrintingsOracleIdIdx = Index(
+    'card_printings_oracle_id_idx',
+    'CREATE INDEX card_printings_oracle_id_idx ON card_printings (oracle_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4292,6 +4893,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     assetsNameIdx,
     cardPrintingsSetCollectorIdx,
     cardPrintingsNameIdx,
+    cardPrintingsOracleIdIdx,
   ];
 }
 
@@ -5426,9 +6028,21 @@ typedef $$CardPrintingsTableCreateCompanionBuilder =
       Value<String?> layout,
       Value<String?> typeLine,
       Value<String?> manaCost,
+      Value<String?> oracleText,
+      Value<String?> colorsJson,
+      Value<String?> colorIdentityJson,
+      Value<double?> cmc,
+      Value<String?> rarity,
+      Value<String?> artist,
+      Value<String?> setName,
+      Value<String?> power,
+      Value<String?> toughness,
+      Value<String?> loyalty,
+      Value<String?> defense,
       Value<String?> imageSmallUrl,
       Value<String?> imageNormalUrl,
       Value<String> facesJson,
+      Value<String?> detailsJson,
       required DateTime fetchedAt,
       Value<int> rowid,
     });
@@ -5443,9 +6057,21 @@ typedef $$CardPrintingsTableUpdateCompanionBuilder =
       Value<String?> layout,
       Value<String?> typeLine,
       Value<String?> manaCost,
+      Value<String?> oracleText,
+      Value<String?> colorsJson,
+      Value<String?> colorIdentityJson,
+      Value<double?> cmc,
+      Value<String?> rarity,
+      Value<String?> artist,
+      Value<String?> setName,
+      Value<String?> power,
+      Value<String?> toughness,
+      Value<String?> loyalty,
+      Value<String?> defense,
       Value<String?> imageSmallUrl,
       Value<String?> imageNormalUrl,
       Value<String> facesJson,
+      Value<String?> detailsJson,
       Value<DateTime> fetchedAt,
       Value<int> rowid,
     });
@@ -5504,6 +6130,61 @@ class $$CardPrintingsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get oracleText => $composableBuilder(
+    column: $table.oracleText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorsJson => $composableBuilder(
+    column: $table.colorsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorIdentityJson => $composableBuilder(
+    column: $table.colorIdentityJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get cmc => $composableBuilder(
+    column: $table.cmc,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rarity => $composableBuilder(
+    column: $table.rarity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get artist => $composableBuilder(
+    column: $table.artist,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get setName => $composableBuilder(
+    column: $table.setName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get power => $composableBuilder(
+    column: $table.power,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toughness => $composableBuilder(
+    column: $table.toughness,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get loyalty => $composableBuilder(
+    column: $table.loyalty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get defense => $composableBuilder(
+    column: $table.defense,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get imageSmallUrl => $composableBuilder(
     column: $table.imageSmallUrl,
     builder: (column) => ColumnFilters(column),
@@ -5516,6 +6197,11 @@ class $$CardPrintingsTableFilterComposer
 
   ColumnFilters<String> get facesJson => $composableBuilder(
     column: $table.facesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get detailsJson => $composableBuilder(
+    column: $table.detailsJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5579,6 +6265,61 @@ class $$CardPrintingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get oracleText => $composableBuilder(
+    column: $table.oracleText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colorsJson => $composableBuilder(
+    column: $table.colorsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colorIdentityJson => $composableBuilder(
+    column: $table.colorIdentityJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get cmc => $composableBuilder(
+    column: $table.cmc,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rarity => $composableBuilder(
+    column: $table.rarity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get artist => $composableBuilder(
+    column: $table.artist,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get setName => $composableBuilder(
+    column: $table.setName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get power => $composableBuilder(
+    column: $table.power,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toughness => $composableBuilder(
+    column: $table.toughness,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get loyalty => $composableBuilder(
+    column: $table.loyalty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get defense => $composableBuilder(
+    column: $table.defense,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get imageSmallUrl => $composableBuilder(
     column: $table.imageSmallUrl,
     builder: (column) => ColumnOrderings(column),
@@ -5591,6 +6332,11 @@ class $$CardPrintingsTableOrderingComposer
 
   ColumnOrderings<String> get facesJson => $composableBuilder(
     column: $table.facesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get detailsJson => $composableBuilder(
+    column: $table.detailsJson,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5640,6 +6386,45 @@ class $$CardPrintingsTableAnnotationComposer
   GeneratedColumn<String> get manaCost =>
       $composableBuilder(column: $table.manaCost, builder: (column) => column);
 
+  GeneratedColumn<String> get oracleText => $composableBuilder(
+    column: $table.oracleText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get colorsJson => $composableBuilder(
+    column: $table.colorsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get colorIdentityJson => $composableBuilder(
+    column: $table.colorIdentityJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get cmc =>
+      $composableBuilder(column: $table.cmc, builder: (column) => column);
+
+  GeneratedColumn<String> get rarity =>
+      $composableBuilder(column: $table.rarity, builder: (column) => column);
+
+  GeneratedColumn<String> get artist =>
+      $composableBuilder(column: $table.artist, builder: (column) => column);
+
+  GeneratedColumn<String> get setName =>
+      $composableBuilder(column: $table.setName, builder: (column) => column);
+
+  GeneratedColumn<String> get power =>
+      $composableBuilder(column: $table.power, builder: (column) => column);
+
+  GeneratedColumn<String> get toughness =>
+      $composableBuilder(column: $table.toughness, builder: (column) => column);
+
+  GeneratedColumn<String> get loyalty =>
+      $composableBuilder(column: $table.loyalty, builder: (column) => column);
+
+  GeneratedColumn<String> get defense =>
+      $composableBuilder(column: $table.defense, builder: (column) => column);
+
   GeneratedColumn<String> get imageSmallUrl => $composableBuilder(
     column: $table.imageSmallUrl,
     builder: (column) => column,
@@ -5652,6 +6437,11 @@ class $$CardPrintingsTableAnnotationComposer
 
   GeneratedColumn<String> get facesJson =>
       $composableBuilder(column: $table.facesJson, builder: (column) => column);
+
+  GeneratedColumn<String> get detailsJson => $composableBuilder(
+    column: $table.detailsJson,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get fetchedAt =>
       $composableBuilder(column: $table.fetchedAt, builder: (column) => column);
@@ -5697,9 +6487,21 @@ class $$CardPrintingsTableTableManager
                 Value<String?> layout = const Value.absent(),
                 Value<String?> typeLine = const Value.absent(),
                 Value<String?> manaCost = const Value.absent(),
+                Value<String?> oracleText = const Value.absent(),
+                Value<String?> colorsJson = const Value.absent(),
+                Value<String?> colorIdentityJson = const Value.absent(),
+                Value<double?> cmc = const Value.absent(),
+                Value<String?> rarity = const Value.absent(),
+                Value<String?> artist = const Value.absent(),
+                Value<String?> setName = const Value.absent(),
+                Value<String?> power = const Value.absent(),
+                Value<String?> toughness = const Value.absent(),
+                Value<String?> loyalty = const Value.absent(),
+                Value<String?> defense = const Value.absent(),
                 Value<String?> imageSmallUrl = const Value.absent(),
                 Value<String?> imageNormalUrl = const Value.absent(),
                 Value<String> facesJson = const Value.absent(),
+                Value<String?> detailsJson = const Value.absent(),
                 Value<DateTime> fetchedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CardPrintingsCompanion(
@@ -5712,9 +6514,21 @@ class $$CardPrintingsTableTableManager
                 layout: layout,
                 typeLine: typeLine,
                 manaCost: manaCost,
+                oracleText: oracleText,
+                colorsJson: colorsJson,
+                colorIdentityJson: colorIdentityJson,
+                cmc: cmc,
+                rarity: rarity,
+                artist: artist,
+                setName: setName,
+                power: power,
+                toughness: toughness,
+                loyalty: loyalty,
+                defense: defense,
                 imageSmallUrl: imageSmallUrl,
                 imageNormalUrl: imageNormalUrl,
                 facesJson: facesJson,
+                detailsJson: detailsJson,
                 fetchedAt: fetchedAt,
                 rowid: rowid,
               ),
@@ -5729,9 +6543,21 @@ class $$CardPrintingsTableTableManager
                 Value<String?> layout = const Value.absent(),
                 Value<String?> typeLine = const Value.absent(),
                 Value<String?> manaCost = const Value.absent(),
+                Value<String?> oracleText = const Value.absent(),
+                Value<String?> colorsJson = const Value.absent(),
+                Value<String?> colorIdentityJson = const Value.absent(),
+                Value<double?> cmc = const Value.absent(),
+                Value<String?> rarity = const Value.absent(),
+                Value<String?> artist = const Value.absent(),
+                Value<String?> setName = const Value.absent(),
+                Value<String?> power = const Value.absent(),
+                Value<String?> toughness = const Value.absent(),
+                Value<String?> loyalty = const Value.absent(),
+                Value<String?> defense = const Value.absent(),
                 Value<String?> imageSmallUrl = const Value.absent(),
                 Value<String?> imageNormalUrl = const Value.absent(),
                 Value<String> facesJson = const Value.absent(),
+                Value<String?> detailsJson = const Value.absent(),
                 required DateTime fetchedAt,
                 Value<int> rowid = const Value.absent(),
               }) => CardPrintingsCompanion.insert(
@@ -5744,9 +6570,21 @@ class $$CardPrintingsTableTableManager
                 layout: layout,
                 typeLine: typeLine,
                 manaCost: manaCost,
+                oracleText: oracleText,
+                colorsJson: colorsJson,
+                colorIdentityJson: colorIdentityJson,
+                cmc: cmc,
+                rarity: rarity,
+                artist: artist,
+                setName: setName,
+                power: power,
+                toughness: toughness,
+                loyalty: loyalty,
+                defense: defense,
                 imageSmallUrl: imageSmallUrl,
                 imageNormalUrl: imageNormalUrl,
                 facesJson: facesJson,
+                detailsJson: detailsJson,
                 fetchedAt: fetchedAt,
                 rowid: rowid,
               ),

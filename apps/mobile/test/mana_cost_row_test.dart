@@ -8,4 +8,13 @@ void main() {
     expect(ManaCostRow.tokensOf('{W/U}{P}'), ['W/U', 'P']);
     expect(ManaCostRow.tokensOf(''), isEmpty);
   });
+
+  test('fromSymbols wraps color letters as mana tokens', () {
+    expect(
+      ManaCostRow.tokensOf(
+        ['U', 'R'].map((s) => '{$s}').join(),
+      ),
+      ['U', 'R'],
+    );
+  });
 }

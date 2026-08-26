@@ -83,6 +83,25 @@ class CardMatchService {
     }
   }
 
+  /// Bind [asset] to a specific printing (alternate print picker).
+  Future<Result<CardPrinting>> bindPrinting(
+    Asset asset,
+    CardPrinting printing,
+  ) async {
+    try {
+      await _bindAsset(asset, printing, replaceExisting: true);
+      await _prefetchImages(printing);
+      return Result.success(printing);
+    } on Object catch (error) {
+      return Result.failure(
+        Failure.unexpected(
+          message: 'Failed to bind printing',
+          cause: error,
+        ),
+      );
+    }
+  }
+
   /// Re-resolve by the asset's **current name**, ignoring bound id / set / #.
   Future<Result<CardPrinting?>> rematchAsset(
     Asset asset, {

@@ -19,6 +19,12 @@ abstract interface class CardMetadataProvider {
   /// Prefix / normalized similar match; may return null.
   Future<CardPrinting?> findSimilarName(String name);
 
+  /// Printings that share [oracleId]. Local cache first; network fills gaps.
+  Future<List<CardPrinting>> listPrints(
+    String oracleId, {
+    bool allowNetwork = true,
+  });
+
   /// Ensure a usable local catalog exists (bulk download if needed).
   Future<void> ensureCatalog({
     void Function(CatalogSyncProgress progress)? onProgress,

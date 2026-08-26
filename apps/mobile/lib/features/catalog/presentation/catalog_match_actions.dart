@@ -233,13 +233,13 @@ Future<CardPrinting?> loadCardPrinting(WidgetRef ref, Asset asset) async {
   }
   final catalog = ref.read(mtgCardCatalogProvider);
   final local = await catalog.getById(id);
-  if (local != null && !local.needsFaceHydration) {
+  if (local != null && !local.needsCatalogHydration) {
     return local;
   }
   // Hydrate faces for printings cached before multi-face support.
   // Soft-fail offline: prefer local stats/URLs over a hard error.
   try {
-    final fresh = await catalog.resolve(scryfallId: id, allowNetwork: true);
+    final fresh = await catalog.resolve(scryfallId: id);
     return fresh ?? local;
   } on Object {
     return local;

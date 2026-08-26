@@ -60,6 +60,7 @@ void main() {
       store: store,
       queue: queue,
       bulkImporter: bulk,
+      client: client,
     );
     matchService = CardMatchService(
       assets: container.read(assetServiceProvider),
@@ -391,5 +392,244 @@ void main() {
     );
     expect(fresh.needsFaceHydration, isFalse);
     expect(fresh.isMultiFace, isTrue);
+    expect(fresh.needsDetailsHydration, isTrue);
+    expect(fresh.needsCatalogHydration, isTrue);
+
+    final hydrated = CardPrinting(
+      id: 'hydrated',
+      name: 'Lightning Bolt',
+      setCode: 'lea',
+      collectorNumber: '161',
+      rarity: 'common',
+      details: const CardPrintingDetails(),
+      faces: const [CardFace(name: 'Lightning Bolt')],
+      fetchedAt: DateTime.utc(2024),
+    );
+    expect(hydrated.needsDetailsHydration, isFalse);
+    expect(hydrated.needsCatalogHydration, isFalse);
+  });
+
+  test('printingFromJson maps gameplay and printing details', () {
+    final printing = ScryfallHttpClient.printingFromJson({
+      'id': 'bear-1111-2222-3333-444444444444',
+      'oracle_id': 'oracle-bears',
+      'name': 'Grizzly Bears',
+      'set': 'lea',
+      'set_name': 'Limited Edition Alpha',
+      'collector_number': '193',
+      'mana_cost': '{1}{G}',
+      'cmc': 2,
+      'type_line': 'Creature — Bear',
+      'oracle_text': '',
+      'colors': ['G'],
+      'color_identity': ['G'],
+      'power': '2',
+      'toughness': '2',
+      'rarity': 'common',
+      'artist': 'Jeff A. Menges',
+      'flavor_text': 'We have nothing to fear.',
+      'keywords': <String>[],
+      'promo': false,
+      'reprint': false,
+      'legalities': {
+        'standard': 'not_legal',
+        'commander': 'legal',
+      },
+      'prices': {
+        'usd': '0.25',
+        'usd_foil': null,
+      },
+    });
+    expect(printing, isNotNull);
+    expect(printing!.oracleText, '');
+    expect(printing.colors, ['G']);
+    expect(printing.colorIdentity, ['G']);
+    expect(printing.cmc, 2);
+    expect(printing.rarity, 'common');
+    expect(printing.artist, 'Jeff A. Menges');
+    expect(printing.setName, 'Limited Edition Alpha');
+    expect(printing.power, '2');
+    expect(printing.toughness, '2');
+    expect(printing.combatStatsForFace(0), '2/2');
+    expect(printing.needsDetailsHydration, isFalse);
+    expect(printing.details?.flavorText, 'We have nothing to fear.');
+    expect(printing.details?.legalities['commander'], 'legal');
+    expect(printing.details?.usd, '0.25');
+  });
+
+  test('printingFromJson maps per-face oracle text and P/T', () {
+    final printing = ScryfallHttpClient.printingFromJson({
+      'id': 'dfc-stats-2222-3333-444444444444',
+      'name': 'Delver of Secrets // Insectile Aberration',
+      'layout': 'transform',
+      'set': 'isd',
+      'collector_number': '51',
+      'card_faces': [
+        {
+          'name': 'Delver of Secrets',
+          'mana_cost': '{U}',
+          'type_line': 'Creature — Human Wizard',
+          'oracle_text': 'At the beginning of your upkeep, look at the top.',
+          'power': '1',
+          'toughness': '1',
+          'colors': ['U'],
+          'image_uris': {
+            'small': 'https://example.com/delver-front-small.jpg',
+            'normal': 'https://example.com/delver-front.jpg',
+          },
+        },
+        {
+          'name': 'Insectile Aberration',
+          'mana_cost': '',
+          'type_line': 'Creature — Human Insect',
+          'oracle_text': 'Flying',
+          'power': '3',
+          'toughness': '2',
+          'colors': ['U'],
+          'image_uris': {
+            'small': 'https://example.com/delver-back-small.jpg',
+            'normal': 'https://example.com/delver-back.jpg',
+          },
+        },
+      ],
+    });
+    expect(printing, isNotNull);
+    expect(printing!.faces[0].oracleText, contains('upkeep'));
+    expect(printing.faces[1].oracleText, 'Flying');
+    expect(printing.combatStatsForFace(1), '3/2');
+  });
+
+  test('findByOracleId lists both Lightning Bolt printings', () async {
+    await seedFixtureCatalog();
+    final store = CardPrintingStore(database);
+    final prints = await store.findByOracleId(
+      '11111111-2222-3333-4444-555555555555',
+    );
+    expect(prints, hasLength(2));
+    expect(
+      prints.map((p) => p.setCode).toSet(),
+      {'lea', 'm10'},
+    );
+    expect(
+      prints.map((p) => p.artist).toSet(),
+      {'Christopher Rush', 'Christopher Moeller'},
+    );
+  });
+
+  test('listPrints uses local cache when search returns 404', () async {
+    await seedFixtureCatalog();
+    networkCalls = 0;
+    final prints = await catalog.listPrints(
+      '11111111-2222-3333-4444-555555555555',
+    );
+    expect(prints, hasLength(2));
+    expect(networkCalls, 1);
+  });
+
+  test('searchPrints follows next_page pagination', () async {
+    var pages = 0;
+    final client = ScryfallHttpClient(
+      client: MockClient((request) async {
+        pages++;
+        if (pages == 1) {
+          return http.Response(
+            jsonEncode({
+              'object': 'list',
+              'has_more': true,
+              'next_page':
+                  'https://api.scryfall.com/cards/search?page=2&q=oracleid:111',
+              'data': [
+                {
+                  'id': 'print-a',
+                  'oracle_id': '111',
+                  'name': 'Lightning Bolt',
+                  'set': 'lea',
+                  'collector_number': '161',
+                  'rarity': 'common',
+                  'artist': 'Christopher Rush',
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        return http.Response(
+          jsonEncode({
+            'object': 'list',
+            'has_more': false,
+            'data': [
+              {
+                'id': 'print-b',
+                'oracle_id': '111',
+                'name': 'Lightning Bolt',
+                'set': 'sld',
+                'collector_number': '1',
+                'rarity': 'rare',
+                'artist': 'Guest Artist',
+                'promo': true,
+              },
+            ],
+          }),
+          200,
+        );
+      }),
+    );
+    final prints = await client.searchPrints(
+      '111',
+      pageDelay: Duration.zero,
+    );
+    expect(prints, hasLength(2));
+    expect(prints.first.setCode, 'lea');
+    expect(prints.last.artist, 'Guest Artist');
+    expect(prints.last.details?.promo, isTrue);
+    expect(pages, 2);
+    client.close();
+  });
+
+  test('bindPrinting switches the matched scryfall id', () async {
+    await seedFixtureCatalog();
+    final office = (await container
+            .read(locationServiceProvider)
+            .createLocation(name: 'Office'))
+        .valueOrNull!;
+    final created = await container.read(assetServiceProvider).createAsset(
+          name: 'Lightning Bolt',
+          locationId: office.id,
+          metadata: const Metadata(
+            values: {
+              MtgMetadataKeys.setCode: 'lea',
+              MtgMetadataKeys.collectorNumber: '161',
+            },
+          ),
+        );
+    final asset = created.valueOrNull!;
+    final matched = await matchService.matchAsset(asset);
+    expect(
+      matched.valueOrNull?.id,
+      'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+    );
+
+    final m10 = await catalog.getById(
+      'bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee',
+    );
+    expect(m10, isNotNull);
+    final rebound = await matchService.bindPrinting(asset, m10!);
+    expect(rebound.isSuccess, isTrue);
+
+    final updated = (await container.read(assetServiceProvider).getAsset(
+          asset.id,
+        ))
+        .valueOrNull!;
+    expect(
+      MtgMetadataKeys.scryfallIdOf(updated.metadata.values),
+      'bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee',
+    );
+    expect(
+      MtgMetadataKeys.stringOf(
+        updated.metadata.values,
+        MtgMetadataKeys.setCode,
+      ),
+      'm10',
+    );
   });
 }

@@ -6,6 +6,7 @@
 /// v4 adds card catalog cache (Scryfall printings + catalog meta).
 /// v5 adds card layout + faces_json for multi-face printings.
 /// v6 adds sync_outbox + sync_state for offline-first sync protocol.
+/// v7 adds Scryfall gameplay / printing details on card_printings.
 abstract final class DatabaseMigrations {
-  static const int schemaVersion = 6;
+  static const int schemaVersion = 7;
 }
