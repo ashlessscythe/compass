@@ -14,8 +14,10 @@
     "lint": "echo \"No lint configured for @compass/domains\"",
     "clean": "rm -rf dist .turbo"
   },
+  "dependencies": {
+    "@compass/api": "workspace:*"
+  },
   "devDependencies": {
-    "@compass/api": "workspace:*",
     "typescript": "^5.8.2"
   }
 }

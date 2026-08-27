@@ -12,6 +12,7 @@ COPY apps/web/prisma ./apps/web/prisma/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/branding/package.json ./packages/branding/
 COPY packages/api/package.json ./packages/api/
+COPY packages/domains/package.json ./packages/domains/
 # postinstall runs `prisma generate` and needs schema + the generate script.
 RUN pnpm install --frozen-lockfile
 

@@ -29,3 +29,4 @@ export function getDomainPack(packId: string): DomainPack | undefined {
 }
 
 export { mtgV1 };
+export type { DomainPack, DomainPackSummary } from "@compass/api";

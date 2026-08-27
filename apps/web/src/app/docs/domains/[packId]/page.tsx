@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDomainPack } from "@compass/domains";
-import type { DomainPackCsvExportColumn } from "@compass/api";
+import type {
+  DomainPackAssetType,
+  DomainPackAttributeDefinition,
+  DomainPackCsvExportColumn,
+  DomainPackCsvField,
+} from "@compass/api";
 
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -51,9 +56,9 @@ export default async function DomainPackDocsPage({ params }: PageProps) {
         <section className="mt-12">
           <h2 className="font-display text-xl font-medium">Asset types</h2>
           <ul className="mt-4 space-y-2 text-sm">
-            {pack.assetTypes.map((type) => (
-              <li key={type.id}>
-                <code>{type.id}</code> — {type.name}
+            {pack.assetTypes.map((assetType: DomainPackAssetType) => (
+              <li key={assetType.id}>
+                <code>{assetType.id}</code> — {assetType.name}
               </li>
             ))}
           </ul>
@@ -71,7 +76,7 @@ export default async function DomainPackDocsPage({ params }: PageProps) {
                 </tr>
               </thead>
               <tbody>
-                {pack.attributeDefinitions.map((attr) => (
+                {pack.attributeDefinitions.map((attr: DomainPackAttributeDefinition) => (
                   <tr
                     key={attr.id}
                     className="border-b border-white/5 last:border-0"
@@ -93,7 +98,7 @@ export default async function DomainPackDocsPage({ params }: PageProps) {
             {pack.csvImport.dialects.map((d) => d.id).join(", ")}.
           </p>
           <ul className="mt-4 space-y-3 text-sm">
-            {pack.csvImport.fields.map((field) => (
+            {pack.csvImport.fields.map((field: DomainPackCsvField) => (
               <li key={field.key}>
                 <span className="font-medium">{field.key}</span>
                 {field.required ? " (required)" : ""}
@@ -122,7 +127,7 @@ export default async function DomainPackDocsPage({ params }: PageProps) {
                 </tr>
               </thead>
               <tbody>
-                {pack.csvExport.columns.map((column) => (
+                {pack.csvExport.columns.map((column: DomainPackCsvExportColumn) => (
                   <tr
                     key={column.header}
                     className="border-b border-white/5 last:border-0"
