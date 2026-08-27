@@ -58,10 +58,28 @@ class PackCsvAdapter {
     if (categoryRaw == null || categoryRaw.trim().isEmpty) {
       return null;
     }
+    if (categoryRaw.contains('.')) {
+      return assetTypeIdForCategoryCanonical(categoryRaw);
+    }
     final normalized = categoryRaw.trim().toLowerCase().replaceAll(' ', '_');
     for (final type in pack.assetTypes) {
       if (type.id.toLowerCase() == normalized ||
           type.name.toLowerCase() == categoryRaw.trim().toLowerCase()) {
+        return type.id;
+      }
+    }
+    return null;
+  }
+
+  /// Resolve asset type id from a category enum canonical key.
+  String? assetTypeIdForCategoryCanonical(String canonicalKey) {
+    final parts = canonicalKey.split('.');
+    if (parts.length < 3) {
+      return null;
+    }
+    final suffix = parts.last;
+    for (final type in pack.assetTypes) {
+      if (type.id == suffix) {
         return type.id;
       }
     }

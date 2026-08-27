@@ -50,3 +50,64 @@ List<Asset> filterAssetsForModule(
 Set<String> assetTypeIdsForPack(DomainPack pack) {
   return pack.assetTypes.map((type) => type.id).toSet();
 }
+
+/// Resolves which domain pack owns [asset] for display, catalog, and forms.
+DomainPack? owningPackForAsset(
+  Asset asset,
+  Iterable<DomainPack> installedPacks, {
+  String? activeModuleId,
+}) {
+  for (final pack in installedPacks) {
+    if (pack.assetTypes.any((type) => type.id == asset.assetTypeId)) {
+      return pack;
+    }
+  }
+  if (asset.assetTypeId != AppConstants.defaultAssetTypeId) {
+    return null;
+  }
+  final tagged = asset.metadata.values[kCompassModuleIdMetadataKey];
+  if (tagged is String && tagged.isNotEmpty) {
+    for (final pack in installedPacks) {
+      if (pack.moduleId == tagged) {
+        return pack;
+      }
+    }
+    return null;
+  }
+  if (activeModuleId != null) {
+    for (final pack in installedPacks) {
+      if (pack.moduleId == activeModuleId) {
+        return pack;
+      }
+    }
+  }
+  return null;
+}
+
+/// Asset type id plus ancestor ids in [pack] (for attribute applicability).
+Set<String> typeIdsForAssetInPack(DomainPack pack, String assetTypeId) {
+  final ids = <String>{assetTypeId};
+  var current = assetTypeId;
+  while (true) {
+    final type = pack.assetTypes.where((t) => t.id == current).firstOrNull;
+    if (type?.parentId == null) {
+      break;
+    }
+    ids.add(type!.parentId!);
+    current = type.parentId!;
+  }
+  return ids;
+}
+
+List<DomainPackAttributeDefinition> applicableAttributeDefinitions(
+  DomainPack pack,
+  String assetTypeId,
+) {
+  final typeIds = typeIdsForAssetInPack(pack, assetTypeId);
+  return pack.attributeDefinitions
+      .where(
+        (def) =>
+            def.assetTypeId == null || typeIds.contains(def.assetTypeId),
+      )
+      .toList(growable: false);
+}

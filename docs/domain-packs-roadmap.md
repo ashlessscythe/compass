@@ -50,6 +50,31 @@ Pack definitions live as **versioned JSON in git** (`packages/domains/packs/`). 
 
 ---
 
+## DP-5.1 — Pack attribute editing (jewelry first)
+
+**In**
+
+- Owning-pack resolution for catalog gating (no Scryfall UI on non-catalog domains)
+- Pack-driven attribute editor on asset detail (string, decimal, currency, enum)
+- Category enum updates asset subtype id on save
+
+**Out**
+
+- Schema-driven fields on create (name-only prompt remains)
+- Web attribute editing
+- Jewelry catalog providers (DP-6)
+
+**Tollgate**
+
+- [ ] Jewelry asset detail shows all pack attributes with Edit / Save
+- [ ] Saved values persist and export in CSV
+- [ ] Jewelry container list has no Match button; MTG unchanged
+- [ ] MTG assets still resolve Scryfall catalog UI
+
+**After DP-5.1:** tools pack, create-time schema forms (DP-6), remote pack download.
+
+---
+
 ## DP-0 — Pack contract + site hosting
 
 **In**

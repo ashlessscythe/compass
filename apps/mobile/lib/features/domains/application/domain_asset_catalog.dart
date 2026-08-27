@@ -1,28 +1,24 @@
 import 'package:compass/core/domain/entities/asset.dart';
-import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
 import 'package:compass/features/domains/application/domain_pack_registry.dart';
+import 'package:compass/features/domains/application/module_scope.dart';
 import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Whether [asset] belongs to a domain pack with a catalog provider.
-bool assetHasCatalogProvider(Asset asset, DomainPack pack) {
-  if (pack.providers.catalog == null) {
-    return false;
+/// Catalog pack for [asset], or null when the owning pack has no catalog provider.
+DomainPack? catalogPackForAsset(
+  Asset asset,
+  Iterable<DomainPack> installedPacks, {
+  String? activeModuleId,
+}) {
+  final owning = owningPackForAsset(
+    asset,
+    installedPacks,
+    activeModuleId: activeModuleId,
+  );
+  if (owning?.providers.catalog == null) {
+    return null;
   }
-  if (pack.assetTypes.any((type) => type.id == asset.assetTypeId)) {
-    return true;
-  }
-  return _looksLikeMtgAsset(asset, pack);
-}
-
-bool _looksLikeMtgAsset(Asset asset, DomainPack pack) {
-  if (pack.moduleId != 'mtg') {
-    return false;
-  }
-  final values = asset.metadata.values;
-  return MtgMetadataKeys.scryfallIdOf(values) != null ||
-      MtgMetadataKeys.stringOf(values, MtgMetadataKeys.setCode) != null ||
-      MtgMetadataKeys.stringOf(values, MtgMetadataKeys.collectorNumber) != null;
+  return owning;
 }
 
 final assetCatalogPackProvider = Provider.family<DomainPack?, Asset>((ref, asset) {
@@ -30,12 +26,11 @@ final assetCatalogPackProvider = Provider.family<DomainPack?, Asset>((ref, asset
   if (registry == null) {
     return null;
   }
-  for (final pack in registry.installedPacks) {
-    if (assetHasCatalogProvider(asset, pack)) {
-      return pack;
-    }
-  }
-  return null;
+  return catalogPackForAsset(
+    asset,
+    registry.installedPacks,
+    activeModuleId: ref.watch(activeModuleIdProvider),
+  );
 });
 
 /// Catalog match key order from the asset's domain pack (Scryfall default).

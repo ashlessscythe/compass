@@ -53,4 +53,41 @@ void main() {
       isFalse,
     );
   });
+
+  test('owningPackForAsset resolves typed and tagged generic items', () async {
+    final mtg = await DomainPackLoader().loadBundled('mtg');
+    final jewelry = await DomainPackLoader().loadBundled('jewelry');
+    final packs = [mtg, jewelry];
+
+    final ring = Asset(
+      id: '4',
+      name: 'Ring',
+      assetTypeId: 'ring',
+      createdAt: DateTime.utc(2024),
+      updatedAt: DateTime.utc(2024),
+    );
+    expect(owningPackForAsset(ring, packs)?.moduleId, 'jewelry');
+
+    final tagged = Asset(
+      id: '5',
+      name: 'Tagged',
+      assetTypeId: AppConstants.defaultAssetTypeId,
+      createdAt: DateTime.utc(2024),
+      updatedAt: DateTime.utc(2024),
+      metadata: Metadata(values: {kCompassModuleIdMetadataKey: 'jewelry'}),
+    );
+    expect(owningPackForAsset(tagged, packs)?.moduleId, 'jewelry');
+
+    final untagged = Asset(
+      id: '6',
+      name: 'Untagged',
+      assetTypeId: AppConstants.defaultAssetTypeId,
+      createdAt: DateTime.utc(2024),
+      updatedAt: DateTime.utc(2024),
+    );
+    expect(
+      owningPackForAsset(untagged, packs, activeModuleId: 'mtg')?.moduleId,
+      'mtg',
+    );
+  });
 }
