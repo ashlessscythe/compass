@@ -1,5 +1,9 @@
+import 'package:compass/features/domains/application/domain_pack_install_service.dart';
 import 'package:compass/features/domains/domain/domain_pack.dart';
+import 'package:compass/features/domains/domain/domain_pack_version.dart';
 import 'package:compass/features/domains/infrastructure/domain_pack_loader.dart';
+import 'package:compass/features/domains/infrastructure/domain_pack_manifest_repository.dart';
+import 'package:compass/features/domains/infrastructure/domain_pack_remote_loader.dart';
 import 'package:compass/features/domains/infrastructure/domain_pack_seeder.dart';
 import 'package:compass/shared/providers/database_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,21 +11,47 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _activeModuleKey = 'compass.active_module_id';
 
-/// In-memory registry of installed domain packs (bundled + seeded on init).
+/// In-memory registry of installed domain packs (bundled + cached remote).
 class DomainPackRegistry {
   DomainPackRegistry({
     required DomainPackLoader loader,
     required DomainPackSeeder seeder,
+    required DomainPackManifestRepository manifestRepository,
   })  : _loader = loader,
-        _seeder = seeder;
+        _seeder = seeder,
+        _manifestRepository = manifestRepository;
 
   final DomainPackLoader _loader;
   final DomainPackSeeder _seeder;
+  final DomainPackManifestRepository _manifestRepository;
   final Map<String, DomainPack> _packsById = {};
 
   Future<void> initialize() async {
-    final packs = await _loader.loadAllBundled();
-    for (final pack in packs) {
+    _packsById.clear();
+    final bundled = await _loader.loadAllBundled();
+
+    for (final pack in bundled) {
+      final raw = await _loader.loadBundledRaw(pack.id);
+      await _manifestRepository.backfillBundledIfMissing(
+        pack: pack,
+        sourceUrl: _loader.sourceUrlForPackId(pack.id),
+        manifestJson: raw,
+      );
+    }
+
+    final cached = await _manifestRepository.loadCachedPacks();
+    final merged = <String, DomainPack>{
+      for (final pack in bundled) pack.id: pack,
+    };
+    for (final pack in cached) {
+      final existing = merged[pack.id];
+      if (existing == null ||
+          DomainPackVersion.isNewer(pack.version, existing.version)) {
+        merged[pack.id] = pack;
+      }
+    }
+
+    for (final pack in merged.values) {
       await _seeder.seedIfNeeded(pack);
       _packsById[pack.id] = pack;
     }
@@ -46,12 +76,26 @@ class DomainPackRegistry {
 
 final domainPackRegistryProvider = FutureProvider<DomainPackRegistry>((ref) async {
   final db = ref.watch(appDatabaseProvider);
+  final loader = DomainPackLoader();
   final registry = DomainPackRegistry(
-    loader: DomainPackLoader(),
+    loader: loader,
     seeder: DomainPackSeeder(db),
+    manifestRepository: DomainPackManifestRepository(db),
   );
   await registry.initialize();
   return registry;
+});
+
+final domainPackInstallServiceProvider = Provider<DomainPackInstallService>((ref) {
+  final db = ref.watch(appDatabaseProvider);
+  final loader = DomainPackLoader();
+  return DomainPackInstallService(
+    remoteLoader: DomainPackRemoteLoader(),
+    seeder: DomainPackSeeder(db),
+    manifestRepository: DomainPackManifestRepository(db),
+    bundledPackIds: DomainPackLoader.bundledPackAssets.keys.toSet(),
+    sourceUrlForPackId: loader.sourceUrlForPackId,
+  );
 });
 
 final installedDomainPacksProvider = Provider<AsyncValue<List<DomainPack>>>((ref) {
@@ -107,3 +151,8 @@ final activeDomainPackProvider = Provider<AsyncValue<DomainPack?>>((ref) {
 final mtgDomainPackProvider = Provider<DomainPack?>((ref) {
   return ref.watch(domainPackRegistryProvider).valueOrNull?.mtgPack;
 });
+
+/// Reload registry after remote install or update.
+void invalidateDomainPackRegistry(WidgetRef ref) {
+  ref.invalidate(domainPackRegistryProvider);
+}

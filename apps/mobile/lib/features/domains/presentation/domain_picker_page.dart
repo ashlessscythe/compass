@@ -77,7 +77,8 @@ class _PickerBody extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   'Each domain adds types, import formats, and catalog tools '
-                  'on top of the shared location graph.',
+                  'on top of the shared location graph. Install more from '
+                  'Settings → Domain packs or on the web.',
                   style: theme.textTheme.bodyLarge,
                 ),
                 const SizedBox(height: AppSpacing.xl),

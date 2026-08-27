@@ -6,6 +6,8 @@ class InstalledDomainPacks extends Table {
   TextColumn get version => text()();
   TextColumn get moduleId => text().named('module_id')();
   DateTimeColumn get installedAt => dateTime().named('installed_at')();
+  TextColumn get sourceUrl => text().named('source_url').nullable()();
+  TextColumn get manifestJson => text().named('manifest_json').nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {packId};

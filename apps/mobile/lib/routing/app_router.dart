@@ -8,6 +8,7 @@ import 'package:compass/features/export/presentation/export_page.dart';
 import 'package:compass/features/home/presentation/home_page.dart';
 import 'package:compass/features/import/presentation/import_page.dart';
 import 'package:compass/features/locations/presentation/location_detail_page.dart';
+import 'package:compass/features/settings/presentation/domain_packs_settings_page.dart';
 import 'package:compass/features/settings/presentation/settings_page.dart';
 import 'package:compass/features/settings/presentation/themes_page.dart';
 import 'package:compass/features/splash/presentation/splash_page.dart';
@@ -76,6 +77,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.themes,
         name: 'themes',
         builder: (context, state) => const ThemesPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.domainPacks,
+        name: 'domainPacks',
+        builder: (context, state) => const DomainPacksSettingsPage(),
       ),
       GoRoute(
         path: AppRoutes.importCsv,

@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Settings surface: themes and sync (domain tools live under each domain).
+/// Settings surface: themes, domain packs, and sync.
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
@@ -40,6 +40,22 @@ class SettingsPage extends ConsumerWidget {
             subtitle: const Text('Dark, Light, Gray — and ambience skins'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(AppRoutes.themes),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Text(
+            'Domain packs',
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.category_outlined),
+            title: const Text('Domain packs'),
+            subtitle: const Text(
+              'Install or update verticals from getcompass.space',
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(AppRoutes.domainPacks),
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(

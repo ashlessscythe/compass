@@ -11,6 +11,7 @@ abstract final class AppRoutes {
   static const String importCsv = '/settings/import';
   static const String exportCsv = '/settings/export';
   static const String themes = '/settings/themes';
+  static const String domainPacks = '/settings/domains';
   static const String about = '/about';
   static const String locationDetail = '/locations/:id';
   static const String containerDetail = '/containers/:id';

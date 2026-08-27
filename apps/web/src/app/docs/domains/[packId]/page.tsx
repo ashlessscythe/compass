@@ -10,6 +10,7 @@ import type {
 
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { PackInstallUrl } from "@/components/domains/pack-install-url";
 
 type PageProps = {
   params: Promise<{ packId: string }>;
@@ -52,6 +53,8 @@ export default async function DomainPackDocsPage({ params }: PageProps) {
           <code className="text-foreground">{pack.moduleId}</code> · version{" "}
           {pack.version}
         </p>
+
+        <PackInstallUrl packId={pack.id} />
 
         <section className="mt-12">
           <h2 className="font-display text-xl font-medium">Asset types</h2>

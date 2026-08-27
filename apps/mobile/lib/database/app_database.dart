@@ -88,6 +88,13 @@ class AppDatabase extends _$AppDatabase {
               await m.createTable(packAttributeDefinitions);
               await m.createTable(packControlledValues);
             }
+            if (from < 9) {
+              await m.addColumn(installedDomainPacks, installedDomainPacks.sourceUrl);
+              await m.addColumn(
+                installedDomainPacks,
+                installedDomainPacks.manifestJson,
+              );
+            }
           }
         },
         beforeOpen: (details) async {

@@ -71,7 +71,33 @@ Pack definitions live as **versioned JSON in git** (`packages/domains/packs/`). 
 - [ ] Jewelry container list has no Match button; MTG unchanged
 - [ ] MTG assets still resolve Scryfall catalog UI
 
-**After DP-5.1:** tools pack, create-time schema forms (DP-6), remote pack download.
+**After DP-5.1:** tools pack, create-time schema forms (DP-6), remote pack install (DP-5.2).
+
+---
+
+## DP-5.2 — Remote pack install (Compass URLs)
+
+**In**
+
+- Site docs show copyable install URL per pack (`/api/domains/{packId}`)
+- App Settings → Domain packs: paste URL to install or update
+- Cached manifest JSON in SQLite for offline use after first fetch
+- Registry merges bundled + cached remote manifests by semver
+
+**Out**
+
+- Third-party pack hosts
+- In-app catalog browser
+- Uninstall / hide bundled packs
+
+**Tollgate**
+
+- [ ] `/docs/domains/{pack}` shows Copy URL callout
+- [ ] Settings → Domain packs installs from Compass API URL
+- [ ] Update re-fetches manifest and re-seeds when version increases
+- [ ] Cached pack loads offline after first install
+
+**After DP-5.2:** tools pack, schema-driven create forms (DP-6).
 
 ---
 

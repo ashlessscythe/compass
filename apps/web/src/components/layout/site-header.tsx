@@ -29,10 +29,10 @@ export function SiteHeader() {
 
         <nav className="flex items-center gap-2 sm:gap-3" aria-label="Primary">
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <a href="#features">Features</a>
+            <Link href="/#features">Features</Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <a href="#vision">Vision</a>
+            <Link href="/#vision">Vision</Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/docs/domains">Domains</Link>
@@ -47,7 +47,7 @@ export function SiteHeader() {
             </a>
           </Button>
           <Button asChild size="sm">
-            <a href="#waitlist">Join Waitlist</a>
+            <Link href="/#waitlist">Join Waitlist</Link>
           </Button>
         </nav>
       </div>

@@ -8,6 +8,7 @@
 /// v6 adds sync_outbox + sync_state for offline-first sync protocol.
 /// v7 adds Scryfall gameplay / printing details on card_printings.
 /// v8 adds domain pack install state + pack attribute/vocab tables.
+/// v9 adds cached manifest JSON + source URL for remote install/update.
 abstract final class DatabaseMigrations {
-  static const int schemaVersion = 8;
+  static const int schemaVersion = 9;
 }

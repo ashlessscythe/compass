@@ -4853,12 +4853,36 @@ class $InstalledDomainPacksTable extends InstalledDomainPacks
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _sourceUrlMeta = const VerificationMeta(
+    'sourceUrl',
+  );
+  @override
+  late final GeneratedColumn<String> sourceUrl = GeneratedColumn<String>(
+    'source_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _manifestJsonMeta = const VerificationMeta(
+    'manifestJson',
+  );
+  @override
+  late final GeneratedColumn<String> manifestJson = GeneratedColumn<String>(
+    'manifest_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     packId,
     version,
     moduleId,
     installedAt,
+    sourceUrl,
+    manifestJson,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4907,6 +4931,21 @@ class $InstalledDomainPacksTable extends InstalledDomainPacks
     } else if (isInserting) {
       context.missing(_installedAtMeta);
     }
+    if (data.containsKey('source_url')) {
+      context.handle(
+        _sourceUrlMeta,
+        sourceUrl.isAcceptableOrUnknown(data['source_url']!, _sourceUrlMeta),
+      );
+    }
+    if (data.containsKey('manifest_json')) {
+      context.handle(
+        _manifestJsonMeta,
+        manifestJson.isAcceptableOrUnknown(
+          data['manifest_json']!,
+          _manifestJsonMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -4932,6 +4971,14 @@ class $InstalledDomainPacksTable extends InstalledDomainPacks
         DriftSqlType.dateTime,
         data['${effectivePrefix}installed_at'],
       )!,
+      sourceUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_url'],
+      ),
+      manifestJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manifest_json'],
+      ),
     );
   }
 
@@ -4947,11 +4994,15 @@ class InstalledDomainPackRow extends DataClass
   final String version;
   final String moduleId;
   final DateTime installedAt;
+  final String? sourceUrl;
+  final String? manifestJson;
   const InstalledDomainPackRow({
     required this.packId,
     required this.version,
     required this.moduleId,
     required this.installedAt,
+    this.sourceUrl,
+    this.manifestJson,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4960,6 +5011,12 @@ class InstalledDomainPackRow extends DataClass
     map['version'] = Variable<String>(version);
     map['module_id'] = Variable<String>(moduleId);
     map['installed_at'] = Variable<DateTime>(installedAt);
+    if (!nullToAbsent || sourceUrl != null) {
+      map['source_url'] = Variable<String>(sourceUrl);
+    }
+    if (!nullToAbsent || manifestJson != null) {
+      map['manifest_json'] = Variable<String>(manifestJson);
+    }
     return map;
   }
 
@@ -4969,6 +5026,12 @@ class InstalledDomainPackRow extends DataClass
       version: Value(version),
       moduleId: Value(moduleId),
       installedAt: Value(installedAt),
+      sourceUrl: sourceUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceUrl),
+      manifestJson: manifestJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(manifestJson),
     );
   }
 
@@ -4982,6 +5045,8 @@ class InstalledDomainPackRow extends DataClass
       version: serializer.fromJson<String>(json['version']),
       moduleId: serializer.fromJson<String>(json['moduleId']),
       installedAt: serializer.fromJson<DateTime>(json['installedAt']),
+      sourceUrl: serializer.fromJson<String?>(json['sourceUrl']),
+      manifestJson: serializer.fromJson<String?>(json['manifestJson']),
     );
   }
   @override
@@ -4992,6 +5057,8 @@ class InstalledDomainPackRow extends DataClass
       'version': serializer.toJson<String>(version),
       'moduleId': serializer.toJson<String>(moduleId),
       'installedAt': serializer.toJson<DateTime>(installedAt),
+      'sourceUrl': serializer.toJson<String?>(sourceUrl),
+      'manifestJson': serializer.toJson<String?>(manifestJson),
     };
   }
 
@@ -5000,11 +5067,15 @@ class InstalledDomainPackRow extends DataClass
     String? version,
     String? moduleId,
     DateTime? installedAt,
+    Value<String?> sourceUrl = const Value.absent(),
+    Value<String?> manifestJson = const Value.absent(),
   }) => InstalledDomainPackRow(
     packId: packId ?? this.packId,
     version: version ?? this.version,
     moduleId: moduleId ?? this.moduleId,
     installedAt: installedAt ?? this.installedAt,
+    sourceUrl: sourceUrl.present ? sourceUrl.value : this.sourceUrl,
+    manifestJson: manifestJson.present ? manifestJson.value : this.manifestJson,
   );
   InstalledDomainPackRow copyWithCompanion(InstalledDomainPacksCompanion data) {
     return InstalledDomainPackRow(
@@ -5014,6 +5085,10 @@ class InstalledDomainPackRow extends DataClass
       installedAt: data.installedAt.present
           ? data.installedAt.value
           : this.installedAt,
+      sourceUrl: data.sourceUrl.present ? data.sourceUrl.value : this.sourceUrl,
+      manifestJson: data.manifestJson.present
+          ? data.manifestJson.value
+          : this.manifestJson,
     );
   }
 
@@ -5023,13 +5098,22 @@ class InstalledDomainPackRow extends DataClass
           ..write('packId: $packId, ')
           ..write('version: $version, ')
           ..write('moduleId: $moduleId, ')
-          ..write('installedAt: $installedAt')
+          ..write('installedAt: $installedAt, ')
+          ..write('sourceUrl: $sourceUrl, ')
+          ..write('manifestJson: $manifestJson')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(packId, version, moduleId, installedAt);
+  int get hashCode => Object.hash(
+    packId,
+    version,
+    moduleId,
+    installedAt,
+    sourceUrl,
+    manifestJson,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5037,7 +5121,9 @@ class InstalledDomainPackRow extends DataClass
           other.packId == this.packId &&
           other.version == this.version &&
           other.moduleId == this.moduleId &&
-          other.installedAt == this.installedAt);
+          other.installedAt == this.installedAt &&
+          other.sourceUrl == this.sourceUrl &&
+          other.manifestJson == this.manifestJson);
 }
 
 class InstalledDomainPacksCompanion
@@ -5046,12 +5132,16 @@ class InstalledDomainPacksCompanion
   final Value<String> version;
   final Value<String> moduleId;
   final Value<DateTime> installedAt;
+  final Value<String?> sourceUrl;
+  final Value<String?> manifestJson;
   final Value<int> rowid;
   const InstalledDomainPacksCompanion({
     this.packId = const Value.absent(),
     this.version = const Value.absent(),
     this.moduleId = const Value.absent(),
     this.installedAt = const Value.absent(),
+    this.sourceUrl = const Value.absent(),
+    this.manifestJson = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   InstalledDomainPacksCompanion.insert({
@@ -5059,6 +5149,8 @@ class InstalledDomainPacksCompanion
     required String version,
     required String moduleId,
     required DateTime installedAt,
+    this.sourceUrl = const Value.absent(),
+    this.manifestJson = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : packId = Value(packId),
        version = Value(version),
@@ -5069,6 +5161,8 @@ class InstalledDomainPacksCompanion
     Expression<String>? version,
     Expression<String>? moduleId,
     Expression<DateTime>? installedAt,
+    Expression<String>? sourceUrl,
+    Expression<String>? manifestJson,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -5076,6 +5170,8 @@ class InstalledDomainPacksCompanion
       if (version != null) 'version': version,
       if (moduleId != null) 'module_id': moduleId,
       if (installedAt != null) 'installed_at': installedAt,
+      if (sourceUrl != null) 'source_url': sourceUrl,
+      if (manifestJson != null) 'manifest_json': manifestJson,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -5085,6 +5181,8 @@ class InstalledDomainPacksCompanion
     Value<String>? version,
     Value<String>? moduleId,
     Value<DateTime>? installedAt,
+    Value<String?>? sourceUrl,
+    Value<String?>? manifestJson,
     Value<int>? rowid,
   }) {
     return InstalledDomainPacksCompanion(
@@ -5092,6 +5190,8 @@ class InstalledDomainPacksCompanion
       version: version ?? this.version,
       moduleId: moduleId ?? this.moduleId,
       installedAt: installedAt ?? this.installedAt,
+      sourceUrl: sourceUrl ?? this.sourceUrl,
+      manifestJson: manifestJson ?? this.manifestJson,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -5111,6 +5211,12 @@ class InstalledDomainPacksCompanion
     if (installedAt.present) {
       map['installed_at'] = Variable<DateTime>(installedAt.value);
     }
+    if (sourceUrl.present) {
+      map['source_url'] = Variable<String>(sourceUrl.value);
+    }
+    if (manifestJson.present) {
+      map['manifest_json'] = Variable<String>(manifestJson.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -5124,6 +5230,8 @@ class InstalledDomainPacksCompanion
           ..write('version: $version, ')
           ..write('moduleId: $moduleId, ')
           ..write('installedAt: $installedAt, ')
+          ..write('sourceUrl: $sourceUrl, ')
+          ..write('manifestJson: $manifestJson, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -8621,6 +8729,8 @@ typedef $$InstalledDomainPacksTableCreateCompanionBuilder =
       required String version,
       required String moduleId,
       required DateTime installedAt,
+      Value<String?> sourceUrl,
+      Value<String?> manifestJson,
       Value<int> rowid,
     });
 typedef $$InstalledDomainPacksTableUpdateCompanionBuilder =
@@ -8629,6 +8739,8 @@ typedef $$InstalledDomainPacksTableUpdateCompanionBuilder =
       Value<String> version,
       Value<String> moduleId,
       Value<DateTime> installedAt,
+      Value<String?> sourceUrl,
+      Value<String?> manifestJson,
       Value<int> rowid,
     });
 
@@ -8658,6 +8770,16 @@ class $$InstalledDomainPacksTableFilterComposer
 
   ColumnFilters<DateTime> get installedAt => $composableBuilder(
     column: $table.installedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceUrl => $composableBuilder(
+    column: $table.sourceUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get manifestJson => $composableBuilder(
+    column: $table.manifestJson,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -8690,6 +8812,16 @@ class $$InstalledDomainPacksTableOrderingComposer
     column: $table.installedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get sourceUrl => $composableBuilder(
+    column: $table.sourceUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get manifestJson => $composableBuilder(
+    column: $table.manifestJson,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$InstalledDomainPacksTableAnnotationComposer
@@ -8712,6 +8844,14 @@ class $$InstalledDomainPacksTableAnnotationComposer
 
   GeneratedColumn<DateTime> get installedAt => $composableBuilder(
     column: $table.installedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceUrl =>
+      $composableBuilder(column: $table.sourceUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get manifestJson => $composableBuilder(
+    column: $table.manifestJson,
     builder: (column) => column,
   );
 }
@@ -8763,12 +8903,16 @@ class $$InstalledDomainPacksTableTableManager
                 Value<String> version = const Value.absent(),
                 Value<String> moduleId = const Value.absent(),
                 Value<DateTime> installedAt = const Value.absent(),
+                Value<String?> sourceUrl = const Value.absent(),
+                Value<String?> manifestJson = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => InstalledDomainPacksCompanion(
                 packId: packId,
                 version: version,
                 moduleId: moduleId,
                 installedAt: installedAt,
+                sourceUrl: sourceUrl,
+                manifestJson: manifestJson,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -8777,12 +8921,16 @@ class $$InstalledDomainPacksTableTableManager
                 required String version,
                 required String moduleId,
                 required DateTime installedAt,
+                Value<String?> sourceUrl = const Value.absent(),
+                Value<String?> manifestJson = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => InstalledDomainPacksCompanion.insert(
                 packId: packId,
                 version: version,
                 moduleId: moduleId,
                 installedAt: installedAt,
+                sourceUrl: sourceUrl,
+                manifestJson: manifestJson,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
