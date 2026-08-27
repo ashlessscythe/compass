@@ -76,6 +76,7 @@ export interface DomainPack {
   version: string;
   displayName: string;
   description: string;
+  tagline?: string;
   defaultAssetTypeId: string;
   assetTypes: DomainPackAssetType[];
   attributeDefinitions: DomainPackAttributeDefinition[];

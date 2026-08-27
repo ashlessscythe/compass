@@ -55,7 +55,10 @@ class _DomainHomePageState extends ConsumerState<DomainHomePage> {
 
     return HomePage(
       title: pack.displayName,
-      subtitle: 'Know where every card is.',
+      subtitle: pack.tagline ??
+          (widget.moduleId == 'mtg'
+              ? 'Know where every card is.'
+              : 'Know where everything is.'),
       moduleId: widget.moduleId,
       onBackToDomains: () => context.go(AppRoutes.domains),
       onOpenDomainSettings: () =>

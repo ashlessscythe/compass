@@ -1,9 +1,11 @@
 import type { DomainPack, DomainPackSummary } from "@compass/api";
 
 import mtgV1 from "../packs/mtg/v1.json";
+import jewelryV1 from "../packs/jewelry/v1.json";
 
 const packs: Record<string, DomainPack> = {
   mtg: mtgV1 as DomainPack,
+  jewelry: jewelryV1 as DomainPack,
 };
 
 /** All published domain pack ids. */
@@ -28,5 +30,5 @@ export function getDomainPack(packId: string): DomainPack | undefined {
   return packs[packId];
 }
 
-export { mtgV1 };
+export { mtgV1, jewelryV1 };
 export type { DomainPack, DomainPackSummary } from "@compass/api";

@@ -19,8 +19,8 @@ class ExportPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final exporting = useState(false);
-    final assets = ref.watch(assetsListProvider);
-    final count = assets.valueOrNull?.length ?? 0;
+    final count = ref.watch(moduleAssetCountProvider(moduleId));
+    final isLoading = count == null;
 
     return CompassScaffold(
       title: 'Export CSV',
@@ -34,26 +34,26 @@ class ExportPage extends HookConsumerWidget {
           const SizedBox(height: AppSpacing.xl),
           Text('Collection', style: theme.textTheme.titleMedium),
           const SizedBox(height: AppSpacing.sm),
-          assets.when(
-            data: (_) => Text(
+          if (isLoading)
+            Text('Counting assets…', style: theme.textTheme.bodyMedium)
+          else
+            Text(
               count == 0
-                  ? 'No assets to export yet.'
+                  ? 'No assets in this domain yet. Add items here or import '
+                      'a CSV — manually added items are tagged to this domain.'
                   : '$count asset${count == 1 ? '' : 's'} will be included.',
               style: theme.textTheme.bodyMedium,
             ),
-            loading: () => const Text('Counting assets…'),
-            error: (_, _) => Text(
-              'Could not load assets.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.error,
-              ),
-            ),
-          ),
           const SizedBox(height: AppSpacing.xl),
           FilledButton(
-            onPressed: exporting.value || count == 0
+            onPressed: exporting.value || isLoading || count == 0
                 ? null
-                : () => _runExport(context, ref, exporting: exporting),
+                : () => _runExport(
+                      context,
+                      ref,
+                      moduleId: moduleId,
+                      exporting: exporting,
+                    ),
             child: exporting.value
                 ? const SizedBox(
                     width: 20,
@@ -70,10 +70,12 @@ class ExportPage extends HookConsumerWidget {
   Future<void> _runExport(
     BuildContext context,
     WidgetRef ref, {
+    required String moduleId,
     required ValueNotifier<bool> exporting,
   }) async {
     exporting.value = true;
-    final result = await ref.read(exportServiceProvider).exportToTempFile();
+    final result =
+        await ref.read(exportServiceProvider(moduleId)).exportToTempFile();
     exporting.value = false;
     if (!context.mounted) {
       return;

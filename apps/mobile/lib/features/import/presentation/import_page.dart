@@ -36,7 +36,7 @@ class ImportPage extends HookConsumerWidget {
     final importing = useState(false);
     final containers = ref.watch(containersListProvider);
     final locations = ref.watch(locationsListProvider);
-    final isCompass = parseResult.value?.dialect == CsvDialect.compass;
+    final isCompass = parseResult.value?.dialectId.isCompass ?? false;
     final canImport = parseResult.value != null &&
         (isCompass || selectedContainer.value != null) &&
         !importing.value;
@@ -49,9 +49,8 @@ class ImportPage extends HookConsumerWidget {
             isCompass
                 ? 'Compass CSV detected — places and containers come from '
                     'each row’s Path. No destination container needed.'
-                : 'Import a Deckbox, Moxfield, Compass, or generic collection '
-                    'CSV into a container. Cards become searchable with that '
-                    'path.',
+                : 'Import a Compass export or spreadsheet CSV into a container. '
+                    'Items become searchable with that path.',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -83,8 +82,8 @@ class ImportPage extends HookConsumerWidget {
           if (parseResult.value != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Detected ${parseResult.value!.dialect.label} · '
-              '${parseResult.value!.rowCount} cards'
+              'Detected ${parseResult.value!.dialectId.label} · '
+              '${parseResult.value!.rowCount} item${parseResult.value!.rowCount == 1 ? '' : 's'}'
               '${_skippedLabel(parseResult.value!)}',
               style: theme.textTheme.bodyMedium,
             ),
@@ -143,6 +142,7 @@ class ImportPage extends HookConsumerWidget {
                 : () => _runImport(
                       context,
                       ref,
+                      moduleId: moduleId,
                       parsed: parseResult.value!,
                       container: selectedContainer.value,
                       importing: importing,
@@ -186,7 +186,7 @@ class ImportPage extends HookConsumerWidget {
     }
 
     final content = utf8.decode(bytes, allowMalformed: true);
-    final result = ref.read(importServiceProvider).parseCsv(content);
+    final result = ref.read(importServiceProvider(moduleId)).parseCsv(content);
     if (result.isFailure) {
       parseError.value = result.failureOrNull!.message;
       parseResult.value = null;
@@ -197,7 +197,7 @@ class ImportPage extends HookConsumerWidget {
     parseError.value = null;
     parseResult.value = result.valueOrNull;
     fileName.value = file.name;
-    if (result.valueOrNull?.dialect == CsvDialect.compass) {
+    if (result.valueOrNull?.dialectId.isCompass ?? false) {
       selectedContainer.value = null;
     }
   }
@@ -234,13 +234,14 @@ class ImportPage extends HookConsumerWidget {
   Future<void> _runImport(
     BuildContext context,
     WidgetRef ref, {
+    required String moduleId,
     required CsvParseResult parsed,
     required graph.Container? container,
     required ValueNotifier<bool> importing,
   }) async {
     importing.value = true;
-    final service = ref.read(importServiceProvider);
-    final result = parsed.dialect == CsvDialect.compass
+    final service = ref.read(importServiceProvider(moduleId));
+    final result = parsed.dialectId.isCompass
         ? await service.importCompassPaths(parsed: parsed)
         : await service.importIntoContainer(
             parsed: parsed,
@@ -261,13 +262,17 @@ class ImportPage extends HookConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          parsed.dialect == CsvDialect.compass
-              ? 'Imported ${summary.createdCount} cards from CSV paths'
-              : 'Imported ${summary.createdCount} cards into '
+          parsed.dialectId.isCompass
+              ? 'Imported ${summary.createdCount} items from CSV paths'
+              : 'Imported ${summary.createdCount} items into '
                   '${summary.destinationLabel}',
         ),
       ),
     );
+
+    if (moduleId != 'mtg') {
+      return;
+    }
 
     final match = await showDialog<bool>(
       context: context,

@@ -1,7 +1,10 @@
 import 'package:compass/database/app_database.dart';
+import 'package:compass/features/domains/application/pack_csv_adapter.dart';
 import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/features/domains/infrastructure/domain_pack_loader.dart';
 import 'package:compass/features/domains/infrastructure/domain_pack_seeder.dart';
+import 'package:compass/features/export/infrastructure/csv_collection_exporter.dart';
+import 'package:compass/features/import/infrastructure/csv_collection_parser.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,6 +33,16 @@ void main() {
       );
     });
 
+    test('bundled jewelry v1.json parses', () async {
+      final pack = await DomainPackLoader().loadBundled('jewelry');
+      expect(pack.id, 'jewelry');
+      expect(pack.moduleId, 'jewelry');
+      expect(pack.defaultAssetTypeId, 'jewelry');
+      expect(pack.tagline, 'Know where every piece is.');
+      expect(pack.providers.catalog, isNull);
+      expect(pack.assetTypes.length, greaterThanOrEqualTo(6));
+    });
+
     test('pack CSV import maps scryfall field to attribute key', () async {
       final pack = await DomainPackLoader().loadBundled('mtg');
       expect(
@@ -38,22 +51,31 @@ void main() {
       );
     });
 
-    test('seeder installs mtg_card type and attribute definitions', () async {
+    test('seeder installs both packs with types and attribute definitions',
+        () async {
       final db = AppDatabase.forTesting(NativeDatabase.memory());
       addTearDown(db.close);
 
-      final pack = await DomainPackLoader().loadBundled('mtg');
-      await DomainPackSeeder(db).seedIfNeeded(pack);
+      final loader = DomainPackLoader();
+      final seeder = DomainPackSeeder(db);
+      for (final packId in DomainPackLoader.bundledPackAssets.keys) {
+        await seeder.seedIfNeeded(await loader.loadBundled(packId));
+      }
 
       final installed = await db.select(db.installedDomainPacks).get();
-      expect(installed, hasLength(1));
-      expect(installed.single.packId, 'mtg');
+      expect(installed, hasLength(2));
+      expect(
+        installed.map((row) => row.packId).toSet(),
+        {'mtg', 'jewelry'},
+      );
 
       final types = await db.select(db.assetTypes).get();
       expect(types.any((t) => t.id == 'mtg_card'), isTrue);
+      expect(types.any((t) => t.id == 'ring'), isTrue);
+      expect(types.any((t) => t.id == 'engagement_ring'), isTrue);
 
       final defs = await db.select(db.packAttributeDefinitions).get();
-      expect(defs.length, greaterThanOrEqualTo(6));
+      expect(defs.length, greaterThanOrEqualTo(20));
     });
   });
 }

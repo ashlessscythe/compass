@@ -6,6 +6,7 @@ class DomainPack {
     required this.version,
     required this.displayName,
     required this.description,
+    this.tagline,
     required this.defaultAssetTypeId,
     required this.assetTypes,
     required this.attributeDefinitions,
@@ -22,6 +23,7 @@ class DomainPack {
       version: json['version'] as String,
       displayName: json['displayName'] as String,
       description: json['description'] as String,
+      tagline: json['tagline'] as String?,
       defaultAssetTypeId: json['defaultAssetTypeId'] as String,
       assetTypes: (json['assetTypes'] as List<dynamic>)
           .map((e) => DomainPackAssetType.fromJson(e as Map<String, dynamic>))
@@ -55,6 +57,7 @@ class DomainPack {
   final String version;
   final String displayName;
   final String description;
+  final String? tagline;
   final String defaultAssetTypeId;
   final List<DomainPackAssetType> assetTypes;
   final List<DomainPackAttributeDefinition> attributeDefinitions;

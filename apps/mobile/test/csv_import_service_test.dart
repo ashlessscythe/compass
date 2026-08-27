@@ -5,7 +5,6 @@ import 'package:compass/database/app_database.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/import/application/import_service.dart';
-import 'package:compass/features/import/domain/csv_import_models.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
 import 'package:compass/shared/providers/database_provider.dart';
@@ -39,14 +38,14 @@ void main() {
         .valueOrNull!;
 
     final csv = File('test/fixtures/import/moxfield_sample.csv').readAsStringSync();
-    final result = await container.read(importServiceProvider).importCsv(
+    final result = await container.read(importServiceProvider('mtg')).importCsv(
           content: csv,
           containerId: binder.id,
         );
 
     expect(result.isSuccess, isTrue);
     final summary = result.valueOrNull!;
-    expect(summary.dialect, CsvDialect.moxfield);
+    expect(summary.dialectId, 'moxfield');
     expect(summary.createdCount, 3);
     expect(summary.containerName, 'Binder');
 
@@ -89,13 +88,13 @@ void main() {
         'Sol Ring,2,c21,1,Office / Binder / Sol Ring\n'
         'Opt,4,znr,65,Home / Box / Opt\n';
 
-    final result = await container.read(importServiceProvider).importCsv(
+    final result = await container.read(importServiceProvider('mtg')).importCsv(
           content: csv,
         );
 
     expect(result.isSuccess, isTrue);
     final summary = result.valueOrNull!;
-    expect(summary.dialect, CsvDialect.compass);
+    expect(summary.dialectId, 'compass');
     expect(summary.createdCount, 3);
     expect(summary.destinationLabel, 'CSV paths');
     expect(summary.createdAssetIds, hasLength(3));

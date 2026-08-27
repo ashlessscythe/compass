@@ -61,19 +61,18 @@ void main() {
       const CsvExportRow(
         name: 'Opt',
         quantity: 4,
-        setValue: 'znr',
-        collectorNumber: '65',
-        finish: null,
-        condition: 'SP',
-        scryfallId: 'sf-1',
-        layout: null,
-        notes: null,
+        attributes: {
+          'set': 'znr',
+          'collectorNumber': '65',
+          'condition': 'SP',
+          'scryfall.card_id': 'sf-1',
+        },
         path: 'Home / Box / Opt',
       ),
     ]);
 
     final result = parser.parse(csv);
-    expect(result.dialect, CsvDialect.compass);
+    expect(result.dialectId, 'compass');
     expect(result.rowCount, 1);
     expect(result.rows.first.name, 'Opt');
     expect(result.rows.first.quantity, 4);
@@ -82,19 +81,19 @@ void main() {
     expect(result.rows.first.condition, 'SP');
     expect(result.rows.first.scryfallId, 'sf-1');
     expect(result.rows.first.path, 'Home / Box / Opt');
-    expect(result.rows.first.dialect, CsvDialect.compass);
-    expect(result.rows.first.dialect.metadataSource, 'compass');
+    expect(result.rows.first.dialectId, 'compass');
+    expect(result.rows.first.dialectId.metadataSource, 'compass');
   });
 
-  test('detectDialect prefers Path over Moxfield-like columns', () {
+  test('detectDialectId prefers Path over Moxfield-like columns', () {
     expect(
-      parser.detectDialect([
+      parser.detectDialectId([
         'name',
         'collector number',
         'edition',
         'path',
       ]),
-      CsvDialect.compass,
+      'compass',
     );
   });
 }

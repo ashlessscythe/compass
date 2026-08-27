@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 class DomainPackLoader {
   static const bundledPackAssets = {
     'mtg': 'assets/domains/mtg/v1.json',
+    'jewelry': 'assets/domains/jewelry/v1.json',
   };
 
   Future<DomainPack> loadBundled(String packId) async {

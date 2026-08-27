@@ -14,6 +14,9 @@ import 'package:compass/features/catalog/presentation/card_details_sheet.dart';
 import 'package:compass/features/catalog/presentation/card_printings_sheet.dart';
 import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
 import 'package:compass/features/domains/application/domain_asset_catalog.dart';
+import 'package:compass/features/domains/application/domain_pack_registry.dart';
+import 'package:compass/features/domains/application/pack_csv_adapter.dart';
+import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
@@ -253,32 +256,121 @@ class AssetDetailPage extends ConsumerWidget {
 
 enum _AssetMenuAction { rematch, clearMatch, delete }
 
-class _GenericAssetBody extends StatelessWidget {
+class _GenericAssetBody extends ConsumerWidget {
   const _GenericAssetBody({required this.asset});
 
   final Asset asset;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final pack = _packForAsset(ref, asset);
+    final adapter = pack == null ? null : PackCsvAdapter(pack);
+    final attributeRows = pack == null
+        ? const <Widget>[]
+        : _attributeRows(
+            theme: theme,
+            pack: pack,
+            adapter: adapter!,
+            asset: asset,
+          );
+
     return Padding(
       padding: AppSpacing.pagePadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(asset.name, style: theme.textTheme.headlineSmall),
-          if (asset.notes != null && asset.notes!.trim().isNotEmpty) ...[
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(asset.name, style: theme.textTheme.headlineSmall),
+            if (asset.notes != null && asset.notes!.trim().isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.md),
+              Text(asset.notes!, style: theme.textTheme.bodyLarge),
+            ],
             const SizedBox(height: AppSpacing.md),
-            Text(asset.notes!, style: theme.textTheme.bodyLarge),
+            Text(
+              'Quantity: ${asset.quantity}',
+              style: theme.textTheme.bodyMedium,
+            ),
+            if (attributeRows.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xl),
+              Text('Details', style: theme.textTheme.titleMedium),
+              const SizedBox(height: AppSpacing.sm),
+              ...attributeRows,
+            ],
           ],
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'Quantity: ${asset.quantity}',
-            style: theme.textTheme.bodyMedium,
-          ),
-        ],
+        ),
       ),
     );
+  }
+
+  DomainPack? _packForAsset(WidgetRef ref, Asset asset) {
+    final registry = ref.watch(domainPackRegistryProvider).valueOrNull;
+    if (registry == null) {
+      return null;
+    }
+    for (final pack in registry.installedPacks) {
+      if (pack.assetTypes.any((type) => type.id == asset.assetTypeId)) {
+        return pack;
+      }
+    }
+    return null;
+  }
+
+  List<Widget> _attributeRows({
+    required ThemeData theme,
+    required DomainPack pack,
+    required PackCsvAdapter adapter,
+    required Asset asset,
+  }) {
+    final typeIds = _typeIdsForAsset(pack, asset.assetTypeId);
+    final rows = <Widget>[];
+    for (final def in pack.attributeDefinitions) {
+      if (def.assetTypeId != null && !typeIds.contains(def.assetTypeId)) {
+        continue;
+      }
+      final raw = asset.metadata.values[def.key]?.toString();
+      if (raw == null || raw.trim().isEmpty) {
+        continue;
+      }
+      final label = adapter.labelForAttributeValue(def.key, raw) ?? raw;
+      rows.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 120,
+                child: Text(
+                  def.displayName ?? def.key,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(label, style: theme.textTheme.bodyMedium),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    return rows;
+  }
+
+  Set<String> _typeIdsForAsset(DomainPack pack, String assetTypeId) {
+    final ids = <String>{assetTypeId};
+    var current = assetTypeId;
+    while (true) {
+      final type = pack.assetTypes.where((t) => t.id == current).firstOrNull;
+      if (type?.parentId == null) {
+        break;
+      }
+      ids.add(type!.parentId!);
+      current = type.parentId!;
+    }
+    return ids;
   }
 }
 

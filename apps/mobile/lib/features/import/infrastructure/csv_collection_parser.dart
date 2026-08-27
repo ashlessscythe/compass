@@ -2,7 +2,7 @@ import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/features/import/domain/csv_import_models.dart';
 import 'package:csv/csv.dart';
 
-/// Parses Deckbox / Moxfield / generic collection CSVs into [ImportRow]s.
+/// Parses pack-driven collection CSVs into [ImportRow]s.
 class CsvCollectionParser {
   CsvCollectionParser({DomainPackCsvImport? packImport})
       : _packImport = packImport;
@@ -11,19 +11,19 @@ class CsvCollectionParser {
 
   final DomainPackCsvImport? _packImport;
 
-  static const _nameHeaders = {
+  static const _legacyNameHeaders = {
     'name',
     'simple name',
     'card',
     'card name',
   };
-  static const _quantityHeaders = {
+  static const _legacyQuantityHeaders = {
     'count',
     'quantity',
     'qty',
     'amount',
   };
-  static const _setHeaders = {
+  static const _legacySetHeaders = {
     'edition',
     'set',
     'set code',
@@ -33,41 +33,53 @@ class CsvCollectionParser {
     'set_hint',
     'set hint',
   };
-  static const _collectorHeaders = {
+  static const _legacyCollectorHeaders = {
     'card number',
     'collector number',
     'collector #',
   };
-  static const _finishHeaders = {
+  static const _legacyFinishHeaders = {
     'foil',
     'printing',
     'finish',
     'premium',
   };
-  static const _scryfallHeaders = {
+  static const _legacyScryfallHeaders = {
     'scryfall id',
     'scryfallid',
   };
-  static const _cardFormHeaders = {
+  static const _legacyCardFormHeaders = {
     'card_form',
     'card form',
     'layout',
     'card layout',
   };
-  static const _conditionHeaders = {
+  static const _legacyConditionHeaders = {
     'condition',
     'cond',
   };
-  static const _pathHeaders = {
+  static const _legacyPathHeaders = {
     'path',
   };
 
-  Set<String> _aliasesFor(String fieldKey, Set<String> fallback) {
+  static const _legacyFallbacks = {
+    'name': _legacyNameHeaders,
+    'quantity': _legacyQuantityHeaders,
+    'set': _legacySetHeaders,
+    'collectorNumber': _legacyCollectorHeaders,
+    'finish': _legacyFinishHeaders,
+    'scryfallId': _legacyScryfallHeaders,
+    'layout': _legacyCardFormHeaders,
+    'condition': _legacyConditionHeaders,
+    'path': _legacyPathHeaders,
+  };
+
+  Set<String> _aliasesFor(String fieldKey) {
     final fromPack = _packImport?.headerAliasesFor(fieldKey);
     if (fromPack != null && fromPack.isNotEmpty) {
       return fromPack;
     }
-    return fallback;
+    return _legacyFallbacks[fieldKey] ?? const {};
   }
 
   /// Parse UTF-8 CSV [content]. Throws [CsvParseException] on bad input.
@@ -94,35 +106,100 @@ class CsvCollectionParser {
     final headers = [
       for (final header in rawHeaders) header.toLowerCase(),
     ];
-    final nameHeaders = _aliasesFor('name', _nameHeaders);
+
+    if (_packImport != null) {
+      return _parsePackDriven(table, headers);
+    }
+    return _parseLegacy(table, headers);
+  }
+
+  CsvParseResult _parsePackDriven(List<List<dynamic>> table, List<String> headers) {
+    final packImport = _packImport!;
+    final nameHeaders = _aliasesFor('name');
     final nameIndex = _firstIndex(headers, nameHeaders);
+    if (nameIndex == null) {
+      throw CsvParseException(
+        'CSV needs a Name column (${nameHeaders.join(', ')}).',
+      );
+    }
+
+    final fieldIndices = <String, int?>{};
+    for (final field in packImport.fields) {
+      if (field.key == 'name') {
+        continue;
+      }
+      fieldIndices[field.key] = _firstIndex(headers, _aliasesFor(field.key));
+    }
+
+    final dialectId = detectDialectId(headers);
+    final rows = <ImportRow>[];
+    var skipped = 0;
+    final emptyLabel = _emptyRowLabel();
+
+    for (var i = 1; i < table.length; i++) {
+      final raw = table[i];
+      String cell(int? index) {
+        if (index == null || index >= raw.length) {
+          return '';
+        }
+        return '${raw[index]}'.trim();
+      }
+
+      final name = cell(nameIndex);
+      if (name.isEmpty) {
+        skipped++;
+        continue;
+      }
+
+      final fieldValues = <String, String?>{};
+      for (final field in packImport.fields) {
+        if (field.key == 'name') {
+          continue;
+        }
+        final index = fieldIndices[field.key];
+        final rawValue = cell(index);
+        fieldValues[field.key] = _normalizeField(field.key, rawValue);
+      }
+
+      rows.add(
+        ImportRow(
+          name: name,
+          quantity: _parseQuantity(cell(fieldIndices['quantity'])),
+          dialectId: dialectId,
+          fieldValues: fieldValues,
+          path: fieldValues['path'],
+        ),
+      );
+    }
+
+    if (rows.isEmpty) {
+      throw CsvParseException('CSV has no rows with a $emptyLabel.');
+    }
+
+    return CsvParseResult(
+      dialectId: dialectId,
+      rows: rows,
+      skippedEmptyNames: skipped,
+    );
+  }
+
+  CsvParseResult _parseLegacy(List<List<dynamic>> table, List<String> headers) {
+    final nameIndex = _firstIndex(headers, _legacyNameHeaders);
     if (nameIndex == null) {
       throw CsvParseException(
         'CSV needs a Name column (Name, Simple Name, Card, or Card Name).',
       );
     }
 
-    final quantityIndex =
-        _firstIndex(headers, _aliasesFor('quantity', _quantityHeaders));
-    final setIndex = _firstIndex(headers, _aliasesFor('set', _setHeaders));
-    final collectorIndex = _firstIndex(
-      headers,
-      _aliasesFor('collectorNumber', _collectorHeaders),
-    );
-    final finishIndex =
-        _firstIndex(headers, _aliasesFor('finish', _finishHeaders));
-    final scryfallIndex = _firstIndex(
-      headers,
-      _aliasesFor('scryfallId', _scryfallHeaders),
-    );
-    final cardFormIndex =
-        _firstIndex(headers, _aliasesFor('layout', _cardFormHeaders));
-    final conditionIndex = _firstIndex(
-      headers,
-      _aliasesFor('condition', _conditionHeaders),
-    );
-    final pathIndex = _firstIndex(headers, _aliasesFor('path', _pathHeaders));
-    final dialect = detectDialect(headers);
+    final quantityIndex = _firstIndex(headers, _legacyQuantityHeaders);
+    final setIndex = _firstIndex(headers, _legacySetHeaders);
+    final collectorIndex = _firstIndex(headers, _legacyCollectorHeaders);
+    final finishIndex = _firstIndex(headers, _legacyFinishHeaders);
+    final scryfallIndex = _firstIndex(headers, _legacyScryfallHeaders);
+    final cardFormIndex = _firstIndex(headers, _legacyCardFormHeaders);
+    final conditionIndex = _firstIndex(headers, _legacyConditionHeaders);
+    final pathIndex = _firstIndex(headers, _legacyPathHeaders);
+    final dialectId = detectDialectId(headers);
 
     final rows = <ImportRow>[];
     var skipped = 0;
@@ -142,27 +219,21 @@ class CsvCollectionParser {
         continue;
       }
 
-      final quantity = _parseQuantity(cell(quantityIndex));
-      final setValue = _nullIfEmpty(cell(setIndex));
-      final collector = _nullIfEmpty(cell(collectorIndex));
-      final finish = _normalizeFinish(cell(finishIndex));
-      final scryfallId = _nullIfEmpty(cell(scryfallIndex));
-      final cardForm = _normalizeCardForm(cell(cardFormIndex));
-      final condition = _nullIfEmpty(cell(conditionIndex));
-      final path = _nullIfEmpty(cell(pathIndex));
-
       rows.add(
         ImportRow(
           name: name,
-          quantity: quantity,
-          dialect: dialect,
-          setValue: setValue,
-          collectorNumber: collector,
-          finish: finish,
-          scryfallId: scryfallId,
-          cardForm: cardForm,
-          condition: condition,
-          path: path,
+          quantity: _parseQuantity(cell(quantityIndex)),
+          dialectId: dialectId,
+          fieldValues: {
+            'set': _nullIfEmpty(cell(setIndex)),
+            'collectorNumber': _nullIfEmpty(cell(collectorIndex)),
+            'finish': _normalizeFinish(cell(finishIndex)),
+            'scryfallId': _nullIfEmpty(cell(scryfallIndex)),
+            'layout': _normalizeCardForm(cell(cardFormIndex)),
+            'condition': _nullIfEmpty(cell(conditionIndex)),
+            'path': _nullIfEmpty(cell(pathIndex)),
+          },
+          path: _nullIfEmpty(cell(pathIndex)),
         ),
       );
     }
@@ -172,14 +243,21 @@ class CsvCollectionParser {
     }
 
     return CsvParseResult(
-      dialect: dialect,
+      dialectId: dialectId,
       rows: rows,
       skippedEmptyNames: skipped,
     );
   }
 
+  String _emptyRowLabel() {
+    if (_packImport?.fields.any((f) => f.key == 'set') ?? false) {
+      return 'card name';
+    }
+    return 'name';
+  }
+
   /// Public for unit tests.
-  CsvDialect detectDialect(List<String> normalizedHeaders) {
+  String detectDialectId(List<String> normalizedHeaders) {
     final set = normalizedHeaders.toSet();
 
     if (_packImport != null) {
@@ -188,15 +266,14 @@ class CsvCollectionParser {
           continue;
         }
         if (dialect.detectHeaders.every(set.contains)) {
-          return _dialectFromPackId(dialect.id);
+          return dialect.id;
         }
       }
-      return CsvDialect.generic;
+      return 'generic';
     }
 
-    // Compass export fingerprint: Path column (checked before other dialects).
     if (set.contains('path')) {
-      return CsvDialect.compass;
+      return 'compass';
     }
     final hasTradelist = set.contains('tradelist count');
     final hasCollectorNumber = set.contains('collector number');
@@ -204,24 +281,28 @@ class CsvCollectionParser {
     final hasEdition = set.contains('edition');
 
     if (hasTradelist && hasCardNumber && hasEdition) {
-      return CsvDialect.deckbox;
+      return 'deckbox';
     }
     if (hasCollectorNumber && hasEdition) {
-      return CsvDialect.moxfield;
+      return 'moxfield';
     }
     if (hasTradelist && hasEdition) {
-      return CsvDialect.deckbox;
+      return 'deckbox';
     }
-    return CsvDialect.generic;
+    return 'generic';
   }
 
-  static CsvDialect _dialectFromPackId(String id) {
-    return switch (id) {
-      'compass' => CsvDialect.compass,
-      'deckbox' => CsvDialect.deckbox,
-      'moxfield' => CsvDialect.moxfield,
-      _ => CsvDialect.generic,
-    };
+  String? _normalizeField(String fieldKey, String raw) {
+    if (fieldKey == 'quantity') {
+      return null;
+    }
+    if (fieldKey == 'finish') {
+      return _normalizeFinish(raw);
+    }
+    if (fieldKey == 'layout') {
+      return _normalizeCardForm(raw);
+    }
+    return _nullIfEmpty(raw);
   }
 
   static String _normalizeNewlines(String input) {
@@ -270,7 +351,6 @@ class CsvCollectionParser {
     return value;
   }
 
-  /// Maps export card_form values onto Scryfall-ish layout keys when possible.
   static String? _normalizeCardForm(String raw) {
     final value = raw.trim().toLowerCase().replaceAll(' ', '_');
     if (value.isEmpty || value == 'single' || value == 'normal') {

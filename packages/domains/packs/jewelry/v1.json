@@ -1,0 +1,449 @@
+{
+  "id": "jewelry",
+  "moduleId": "jewelry",
+  "version": "1.0.0",
+  "displayName": "Jewelry",
+  "description": "Track rings, necklaces, and watches with spreadsheet import and location mapping.",
+  "tagline": "Know where every piece is.",
+  "defaultAssetTypeId": "jewelry",
+  "assetTypes": [
+    {
+      "id": "jewelry",
+      "name": "Jewelry",
+      "moduleId": "jewelry",
+      "description": "A jewelry piece"
+    },
+    {
+      "id": "ring",
+      "name": "Ring",
+      "moduleId": "jewelry",
+      "parentId": "jewelry",
+      "description": "A ring"
+    },
+    {
+      "id": "engagement_ring",
+      "name": "Engagement Ring",
+      "moduleId": "jewelry",
+      "parentId": "ring",
+      "description": "An engagement ring"
+    },
+    {
+      "id": "necklace",
+      "name": "Necklace",
+      "moduleId": "jewelry",
+      "parentId": "jewelry",
+      "description": "A necklace"
+    },
+    {
+      "id": "bracelet",
+      "name": "Bracelet",
+      "moduleId": "jewelry",
+      "parentId": "jewelry",
+      "description": "A bracelet"
+    },
+    {
+      "id": "earring",
+      "name": "Earring",
+      "moduleId": "jewelry",
+      "parentId": "jewelry",
+      "description": "An earring"
+    },
+    {
+      "id": "watch",
+      "name": "Watch",
+      "moduleId": "jewelry",
+      "parentId": "jewelry",
+      "description": "A watch"
+    }
+  ],
+  "attributeDefinitions": [
+    {
+      "id": "jewelry-attr-category",
+      "key": "category",
+      "valueType": "enum",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Category",
+      "vocabularyKey": "jewelry.category"
+    },
+    {
+      "id": "jewelry-attr-material",
+      "key": "material",
+      "valueType": "enum",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Material",
+      "vocabularyKey": "jewelry.material"
+    },
+    {
+      "id": "jewelry-attr-purity",
+      "key": "purity",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Metal purity"
+    },
+    {
+      "id": "jewelry-attr-gemstone",
+      "key": "gemstone",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Gemstone"
+    },
+    {
+      "id": "jewelry-attr-carat",
+      "key": "carat",
+      "valueType": "decimal",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Carat",
+      "unit": "ct"
+    },
+    {
+      "id": "jewelry-attr-cut",
+      "key": "cut",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Cut"
+    },
+    {
+      "id": "jewelry-attr-color",
+      "key": "color",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Color"
+    },
+    {
+      "id": "jewelry-attr-clarity",
+      "key": "clarity",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Clarity"
+    },
+    {
+      "id": "jewelry-attr-style",
+      "key": "style",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Style"
+    },
+    {
+      "id": "jewelry-attr-era",
+      "key": "era",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Era"
+    },
+    {
+      "id": "jewelry-attr-maker",
+      "key": "maker",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Maker / brand"
+    },
+    {
+      "id": "jewelry-attr-hallmark",
+      "key": "hallmark",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Hallmark"
+    },
+    {
+      "id": "jewelry-attr-purchase-value",
+      "key": "purchaseValue",
+      "valueType": "currency",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Purchase value"
+    },
+    {
+      "id": "jewelry-attr-appraisal-value",
+      "key": "appraisalValue",
+      "valueType": "currency",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Appraised value"
+    },
+    {
+      "id": "jewelry-attr-condition",
+      "key": "condition",
+      "valueType": "enum",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Condition",
+      "vocabularyKey": "jewelry.condition"
+    },
+    {
+      "id": "jewelry-attr-size",
+      "key": "size",
+      "valueType": "string",
+      "assetTypeId": "jewelry",
+      "moduleId": "jewelry",
+      "displayName": "Size"
+    }
+  ],
+  "controlledValues": [
+    {
+      "id": "jewelry-cat-ring",
+      "vocabularyKey": "jewelry.category",
+      "canonicalKey": "jewelry.category.ring",
+      "label": "Ring"
+    },
+    {
+      "id": "jewelry-cat-engagement",
+      "vocabularyKey": "jewelry.category",
+      "canonicalKey": "jewelry.category.engagement_ring",
+      "label": "Engagement Ring"
+    },
+    {
+      "id": "jewelry-cat-necklace",
+      "vocabularyKey": "jewelry.category",
+      "canonicalKey": "jewelry.category.necklace",
+      "label": "Necklace"
+    },
+    {
+      "id": "jewelry-cat-bracelet",
+      "vocabularyKey": "jewelry.category",
+      "canonicalKey": "jewelry.category.bracelet",
+      "label": "Bracelet"
+    },
+    {
+      "id": "jewelry-cat-earring",
+      "vocabularyKey": "jewelry.category",
+      "canonicalKey": "jewelry.category.earring",
+      "label": "Earring"
+    },
+    {
+      "id": "jewelry-cat-watch",
+      "vocabularyKey": "jewelry.category",
+      "canonicalKey": "jewelry.category.watch",
+      "label": "Watch"
+    },
+    {
+      "id": "jewelry-mat-gold-14k",
+      "vocabularyKey": "jewelry.material",
+      "canonicalKey": "jewelry.material.gold.14k",
+      "label": "14K Gold"
+    },
+    {
+      "id": "jewelry-mat-gold-18k",
+      "vocabularyKey": "jewelry.material",
+      "canonicalKey": "jewelry.material.gold.18k",
+      "label": "18K Gold"
+    },
+    {
+      "id": "jewelry-mat-gold-24k",
+      "vocabularyKey": "jewelry.material",
+      "canonicalKey": "jewelry.material.gold.24k",
+      "label": "24K Gold"
+    },
+    {
+      "id": "jewelry-mat-silver",
+      "vocabularyKey": "jewelry.material",
+      "canonicalKey": "jewelry.material.silver",
+      "label": "Silver"
+    },
+    {
+      "id": "jewelry-mat-platinum",
+      "vocabularyKey": "jewelry.material",
+      "canonicalKey": "jewelry.material.platinum",
+      "label": "Platinum"
+    },
+    {
+      "id": "jewelry-cond-excellent",
+      "vocabularyKey": "jewelry.condition",
+      "canonicalKey": "jewelry.condition.excellent",
+      "label": "Excellent"
+    },
+    {
+      "id": "jewelry-cond-good",
+      "vocabularyKey": "jewelry.condition",
+      "canonicalKey": "jewelry.condition.good",
+      "label": "Good"
+    },
+    {
+      "id": "jewelry-cond-fair",
+      "vocabularyKey": "jewelry.condition",
+      "canonicalKey": "jewelry.condition.fair",
+      "label": "Fair"
+    },
+    {
+      "id": "jewelry-cond-poor",
+      "vocabularyKey": "jewelry.condition",
+      "canonicalKey": "jewelry.condition.poor",
+      "label": "Poor"
+    }
+  ],
+  "csvImport": {
+    "fields": [
+      {
+        "key": "name",
+        "required": true,
+        "headerAliases": [
+          "name",
+          "item name",
+          "item",
+          "description",
+          "jewelry name"
+        ]
+      },
+      {
+        "key": "quantity",
+        "headerAliases": ["count", "quantity", "qty", "amount"]
+      },
+      {
+        "key": "category",
+        "attributeKey": "category",
+        "headerAliases": [
+          "category",
+          "jewelry type",
+          "item type",
+          "type",
+          "jewelry category"
+        ]
+      },
+      {
+        "key": "material",
+        "attributeKey": "material",
+        "headerAliases": [
+          "material",
+          "metal type",
+          "metal",
+          "precious metal"
+        ]
+      },
+      {
+        "key": "purity",
+        "attributeKey": "purity",
+        "headerAliases": ["purity", "metal purity", "karat", "k"]
+      },
+      {
+        "key": "gemstone",
+        "attributeKey": "gemstone",
+        "headerAliases": ["gemstone", "gemstones", "stone", "gem"]
+      },
+      {
+        "key": "carat",
+        "attributeKey": "carat",
+        "headerAliases": ["carat", "carat weight", "carats", "ct"]
+      },
+      {
+        "key": "cut",
+        "attributeKey": "cut",
+        "headerAliases": ["cut"]
+      },
+      {
+        "key": "color",
+        "attributeKey": "color",
+        "headerAliases": ["color", "colour"]
+      },
+      {
+        "key": "clarity",
+        "attributeKey": "clarity",
+        "headerAliases": ["clarity"]
+      },
+      {
+        "key": "style",
+        "attributeKey": "style",
+        "headerAliases": ["style"]
+      },
+      {
+        "key": "era",
+        "attributeKey": "era",
+        "headerAliases": ["era", "period", "vintage era"]
+      },
+      {
+        "key": "maker",
+        "attributeKey": "maker",
+        "headerAliases": ["maker", "brand", "brand name", "designer"]
+      },
+      {
+        "key": "hallmark",
+        "attributeKey": "hallmark",
+        "headerAliases": ["hallmark", "stamp", "identification number"]
+      },
+      {
+        "key": "size",
+        "attributeKey": "size",
+        "headerAliases": ["size", "ring size", "dimensions"]
+      },
+      {
+        "key": "purchaseValue",
+        "attributeKey": "purchaseValue",
+        "headerAliases": [
+          "purchase price",
+          "purchase value",
+          "cost",
+          "paid"
+        ]
+      },
+      {
+        "key": "appraisalValue",
+        "attributeKey": "appraisalValue",
+        "headerAliases": [
+          "appraised value",
+          "appraisal value",
+          "latest appraised value",
+          "estimated value",
+          "value"
+        ]
+      },
+      {
+        "key": "condition",
+        "attributeKey": "condition",
+        "headerAliases": ["condition", "cond"]
+      },
+      {
+        "key": "path",
+        "headerAliases": ["path"]
+      }
+    ],
+    "dialects": [
+      {
+        "id": "compass",
+        "detectHeaders": ["path"]
+      },
+      {
+        "id": "spreadsheet",
+        "detectHeaders": ["item name", "jewelry type"]
+      },
+      {
+        "id": "generic",
+        "detectHeaders": []
+      }
+    ]
+  },
+  "csvExport": {
+    "columns": [
+      { "header": "Name", "source": "asset.name" },
+      { "header": "Quantity", "source": "asset.quantity" },
+      { "header": "Category", "attributeKey": "category" },
+      { "header": "Material", "attributeKey": "material" },
+      { "header": "Purity", "attributeKey": "purity" },
+      { "header": "Gemstone", "attributeKey": "gemstone" },
+      { "header": "Carat", "attributeKey": "carat" },
+      { "header": "Cut", "attributeKey": "cut" },
+      { "header": "Color", "attributeKey": "color" },
+      { "header": "Clarity", "attributeKey": "clarity" },
+      { "header": "Style", "attributeKey": "style" },
+      { "header": "Era", "attributeKey": "era" },
+      { "header": "Maker", "attributeKey": "maker" },
+      { "header": "Hallmark", "attributeKey": "hallmark" },
+      { "header": "Size", "attributeKey": "size" },
+      { "header": "Purchase Value", "attributeKey": "purchaseValue" },
+      { "header": "Appraised Value", "attributeKey": "appraisalValue" },
+      { "header": "Condition", "attributeKey": "condition" },
+      { "header": "Notes", "source": "asset.notes" },
+      { "header": "Path", "source": "asset.path" }
+    ]
+  },
+  "providers": {}
+}

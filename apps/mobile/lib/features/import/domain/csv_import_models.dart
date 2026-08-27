@@ -1,25 +1,17 @@
-/// Detected collection CSV dialect from headers.
-enum CsvDialect {
-  compass,
-  deckbox,
-  moxfield,
-  generic,
-}
-
-extension CsvDialectLabel on CsvDialect {
+/// Labels for known CSV dialect ids (pack-defined + legacy MTG sources).
+extension CsvDialectId on String {
   String get label => switch (this) {
-        CsvDialect.compass => 'Compass',
-        CsvDialect.deckbox => 'Deckbox',
-        CsvDialect.moxfield => 'Moxfield',
-        CsvDialect.generic => 'Generic',
+        'compass' => 'Compass',
+        'deckbox' => 'Deckbox',
+        'moxfield' => 'Moxfield',
+        'spreadsheet' => 'Spreadsheet',
+        'generic' => 'Generic',
+        _ => this,
       };
 
-  String get metadataSource => switch (this) {
-        CsvDialect.compass => 'compass',
-        CsvDialect.deckbox => 'deckbox',
-        CsvDialect.moxfield => 'moxfield',
-        CsvDialect.generic => 'generic',
-      };
+  String get metadataSource => this;
+
+  bool get isCompass => this == 'compass';
 }
 
 /// One mapped row from a collection CSV.
@@ -27,43 +19,43 @@ class ImportRow {
   const ImportRow({
     required this.name,
     required this.quantity,
-    required this.dialect,
-    this.setValue,
-    this.collectorNumber,
-    this.finish,
-    this.scryfallId,
-    this.cardForm,
-    this.condition,
+    required this.dialectId,
+    this.fieldValues = const {},
     this.path,
   });
 
   final String name;
   final int quantity;
-  final CsvDialect dialect;
-  final String? setValue;
-  final String? collectorNumber;
-  final String? finish;
-  final String? scryfallId;
 
-  /// Optional layout hint from export (`double_faced`, `modal_dfc`, …).
-  final String? cardForm;
+  /// Pack dialect id (`compass`, `deckbox`, `spreadsheet`, …).
+  final String dialectId;
 
-  final String? condition;
+  /// Values keyed by pack `csvImport.fields[].key`.
+  final Map<String, String?> fieldValues;
 
-  /// Compass display path (`Place / … / Container / Name`). Ignored for
-  /// non-Compass dialects.
+  /// Compass display path (`Place / … / Container / Name`).
   final String? path;
+
+  String? field(String key) => fieldValues[key];
+
+  // MTG back-compat getters for existing tests and call sites.
+  String? get setValue => fieldValues['set'];
+  String? get collectorNumber => fieldValues['collectorNumber'];
+  String? get finish => fieldValues['finish'];
+  String? get scryfallId => fieldValues['scryfallId'];
+  String? get cardForm => fieldValues['layout'];
+  String? get condition => fieldValues['condition'];
 }
 
 /// Result of parsing a collection CSV.
 class CsvParseResult {
   const CsvParseResult({
-    required this.dialect,
+    required this.dialectId,
     required this.rows,
     this.skippedEmptyNames = 0,
   });
 
-  final CsvDialect dialect;
+  final String dialectId;
   final List<ImportRow> rows;
   final int skippedEmptyNames;
 

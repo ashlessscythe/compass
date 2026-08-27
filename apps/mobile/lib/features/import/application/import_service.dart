@@ -19,7 +19,7 @@ class ImportSummary {
   const ImportSummary({
     required this.createdCount,
     required this.skippedEmptyNames,
-    required this.dialect,
+    required this.dialectId,
     required this.destinationLabel,
     required this.createdAssetIds,
     this.warnedLargeFile = false,
@@ -27,7 +27,7 @@ class ImportSummary {
 
   final int createdCount;
   final int skippedEmptyNames;
-  final CsvDialect dialect;
+  final String dialectId;
 
   /// Human label for snackbars (`Binder`, `CSV paths`, …).
   final String destinationLabel;
@@ -74,7 +74,7 @@ class ImportService {
     required CsvParseResult parsed,
     required String containerId,
   }) async {
-    if (parsed.dialect == CsvDialect.compass) {
+    if (parsed.dialectId.isCompass) {
       return importCompassPaths(parsed: parsed);
     }
 
@@ -98,7 +98,7 @@ class ImportService {
         locationId: container.locationId,
         notes: _notesFor(row),
         metadata: _metadataFor(row),
-        assetTypeId: _domainPack?.defaultAssetTypeId,
+        assetTypeId: _assetTypeIdFor(row),
       );
       if (result.isFailure) {
         return Result.failure(result.failureOrNull!);
@@ -110,7 +110,7 @@ class ImportService {
       ImportSummary(
         createdCount: createdIds.length,
         skippedEmptyNames: parsed.skippedEmptyNames,
-        dialect: parsed.dialect,
+        dialectId: parsed.dialectId,
         destinationLabel: container.name,
         createdAssetIds: createdIds,
         warnedLargeFile: parsed.rowCount > CsvCollectionParser.warnRowThreshold,
@@ -123,7 +123,7 @@ class ImportService {
   Future<Result<ImportSummary>> importCompassPaths({
     required CsvParseResult parsed,
   }) async {
-    if (parsed.dialect != CsvDialect.compass) {
+    if (!parsed.dialectId.isCompass) {
       return const Result.failure(
         Failure.validation(
           message: 'Path restore is only for Compass CSV exports.',
@@ -166,7 +166,7 @@ class ImportService {
         locationId: slot.locationId,
         notes: _notesFor(row),
         metadata: _metadataFor(row),
-        assetTypeId: _domainPack?.defaultAssetTypeId,
+        assetTypeId: _assetTypeIdFor(row),
       );
       if (result.isFailure) {
         return Result.failure(result.failureOrNull!);
@@ -178,7 +178,7 @@ class ImportService {
       ImportSummary(
         createdCount: createdIds.length,
         skippedEmptyNames: parsed.skippedEmptyNames,
-        dialect: parsed.dialect,
+        dialectId: parsed.dialectId,
         destinationLabel: 'CSV paths',
         createdAssetIds: createdIds,
         warnedLargeFile: parsed.rowCount > CsvCollectionParser.warnRowThreshold,
@@ -196,7 +196,7 @@ class ImportService {
       return Result.failure(parsed.failureOrNull!);
     }
     final result = parsed.valueOrNull!;
-    if (result.dialect == CsvDialect.compass) {
+    if (result.dialectId.isCompass) {
       return importCompassPaths(parsed: result);
     }
     if (containerId == null || containerId.isEmpty) {
@@ -211,13 +211,14 @@ class ImportService {
   }
 
   Metadata _metadataFor(ImportRow row) {
-    if (_domainPack != null) {
+    final pack = _domainPack;
+    if (pack != null) {
       return Metadata(
-        values: PackCsvAdapter(_domainPack!).metadataValuesForRow(row),
+        values: PackCsvAdapter(pack).metadataValuesForRow(row),
       );
     }
     final values = <String, dynamic>{
-      'import.source': row.dialect.metadataSource,
+      'import.source': row.dialectId.metadataSource,
     };
     if (row.setValue != null) {
       values['set'] = row.setValue;
@@ -240,7 +241,20 @@ class ImportService {
     return Metadata(values: values);
   }
 
+  String? _assetTypeIdFor(ImportRow row) {
+    final pack = _domainPack;
+    if (pack == null) {
+      return null;
+    }
+    final fromCategory =
+        PackCsvAdapter(pack).assetTypeIdForCategory(row.field('category'));
+    return fromCategory ?? pack.defaultAssetTypeId;
+  }
+
   String? _notesFor(ImportRow row) {
+    if (_domainPack != null) {
+      return null;
+    }
     final parts = <String>[];
     if (row.setValue != null) {
       parts.add(row.setValue!);
@@ -458,8 +472,10 @@ class _PathResolver {
   }
 }
 
-final importServiceProvider = Provider<ImportService>((ref) {
-  final pack = ref.watch(mtgDomainPackProvider);
+final importServiceProvider = Provider.family<ImportService, String>((ref, moduleId) {
+  final pack = ref.watch(domainPackRegistryProvider).valueOrNull?.packForModule(
+        moduleId,
+      );
   final parser = pack == null
       ? CsvCollectionParser()
       : PackCsvAdapter(pack).createParser();

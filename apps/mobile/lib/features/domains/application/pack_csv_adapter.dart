@@ -20,26 +20,20 @@ class PackCsvAdapter {
   /// Metadata keys for imported CSV fields (uses pack attribute mapping).
   Map<String, dynamic> metadataValuesForRow(ImportRow row) {
     final values = <String, dynamic>{
-      'import.source': row.dialect.metadataSource,
+      'import.source': row.dialectId.metadataSource,
     };
 
-    void put(String fieldKey, Object? value) {
-      if (value == null) {
-        return;
+    for (final field in pack.csvImport.fields) {
+      if (field.key == 'name' || field.key == 'quantity' || field.key == 'path') {
+        continue;
       }
-      if (value is String && value.isEmpty) {
-        return;
+      final raw = row.fieldValues[field.key];
+      if (raw == null || raw.isEmpty) {
+        continue;
       }
-      final attributeKey = pack.attributeKeyForCsvField(fieldKey) ?? fieldKey;
-      values[attributeKey] = value;
+      final attributeKey = pack.attributeKeyForCsvField(field.key) ?? field.key;
+      values[attributeKey] = raw;
     }
-
-    put('set', row.setValue);
-    put('collectorNumber', row.collectorNumber);
-    put('finish', row.finish);
-    put('scryfallId', row.scryfallId);
-    put('layout', row.cardForm);
-    put('condition', row.condition);
 
     return values;
   }
@@ -57,5 +51,20 @@ class PackCsvAdapter {
       return pack.labelForCanonicalKey(canonical) ?? raw;
     }
     return raw;
+  }
+
+  /// Resolve asset type id from a category CSV value, or null for default.
+  String? assetTypeIdForCategory(String? categoryRaw) {
+    if (categoryRaw == null || categoryRaw.trim().isEmpty) {
+      return null;
+    }
+    final normalized = categoryRaw.trim().toLowerCase().replaceAll(' ', '_');
+    for (final type in pack.assetTypes) {
+      if (type.id.toLowerCase() == normalized ||
+          type.name.toLowerCase() == categoryRaw.trim().toLowerCase()) {
+        return type.id;
+      }
+    }
+    return null;
   }
 }

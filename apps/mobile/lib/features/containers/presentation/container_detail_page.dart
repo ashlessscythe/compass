@@ -1,3 +1,4 @@
+import 'package:compass/core/domain/entities/metadata.dart';
 import 'package:compass/core/domain/entities/container.dart' as graph;
 import 'package:compass/core/domain/entities/location.dart';
 import 'package:compass/core/errors/failures.dart';
@@ -5,6 +6,8 @@ import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
 import 'package:compass/features/containers/application/container_service.dart';
+import 'package:compass/features/domains/application/domain_pack_registry.dart';
+import 'package:compass/features/domains/application/module_scope.dart';
 import 'package:compass/features/entitlements/application/entitlement_providers.dart';
 import 'package:compass/features/entitlements/domain/compass_feature.dart';
 import 'package:compass/features/entitlements/presentation/unlock_sheet.dart';
@@ -54,12 +57,21 @@ class ContainerDetailPage extends ConsumerWidget {
 
     final locationById = {for (final loc in locations) loc.id: loc};
     final containerById = {for (final item in containers) item.id: item};
+    final activeModuleId = ref.watch(activeModuleIdProvider);
+    final pack = activeModuleId == null
+        ? null
+        : ref
+            .watch(domainPackRegistryProvider)
+            .valueOrNull
+            ?.packForModule(activeModuleId);
     final nested = containers
         .where((item) => item.parentContainerId == containerId)
         .toList(growable: false);
-    final heldAssets = assets
-        .where((item) => item.containerId == containerId)
-        .toList(growable: false);
+    final heldAssets = filterAssetsForModule(
+      assets.where((item) => item.containerId == containerId),
+      pack,
+      activeModuleId: activeModuleId,
+    );
 
     final nfcPaired = container.nfcTagId != null;
     final scheme = Theme.of(context).colorScheme;
@@ -67,7 +79,7 @@ class ContainerDetailPage extends ConsumerWidget {
     return CompassScaffold(
       title: container.name,
       actions: [
-        if (heldAssets.isNotEmpty)
+        if (heldAssets.isNotEmpty && pack?.moduleId == 'mtg')
           IconButton(
             tooltip: ref.watch(
               canUseFeatureProvider(CompassFeature.bulkRefresh),
@@ -223,9 +235,21 @@ class ContainerDetailPage extends ConsumerWidget {
     if (name == null) {
       return;
     }
+    final moduleId = ref.read(activeModuleIdProvider);
+    final pack = moduleId == null
+        ? null
+        : ref
+            .read(domainPackRegistryProvider)
+            .valueOrNull
+            ?.packForModule(moduleId);
+    final metadata = moduleId == null
+        ? Metadata.empty
+        : Metadata(values: {kCompassModuleIdMetadataKey: moduleId});
     final result = await ref.read(assetServiceProvider).createAsset(
           name: name,
           containerId: containerId,
+          assetTypeId: pack?.defaultAssetTypeId,
+          metadata: metadata,
         );
     if (context.mounted && result.isFailure) {
       showFailureSnackBar(context, result.failureOrNull!.message);

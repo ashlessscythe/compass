@@ -22,6 +22,34 @@ Pack definitions live as **versioned JSON in git** (`packages/domains/packs/`). 
 
 ---
 
+## DP-5 — Jewelry domain pack (2-domain picker)
+
+**In**
+
+- `packages/domains/packs/jewelry/v1.json` — type hierarchy, attributes, vocab, Compass + spreadsheet CSV dialects
+- Pack-driven CSV pipeline (no MTG hardcoding in parser/exporter)
+- Module-scoped import/export and domain home asset counts
+- Generic asset detail attribute panel (no catalog provider)
+- Second bundled pack on domain picker
+
+**Out**
+
+- Camera / reverse image / eBay / Etsy providers (DP-6 skeleton)
+- Schema-driven create forms
+- Remote pack install
+
+**Tollgate**
+
+- [x] Picker shows MTG + Jewelry; each domain home uses pack tagline
+- [x] Jewelry Compass + spreadsheet CSV import/export round-trip
+- [x] Module-scoped export (MTG rows excluded from jewelry export and vice versa)
+- [x] `/api/domains/jewelry` and `/docs/domains/jewelry` on site
+- [x] Third pack drop-in = JSON + registry + bundled asset only
+
+**After DP-5:** tools pack, visual match providers, schema-driven create forms, remote pack download.
+
+---
+
 ## DP-0 — Pack contract + site hosting
 
 **In**

@@ -3,6 +3,7 @@ import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/containers/application/container_service.dart';
+import 'package:compass/features/export/application/export_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/nfc/application/nfc_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
@@ -43,9 +44,16 @@ class HomePage extends HookConsumerWidget {
     final locations = ref.watch(locationsListProvider);
     final hits = query.value.trim().isEmpty
         ? const AsyncValue<List<SearchHit>>.data([])
-        : ref.watch(searchHitsProvider(query.value));
+        : ref.watch(moduleSearchHitsProvider((
+            moduleId: moduleId,
+            query: query.value,
+          )));
 
-    final assetCount = assets.valueOrNull?.length ?? 0;
+    final moduleCount = moduleId != null
+        ? ref.watch(moduleAssetCountProvider(moduleId!))
+        : null;
+    final assetCount = moduleCount ??
+        (assets.valueOrNull?.length ?? 0);
     final containerCount = containers.valueOrNull?.length ?? 0;
     final locationCount = locations.valueOrNull?.length ?? 0;
     final rootPlaces = (locations.valueOrNull ?? const [])
@@ -140,9 +148,20 @@ class HomePage extends HookConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Browse places or search for an item.',
+                          'Browse places or search for an item in this domain.',
                           style: theme.textTheme.bodyMedium,
                         ),
+                        if (moduleId != null) ...[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'Places and containers are shared across domains; '
+                            'only items tagged to ${title ?? 'this domain'} '
+                            'appear in search and export.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: AppSpacing.lg),
                         Wrap(
                           spacing: AppSpacing.md,

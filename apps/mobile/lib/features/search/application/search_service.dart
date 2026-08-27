@@ -5,6 +5,10 @@ import 'package:compass/core/domain/repositories/asset_repository.dart';
 import 'package:compass/core/domain/repositories/container_repository.dart';
 import 'package:compass/core/domain/repositories/location_repository.dart';
 import 'package:compass/core/utils/display_path.dart';
+import 'package:compass/features/assets/application/asset_service.dart';
+import 'package:compass/features/domains/application/domain_pack_registry.dart';
+import 'package:compass/features/domains/application/module_scope.dart';
+import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/shared/providers/repository_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -76,6 +80,35 @@ class SearchService {
 
     return hits;
   }
+
+  /// Same as [query], but drops asset hits outside [pack]'s collection.
+  Future<List<SearchHit>> queryForModule(
+    String rawQuery, {
+    required DomainPack pack,
+    String? activeModuleId,
+    List<Asset>? assetsCache,
+  }) async {
+    final hits = await query(rawQuery);
+    if (hits.every((hit) => hit.kind != SearchHitKind.asset)) {
+      return hits;
+    }
+    final assets = assetsCache ?? await this.assets.getAll();
+    final assetById = {for (final asset in assets) asset.id: asset};
+    return [
+      for (final hit in hits)
+        if (hit.kind != SearchHitKind.asset)
+          hit
+        else ...[
+          if (assetById[hit.id] != null &&
+              assetBelongsToModule(
+                assetById[hit.id]!,
+                pack,
+                activeModuleId: activeModuleId,
+              ))
+            hit,
+        ],
+    ];
+  }
 }
 
 String containerPath(
@@ -137,4 +170,31 @@ final searchServiceProvider = Provider<SearchService>((ref) {
 final FutureProviderFamily<List<SearchHit>, String> searchHitsProvider =
     FutureProvider.family<List<SearchHit>, String>((ref, query) async {
   return ref.watch(searchServiceProvider).query(query);
+});
+
+typedef ModuleSearchQuery = ({String? moduleId, String query});
+
+final moduleSearchHitsProvider =
+    FutureProvider.family<List<SearchHit>, ModuleSearchQuery>((ref, args) async {
+  final trimmed = args.query.trim();
+  if (trimmed.isEmpty) {
+    return const [];
+  }
+  final service = ref.watch(searchServiceProvider);
+  final moduleId = args.moduleId;
+  if (moduleId == null) {
+    return service.query(trimmed);
+  }
+  final pack =
+      ref.watch(domainPackRegistryProvider).valueOrNull?.packForModule(moduleId);
+  if (pack == null) {
+    return service.query(trimmed);
+  }
+  final assets = ref.watch(assetsListProvider).valueOrNull;
+  return service.queryForModule(
+    trimmed,
+    pack: pack,
+    activeModuleId: ref.watch(activeModuleIdProvider),
+    assetsCache: assets,
+  );
 });

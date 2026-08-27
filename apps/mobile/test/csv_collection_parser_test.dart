@@ -8,11 +8,11 @@ void main() {
   final parser = CsvCollectionParser();
 
   test('parses Deckbox-style CSV and detects dialect', () {
-    final content = File('test/fixtures/import/deckbox_sample.csv')
-        .readAsStringSync();
+    final content =
+        File('test/fixtures/import/deckbox_sample.csv').readAsStringSync();
     final result = parser.parse(content);
 
-    expect(result.dialect, CsvDialect.deckbox);
+    expect(result.dialectId, 'deckbox');
     expect(result.rowCount, 3);
     expect(result.rows.first.name, 'Lightning Bolt');
     expect(result.rows.first.quantity, 1);
@@ -29,11 +29,11 @@ void main() {
   });
 
   test('parses Moxfield-style CSV and detects dialect', () {
-    final content = File('test/fixtures/import/moxfield_sample.csv')
-        .readAsStringSync();
+    final content =
+        File('test/fixtures/import/moxfield_sample.csv').readAsStringSync();
     final result = parser.parse(content);
 
-    expect(result.dialect, CsvDialect.moxfield);
+    expect(result.dialectId, 'moxfield');
     expect(result.rowCount, 3);
     expect(result.rows.first.name, 'Lightning Bolt');
     expect(result.rows.first.setValue, 'm10');
@@ -51,7 +51,7 @@ void main() {
         'Shock,4,m21\n';
     final result = parser.parse(content);
 
-    expect(result.dialect, CsvDialect.generic);
+    expect(result.dialectId, 'generic');
     expect(result.rows.first.quantity, 1);
     expect(result.rows.first.setValue, 'znr');
     expect(result.rows[1].quantity, 4);
@@ -62,12 +62,12 @@ void main() {
         'Lightning Bolt,1,m10,146,Office / Binder / Lightning Bolt\n';
     final result = parser.parse(content);
 
-    expect(result.dialect, CsvDialect.compass);
+    expect(result.dialectId, 'compass');
     expect(result.rows.first.name, 'Lightning Bolt');
     expect(result.rows.first.setValue, 'm10');
     expect(result.rows.first.collectorNumber, '146');
     expect(result.rows.first.path, 'Office / Binder / Lightning Bolt');
-    expect(result.rows.first.dialect.metadataSource, 'compass');
+    expect(result.rows.first.dialectId.metadataSource, 'compass');
   });
 
   test('rejects CSV without a name column', () {
@@ -94,7 +94,7 @@ void main() {
         'Valakut Awakening // Valakut Stoneforge,2,SP,nonfoil,modal_dfc,ZNR\n';
     final result = parser.parse(content);
 
-    expect(result.dialect, CsvDialect.generic);
+    expect(result.dialectId, 'generic');
     expect(result.rowCount, 3);
 
     final single = result.rows[0];

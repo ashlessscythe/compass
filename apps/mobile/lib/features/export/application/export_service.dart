@@ -7,7 +7,9 @@ import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/domains/application/domain_pack_registry.dart';
+import 'package:compass/features/domains/application/module_scope.dart';
 import 'package:compass/features/domains/application/pack_csv_adapter.dart';
+import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/features/export/infrastructure/csv_collection_exporter.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
@@ -33,12 +35,17 @@ class ExportService {
     this._locationService,
     this._containerService, {
     CsvCollectionExporter? exporter,
-  }) : _exporter = exporter ?? CsvCollectionExporter();
+    DomainPack? domainPack,
+    this.activeModuleId,
+  })  : _exporter = exporter ?? CsvCollectionExporter(),
+        _domainPack = domainPack;
 
   final AssetService _assetService;
   final LocationService _locationService;
   final ContainerService _containerService;
   final CsvCollectionExporter _exporter;
+  final DomainPack? _domainPack;
+  final String? activeModuleId;
 
   /// Build CSV text for all assets (does not write a file).
   Future<Result<String>> buildCsv() async {
@@ -96,6 +103,13 @@ class ExportService {
     }
 
     final assets = assetsResult.valueOrNull ?? const [];
+    final filtered = _domainPack == null
+        ? assets
+        : filterAssetsForModule(
+            assets,
+            _domainPack,
+            activeModuleId: activeModuleId,
+          );
     final locationById = {
       for (final item in locationsResult.valueOrNull ?? const <Location>[])
         item.id: item,
@@ -107,7 +121,7 @@ class ExportService {
     };
 
     final rows = [
-      for (final asset in assets)
+      for (final asset in filtered)
         _exporter.rowForAsset(
           asset,
           assetPath(asset, locationById, containerById),
@@ -124,8 +138,10 @@ class ExportService {
   }
 }
 
-final exportServiceProvider = Provider<ExportService>((ref) {
-  final pack = ref.watch(mtgDomainPackProvider);
+final exportServiceProvider = Provider.family<ExportService, String>((ref, moduleId) {
+  final pack = ref.watch(domainPackRegistryProvider).valueOrNull?.packForModule(
+        moduleId,
+      );
   final exporter = pack == null
       ? CsvCollectionExporter()
       : PackCsvAdapter(pack).createExporter();
@@ -134,5 +150,25 @@ final exportServiceProvider = Provider<ExportService>((ref) {
     ref.watch(locationServiceProvider),
     ref.watch(containerServiceProvider),
     exporter: exporter,
+    domainPack: pack,
+    activeModuleId: ref.watch(activeModuleIdProvider),
   );
+});
+
+final moduleAssetCountProvider = Provider.family<int?, String>((ref, moduleId) {
+  final registryAsync = ref.watch(domainPackRegistryProvider);
+  if (registryAsync.isLoading) {
+    return null;
+  }
+  final pack = registryAsync.valueOrNull?.packForModule(moduleId);
+  if (pack == null) {
+    return 0;
+  }
+  final activeModuleId = ref.watch(activeModuleIdProvider);
+  final assets = ref.watch(assetsListProvider).valueOrNull ?? const [];
+  return filterAssetsForModule(
+    assets,
+    pack,
+    activeModuleId: activeModuleId,
+  ).length;
 });

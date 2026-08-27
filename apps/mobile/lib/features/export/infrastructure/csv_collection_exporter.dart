@@ -45,12 +45,12 @@ class CsvCollectionExporter {
       return [
         row.name,
         '${row.quantity}',
-        row.setValue ?? '',
-        row.collectorNumber ?? '',
-        row.finish ?? '',
-        row.condition ?? '',
-        row.scryfallId ?? '',
-        row.layout ?? '',
+        row.attributes['set'] ?? '',
+        row.attributes['collectorNumber'] ?? '',
+        row.attributes['finish'] ?? '',
+        row.attributes['condition'] ?? '',
+        row.attributes['scryfall.card_id'] ?? '',
+        row.attributes['layout'] ?? '',
         row.notes ?? '',
         row.path,
       ];
@@ -81,39 +81,64 @@ class CsvCollectionExporter {
     if (key == null) {
       return '';
     }
-    return switch (key) {
-      'set' => row.setValue ?? '',
-      'collectorNumber' => row.collectorNumber ?? '',
-      'finish' => row.finish ?? '',
-      'condition' => row.condition ?? '',
-      'scryfall.card_id' => row.scryfallId ?? '',
-      'layout' => row.layout ?? '',
-      _ => '',
-    };
+    return row.attributes[key] ?? '';
   }
 
   /// Map an [asset] + display [path] into an export row.
   CsvExportRow rowForAsset(Asset asset, String path) {
     final values = asset.metadata.values;
+    final pack = _pack;
+
+    if (pack == null) {
+      return CsvExportRow(
+        name: asset.name,
+        quantity: asset.quantity,
+        attributes: {
+          'set': _readLegacy(values, 'set', MtgMetadataKeys.setCode) ?? '',
+          'collectorNumber': _readLegacy(
+                values,
+                'collectorNumber',
+                MtgMetadataKeys.collectorNumber,
+              ) ??
+              '',
+          'finish': _readLegacy(values, 'finish', MtgMetadataKeys.finish) ?? '',
+          'condition':
+              _readLegacy(values, 'condition', MtgMetadataKeys.condition) ?? '',
+          'scryfall.card_id': MtgMetadataKeys.scryfallIdOf(values) ?? '',
+          'layout': _readLegacy(values, 'layout', MtgMetadataKeys.layout) ?? '',
+        },
+        notes: _nullIfEmpty(asset.notes),
+        path: path,
+      );
+    }
+
+    final attributes = <String, String>{};
+    for (final column in pack.csvExport.columns) {
+      final key = column.attributeKey;
+      if (key == null) {
+        continue;
+      }
+      attributes[key] = _readAttribute(values, key) ?? '';
+    }
+
     return CsvExportRow(
       name: asset.name,
       quantity: asset.quantity,
-      setValue: _readAttribute(values, 'set', MtgMetadataKeys.setCode),
-      collectorNumber: _readAttribute(
-        values,
-        'collectorNumber',
-        MtgMetadataKeys.collectorNumber,
-      ),
-      finish: _readAttribute(values, 'finish', MtgMetadataKeys.finish),
-      condition: _readAttribute(values, 'condition', MtgMetadataKeys.condition),
-      scryfallId: MtgMetadataKeys.scryfallIdOf(values),
-      layout: _readAttribute(values, 'layout', MtgMetadataKeys.layout),
+      attributes: attributes,
       notes: _nullIfEmpty(asset.notes),
       path: path,
     );
   }
 
-  String? _readAttribute(
+  String? _readAttribute(Map<String, dynamic> values, String key) {
+    final direct = values[key];
+    if (direct != null && '$direct'.trim().isNotEmpty) {
+      return '$direct'.trim();
+    }
+    return null;
+  }
+
+  String? _readLegacy(
     Map<String, dynamic> values,
     String packKey,
     String legacyKey,
@@ -131,23 +156,13 @@ class CsvExportRow {
     required this.name,
     required this.quantity,
     required this.path,
-    this.setValue,
-    this.collectorNumber,
-    this.finish,
-    this.condition,
-    this.scryfallId,
-    this.layout,
+    this.attributes = const {},
     this.notes,
   });
 
   final String name;
   final int quantity;
-  final String? setValue;
-  final String? collectorNumber;
-  final String? finish;
-  final String? condition;
-  final String? scryfallId;
-  final String? layout;
+  final Map<String, String> attributes;
   final String? notes;
   final String path;
 }
