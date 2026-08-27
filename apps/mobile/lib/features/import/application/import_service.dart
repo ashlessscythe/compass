@@ -7,6 +7,9 @@ import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/catalog/domain/mtg_metadata_keys.dart';
 import 'package:compass/features/containers/application/container_service.dart';
+import 'package:compass/features/domains/application/pack_csv_adapter.dart';
+import 'package:compass/features/domains/application/domain_pack_registry.dart';
+import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/features/import/domain/csv_import_models.dart';
 import 'package:compass/features/import/infrastructure/csv_collection_parser.dart';
 import 'package:compass/features/locations/application/location_service.dart';
@@ -42,12 +45,15 @@ class ImportService {
     this._containerService,
     this._locationService, {
     CsvCollectionParser? parser,
-  }) : _parser = parser ?? CsvCollectionParser();
+    DomainPack? domainPack,
+  })  : _parser = parser ?? CsvCollectionParser(),
+        _domainPack = domainPack;
 
   final AssetService _assetService;
   final ContainerService _containerService;
   final LocationService _locationService;
   final CsvCollectionParser _parser;
+  final DomainPack? _domainPack;
 
   /// Parse CSV text without writing.
   Result<CsvParseResult> parseCsv(String content) {
@@ -92,6 +98,7 @@ class ImportService {
         locationId: container.locationId,
         notes: _notesFor(row),
         metadata: _metadataFor(row),
+        assetTypeId: _domainPack?.defaultAssetTypeId,
       );
       if (result.isFailure) {
         return Result.failure(result.failureOrNull!);
@@ -159,6 +166,7 @@ class ImportService {
         locationId: slot.locationId,
         notes: _notesFor(row),
         metadata: _metadataFor(row),
+        assetTypeId: _domainPack?.defaultAssetTypeId,
       );
       if (result.isFailure) {
         return Result.failure(result.failureOrNull!);
@@ -203,6 +211,11 @@ class ImportService {
   }
 
   Metadata _metadataFor(ImportRow row) {
+    if (_domainPack != null) {
+      return Metadata(
+        values: PackCsvAdapter(_domainPack!).metadataValuesForRow(row),
+      );
+    }
     final values = <String, dynamic>{
       'import.source': row.dialect.metadataSource,
     };
@@ -446,9 +459,15 @@ class _PathResolver {
 }
 
 final importServiceProvider = Provider<ImportService>((ref) {
+  final pack = ref.watch(mtgDomainPackProvider);
+  final parser = pack == null
+      ? CsvCollectionParser()
+      : PackCsvAdapter(pack).createParser();
   return ImportService(
     ref.watch(assetServiceProvider),
     ref.watch(containerServiceProvider),
     ref.watch(locationServiceProvider),
+    parser: parser,
+    domainPack: pack,
   );
 });

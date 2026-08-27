@@ -1,9 +1,15 @@
+import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/features/import/domain/csv_import_models.dart';
 import 'package:csv/csv.dart';
 
 /// Parses Deckbox / Moxfield / generic collection CSVs into [ImportRow]s.
 class CsvCollectionParser {
+  CsvCollectionParser({DomainPackCsvImport? packImport})
+      : _packImport = packImport;
+
   static const int warnRowThreshold = 5000;
+
+  final DomainPackCsvImport? _packImport;
 
   static const _nameHeaders = {
     'name',
@@ -56,6 +62,14 @@ class CsvCollectionParser {
     'path',
   };
 
+  Set<String> _aliasesFor(String fieldKey, Set<String> fallback) {
+    final fromPack = _packImport?.headerAliasesFor(fieldKey);
+    if (fromPack != null && fromPack.isNotEmpty) {
+      return fromPack;
+    }
+    return fallback;
+  }
+
   /// Parse UTF-8 CSV [content]. Throws [CsvParseException] on bad input.
   CsvParseResult parse(String content) {
     final trimmed = content.trim();
@@ -80,21 +94,34 @@ class CsvCollectionParser {
     final headers = [
       for (final header in rawHeaders) header.toLowerCase(),
     ];
-    final nameIndex = _firstIndex(headers, _nameHeaders);
+    final nameHeaders = _aliasesFor('name', _nameHeaders);
+    final nameIndex = _firstIndex(headers, nameHeaders);
     if (nameIndex == null) {
       throw CsvParseException(
         'CSV needs a Name column (Name, Simple Name, Card, or Card Name).',
       );
     }
 
-    final quantityIndex = _firstIndex(headers, _quantityHeaders);
-    final setIndex = _firstIndex(headers, _setHeaders);
-    final collectorIndex = _firstIndex(headers, _collectorHeaders);
-    final finishIndex = _firstIndex(headers, _finishHeaders);
-    final scryfallIndex = _firstIndex(headers, _scryfallHeaders);
-    final cardFormIndex = _firstIndex(headers, _cardFormHeaders);
-    final conditionIndex = _firstIndex(headers, _conditionHeaders);
-    final pathIndex = _firstIndex(headers, _pathHeaders);
+    final quantityIndex =
+        _firstIndex(headers, _aliasesFor('quantity', _quantityHeaders));
+    final setIndex = _firstIndex(headers, _aliasesFor('set', _setHeaders));
+    final collectorIndex = _firstIndex(
+      headers,
+      _aliasesFor('collectorNumber', _collectorHeaders),
+    );
+    final finishIndex =
+        _firstIndex(headers, _aliasesFor('finish', _finishHeaders));
+    final scryfallIndex = _firstIndex(
+      headers,
+      _aliasesFor('scryfallId', _scryfallHeaders),
+    );
+    final cardFormIndex =
+        _firstIndex(headers, _aliasesFor('layout', _cardFormHeaders));
+    final conditionIndex = _firstIndex(
+      headers,
+      _aliasesFor('condition', _conditionHeaders),
+    );
+    final pathIndex = _firstIndex(headers, _aliasesFor('path', _pathHeaders));
     final dialect = detectDialect(headers);
 
     final rows = <ImportRow>[];
@@ -154,6 +181,19 @@ class CsvCollectionParser {
   /// Public for unit tests.
   CsvDialect detectDialect(List<String> normalizedHeaders) {
     final set = normalizedHeaders.toSet();
+
+    if (_packImport != null) {
+      for (final dialect in _packImport!.dialects) {
+        if (dialect.detectHeaders.isEmpty) {
+          continue;
+        }
+        if (dialect.detectHeaders.every(set.contains)) {
+          return _dialectFromPackId(dialect.id);
+        }
+      }
+      return CsvDialect.generic;
+    }
+
     // Compass export fingerprint: Path column (checked before other dialects).
     if (set.contains('path')) {
       return CsvDialect.compass;
@@ -173,6 +213,15 @@ class CsvCollectionParser {
       return CsvDialect.deckbox;
     }
     return CsvDialect.generic;
+  }
+
+  static CsvDialect _dialectFromPackId(String id) {
+    return switch (id) {
+      'compass' => CsvDialect.compass,
+      'deckbox' => CsvDialect.deckbox,
+      'moxfield' => CsvDialect.moxfield,
+      _ => CsvDialect.generic,
+    };
   }
 
   static String _normalizeNewlines(String input) {

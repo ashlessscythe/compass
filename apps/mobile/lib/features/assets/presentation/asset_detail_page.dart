@@ -13,6 +13,7 @@ import 'package:compass/features/catalog/infrastructure/card_image_cache.dart';
 import 'package:compass/features/catalog/presentation/card_details_sheet.dart';
 import 'package:compass/features/catalog/presentation/card_printings_sheet.dart';
 import 'package:compass/features/catalog/presentation/catalog_match_actions.dart';
+import 'package:compass/features/domains/application/domain_asset_catalog.dart';
 import 'package:compass/features/containers/application/container_service.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
@@ -56,30 +57,34 @@ class AssetDetailPage extends ConsumerWidget {
       );
     }
 
+    final currentAsset = asset;
+    final catalogPack = ref.watch(assetCatalogPackProvider(currentAsset));
+    final showCatalogUi = catalogPack != null;
+
     final locationById = {for (final loc in locations) loc.id: loc};
     final containerById = {for (final item in containers) item.id: item};
     final crumbs = assetPathCrumbs(
       context,
-      asset,
+      currentAsset,
       locationById,
       containerById,
     );
-    final scryfallId = MtgMetadataKeys.scryfallIdOf(asset.metadata.values);
+    final scryfallId = MtgMetadataKeys.scryfallIdOf(currentAsset.metadata.values);
     final setCode = MtgMetadataKeys.stringOf(
-      asset.metadata.values,
+      currentAsset.metadata.values,
       MtgMetadataKeys.setCode,
     );
     final collector = MtgMetadataKeys.stringOf(
-      asset.metadata.values,
+      currentAsset.metadata.values,
       MtgMetadataKeys.collectorNumber,
     );
 
     return CompassScaffold(
-      title: asset.name,
+      title: currentAsset.name,
       actions: [
         IconButton(
           tooltip: 'Rename',
-          onPressed: () => _rename(context, ref, asset!),
+          onPressed: () => _rename(context, ref, currentAsset),
           icon: const Icon(Icons.edit_outlined),
         ),
         IconButton(
@@ -87,7 +92,7 @@ class AssetDetailPage extends ConsumerWidget {
           onPressed: () => _move(
             context,
             ref,
-            asset!,
+            currentAsset,
             containers,
             locationById,
             containerById,
@@ -102,29 +107,30 @@ class AssetDetailPage extends ConsumerWidget {
                 await runSingleCardMatch(
                   context,
                   ref,
-                  asset!,
+                  currentAsset,
                   rematch: true,
                 );
               case _AssetMenuAction.clearMatch:
-                await runClearCardMatch(context, ref, asset!);
+                await runClearCardMatch(context, ref, currentAsset);
               case _AssetMenuAction.delete:
-                await _delete(context, ref, name: asset!.name);
+                await _delete(context, ref, name: currentAsset.name);
             }
           },
           itemBuilder: (context) => [
-            PopupMenuItem(
-              value: _AssetMenuAction.rematch,
-              enabled: catalogEnabled,
-              child: Text(
-                scryfallId == null ? 'Match with Scryfall' : 'Rematch',
+            if (showCatalogUi)
+              PopupMenuItem(
+                value: _AssetMenuAction.rematch,
+                enabled: catalogEnabled,
+                child: Text(
+                  scryfallId == null ? 'Match with Scryfall' : 'Rematch',
+                ),
               ),
-            ),
-            if (scryfallId != null)
+            if (showCatalogUi && scryfallId != null)
               const PopupMenuItem(
                 value: _AssetMenuAction.clearMatch,
                 child: Text('Clear match'),
               ),
-            const PopupMenuDivider(),
+            if (showCatalogUi) const PopupMenuDivider(),
             const PopupMenuItem(
               value: _AssetMenuAction.delete,
               child: Text('Delete'),
@@ -138,19 +144,23 @@ class AssetDetailPage extends ConsumerWidget {
           PathBreadcrumbs(crumbs: crumbs),
           const SizedBox(height: AppSpacing.md),
           Expanded(
-            child: scryfallId != null
-                ? _MatchedCardPanel(
-                    asset: asset,
-                    scryfallId: scryfallId,
-                    catalogEnabled: catalogEnabled,
-                    onMatch: () => runSingleCardMatch(context, ref, asset!),
-                  )
-                : _UnmatchedCardBody(
-                    catalogEnabled: catalogEnabled,
-                    onMatch: () => runSingleCardMatch(context, ref, asset!),
-                    setCode: setCode,
-                    collector: collector,
-                  ),
+            child: showCatalogUi
+                ? (scryfallId != null
+                    ? _MatchedCardPanel(
+                        asset: currentAsset,
+                        scryfallId: scryfallId,
+                        catalogEnabled: catalogEnabled,
+                        onMatch: () =>
+                            runSingleCardMatch(context, ref, currentAsset),
+                      )
+                    : _UnmatchedCardBody(
+                        catalogEnabled: catalogEnabled,
+                        onMatch: () =>
+                            runSingleCardMatch(context, ref, currentAsset),
+                        setCode: setCode,
+                        collector: collector,
+                      ))
+                : _GenericAssetBody(asset: currentAsset),
           ),
         ],
       ),
@@ -242,6 +252,35 @@ class AssetDetailPage extends ConsumerWidget {
 }
 
 enum _AssetMenuAction { rematch, clearMatch, delete }
+
+class _GenericAssetBody extends StatelessWidget {
+  const _GenericAssetBody({required this.asset});
+
+  final Asset asset;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: AppSpacing.pagePadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(asset.name, style: theme.textTheme.headlineSmall),
+          if (asset.notes != null && asset.notes!.trim().isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            Text(asset.notes!, style: theme.textTheme.bodyLarge),
+          ],
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'Quantity: ${asset.quantity}',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _UnmatchedCardBody extends StatelessWidget {
   const _UnmatchedCardBody({

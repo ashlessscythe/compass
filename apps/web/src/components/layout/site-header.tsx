@@ -34,6 +34,9 @@ export function SiteHeader() {
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <a href="#vision">Vision</a>
           </Button>
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link href="/docs/domains">Domains</Link>
+          </Button>
           <Button asChild variant="outline" size="sm">
             <a
               href={siteConfig.github}

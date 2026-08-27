@@ -22,7 +22,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ImportPage extends HookConsumerWidget {
-  const ImportPage({super.key});
+  const ImportPage({this.moduleId = 'mtg', super.key});
+
+  final String moduleId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

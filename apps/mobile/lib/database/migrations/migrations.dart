@@ -7,6 +7,7 @@
 /// v5 adds card layout + faces_json for multi-face printings.
 /// v6 adds sync_outbox + sync_state for offline-first sync protocol.
 /// v7 adds Scryfall gameplay / printing details on card_printings.
+/// v8 adds domain pack install state + pack attribute/vocab tables.
 abstract final class DatabaseMigrations {
-  static const int schemaVersion = 7;
+  static const int schemaVersion = 8;
 }

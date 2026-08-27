@@ -19,7 +19,20 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key});
+  const HomePage({
+    super.key,
+    this.title,
+    this.subtitle,
+    this.moduleId,
+    this.onBackToDomains,
+    this.onOpenDomainSettings,
+  });
+
+  final String? title;
+  final String? subtitle;
+  final String? moduleId;
+  final VoidCallback? onBackToDomains;
+  final VoidCallback? onOpenDomainSettings;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -64,8 +77,21 @@ class HomePage extends HookConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const CompassMark(size: 36),
+                          if (onBackToDomains != null)
+                            IconButton(
+                              tooltip: 'All domains',
+                              onPressed: onBackToDomains,
+                              icon: const Icon(Icons.apps_outlined),
+                            )
+                          else
+                            const CompassMark(size: 36),
                           const Spacer(),
+                          if (onOpenDomainSettings != null)
+                            IconButton(
+                              tooltip: 'Domain settings',
+                              onPressed: onOpenDomainSettings,
+                              icon: const Icon(Icons.tune_outlined),
+                            ),
                           IconButton(
                             tooltip: 'Scan NFC',
                             onPressed: () => _scanNfc(context, ref),
@@ -85,12 +111,12 @@ class HomePage extends HookConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
-                        AppConstants.appName,
+                        title ?? AppConstants.appName,
                         style: theme.textTheme.displaySmall,
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        AppConstants.tagline,
+                        subtitle ?? AppConstants.tagline,
                         style: theme.textTheme.bodyLarge,
                       ),
                       const SizedBox(height: AppSpacing.lg),

@@ -22,7 +22,7 @@ class SplashPage extends HookWidget {
 
       Future<void>.delayed(const Duration(milliseconds: 1400), () {
         if (context.mounted) {
-          context.go(AppRoutes.home);
+          context.go(AppRoutes.domains);
         }
       });
       return null;

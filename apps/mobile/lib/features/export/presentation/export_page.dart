@@ -11,7 +11,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ExportPage extends HookConsumerWidget {
-  const ExportPage({super.key});
+  const ExportPage({this.moduleId = 'mtg', super.key});
+
+  final String moduleId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

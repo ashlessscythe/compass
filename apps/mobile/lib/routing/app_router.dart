@@ -1,6 +1,9 @@
 import 'package:compass/features/about/presentation/about_page.dart';
 import 'package:compass/features/assets/presentation/asset_detail_page.dart';
 import 'package:compass/features/containers/presentation/container_detail_page.dart';
+import 'package:compass/features/domains/presentation/domain_home_page.dart';
+import 'package:compass/features/domains/presentation/domain_picker_page.dart';
+import 'package:compass/features/domains/presentation/domain_settings_page.dart';
 import 'package:compass/features/export/presentation/export_page.dart';
 import 'package:compass/features/home/presentation/home_page.dart';
 import 'package:compass/features/import/presentation/import_page.dart';
@@ -27,9 +30,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
+        path: AppRoutes.domains,
+        name: 'domains',
+        builder: (context, state) => const DomainPickerPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.domainHome,
+        name: 'domainHome',
+        builder: (context, state) => DomainHomePage(
+          moduleId: state.pathParameters['moduleId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.domainSettings,
+        name: 'domainSettings',
+        builder: (context, state) => DomainSettingsPage(
+          moduleId: state.pathParameters['moduleId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.domainImport,
+        name: 'domainImport',
+        builder: (context, state) => ImportPage(
+          moduleId: state.pathParameters['moduleId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.domainExport,
+        name: 'domainExport',
+        builder: (context, state) => ExportPage(
+          moduleId: state.pathParameters['moduleId']!,
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.home,
         name: 'home',
-        builder: (context, state) => const HomePage(),
+        redirect: (context, state) => AppRoutes.domains,
       ),
       GoRoute(
         path: AppRoutes.settings,
@@ -44,12 +80,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.importCsv,
         name: 'import',
-        builder: (context, state) => const ImportPage(),
+        redirect: (context, state) => AppRoutes.domainImportPath('mtg'),
       ),
       GoRoute(
         path: AppRoutes.exportCsv,
         name: 'export',
-        builder: (context, state) => const ExportPage(),
+        redirect: (context, state) => AppRoutes.domainExportPath('mtg'),
       ),
       GoRoute(
         path: AppRoutes.about,

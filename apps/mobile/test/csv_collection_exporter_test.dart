@@ -39,7 +39,7 @@ void main() {
         .trim()
         .split('\n');
 
-    expect(lines.first, CsvCollectionExporter.headers.join(','));
+    expect(lines.first, exporter.headers.join(','));
     expect(
       lines[1],
       'Lightning Bolt,3,m10,146,foil,NM,abc-123,normal,binder top,'
@@ -53,7 +53,7 @@ void main() {
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n')
         .trim();
-    expect(csv, CsvCollectionExporter.headers.join(','));
+    expect(csv, exporter.headers.join(','));
   });
 
   test('Path header detects Compass dialect and parses fields', () {

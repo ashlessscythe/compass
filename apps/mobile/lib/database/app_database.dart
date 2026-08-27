@@ -5,6 +5,7 @@ import 'package:compass/database/tables/asset_types.dart';
 import 'package:compass/database/tables/assets.dart';
 import 'package:compass/database/tables/card_printings.dart';
 import 'package:compass/database/tables/containers.dart';
+import 'package:compass/database/tables/domain_pack_tables.dart';
 import 'package:compass/database/tables/locations.dart';
 import 'package:compass/database/tables/sync_tables.dart';
 import 'package:drift/drift.dart';
@@ -22,6 +23,9 @@ part 'app_database.g.dart';
     CatalogMeta,
     SyncOutbox,
     SyncState,
+    InstalledDomainPacks,
+    PackAttributeDefinitions,
+    PackControlledValues,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -78,6 +82,11 @@ class AppDatabase extends _$AppDatabase {
                 'CREATE INDEX IF NOT EXISTS '
                 'card_printings_oracle_id_idx ON card_printings (oracle_id)',
               );
+            }
+            if (from < 8) {
+              await m.createTable(installedDomainPacks);
+              await m.createTable(packAttributeDefinitions);
+              await m.createTable(packControlledValues);
             }
           }
         },

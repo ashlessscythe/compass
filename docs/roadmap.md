@@ -43,9 +43,9 @@ Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add dom
 - [x] CSV export (free; data ownership)
 - [ ] Monetization analytics events (paywall / purchase / restore; no inventory contents)
 - [ ] Sync Plus tier (shared collections, advanced cloud history) — only when needed
-- [ ] MTG schema + Scryfall / importers / pricing providers (persist attributes when catalog needs them)
-- [ ] Taxonomy model, versioning, external taxonomy import, reference entities
-- [ ] Domain packs (jewelry, tools, clothing, collectibles, …)
+- [x] **Domain packs (MTG first)** — see [domain-packs-roadmap.md](./domain-packs-roadmap.md) (pack JSON, domain picker, pack-driven import/export/display)
+- [ ] Taxonomy model, versioning, external taxonomy import, reference entities (after MTG pack gate)
+- [ ] Domain packs expansion (jewelry, tools, clothing, collectibles, …)
 - [ ] Cross-module search
 - [ ] Sharing / household spaces
 - [ ] Web collection browser

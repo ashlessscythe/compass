@@ -4805,6 +4805,1382 @@ class SyncStateCompanion extends UpdateCompanion<SyncStateRow> {
   }
 }
 
+class $InstalledDomainPacksTable extends InstalledDomainPacks
+    with TableInfo<$InstalledDomainPacksTable, InstalledDomainPackRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InstalledDomainPacksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _packIdMeta = const VerificationMeta('packId');
+  @override
+  late final GeneratedColumn<String> packId = GeneratedColumn<String>(
+    'pack_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<String> version = GeneratedColumn<String>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _moduleIdMeta = const VerificationMeta(
+    'moduleId',
+  );
+  @override
+  late final GeneratedColumn<String> moduleId = GeneratedColumn<String>(
+    'module_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _installedAtMeta = const VerificationMeta(
+    'installedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> installedAt = GeneratedColumn<DateTime>(
+    'installed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    packId,
+    version,
+    moduleId,
+    installedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'installed_domain_packs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InstalledDomainPackRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('pack_id')) {
+      context.handle(
+        _packIdMeta,
+        packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_packIdMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('module_id')) {
+      context.handle(
+        _moduleIdMeta,
+        moduleId.isAcceptableOrUnknown(data['module_id']!, _moduleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_moduleIdMeta);
+    }
+    if (data.containsKey('installed_at')) {
+      context.handle(
+        _installedAtMeta,
+        installedAt.isAcceptableOrUnknown(
+          data['installed_at']!,
+          _installedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_installedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {packId};
+  @override
+  InstalledDomainPackRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InstalledDomainPackRow(
+      packId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_id'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}version'],
+      )!,
+      moduleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}module_id'],
+      )!,
+      installedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}installed_at'],
+      )!,
+    );
+  }
+
+  @override
+  $InstalledDomainPacksTable createAlias(String alias) {
+    return $InstalledDomainPacksTable(attachedDatabase, alias);
+  }
+}
+
+class InstalledDomainPackRow extends DataClass
+    implements Insertable<InstalledDomainPackRow> {
+  final String packId;
+  final String version;
+  final String moduleId;
+  final DateTime installedAt;
+  const InstalledDomainPackRow({
+    required this.packId,
+    required this.version,
+    required this.moduleId,
+    required this.installedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['pack_id'] = Variable<String>(packId);
+    map['version'] = Variable<String>(version);
+    map['module_id'] = Variable<String>(moduleId);
+    map['installed_at'] = Variable<DateTime>(installedAt);
+    return map;
+  }
+
+  InstalledDomainPacksCompanion toCompanion(bool nullToAbsent) {
+    return InstalledDomainPacksCompanion(
+      packId: Value(packId),
+      version: Value(version),
+      moduleId: Value(moduleId),
+      installedAt: Value(installedAt),
+    );
+  }
+
+  factory InstalledDomainPackRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InstalledDomainPackRow(
+      packId: serializer.fromJson<String>(json['packId']),
+      version: serializer.fromJson<String>(json['version']),
+      moduleId: serializer.fromJson<String>(json['moduleId']),
+      installedAt: serializer.fromJson<DateTime>(json['installedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'packId': serializer.toJson<String>(packId),
+      'version': serializer.toJson<String>(version),
+      'moduleId': serializer.toJson<String>(moduleId),
+      'installedAt': serializer.toJson<DateTime>(installedAt),
+    };
+  }
+
+  InstalledDomainPackRow copyWith({
+    String? packId,
+    String? version,
+    String? moduleId,
+    DateTime? installedAt,
+  }) => InstalledDomainPackRow(
+    packId: packId ?? this.packId,
+    version: version ?? this.version,
+    moduleId: moduleId ?? this.moduleId,
+    installedAt: installedAt ?? this.installedAt,
+  );
+  InstalledDomainPackRow copyWithCompanion(InstalledDomainPacksCompanion data) {
+    return InstalledDomainPackRow(
+      packId: data.packId.present ? data.packId.value : this.packId,
+      version: data.version.present ? data.version.value : this.version,
+      moduleId: data.moduleId.present ? data.moduleId.value : this.moduleId,
+      installedAt: data.installedAt.present
+          ? data.installedAt.value
+          : this.installedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InstalledDomainPackRow(')
+          ..write('packId: $packId, ')
+          ..write('version: $version, ')
+          ..write('moduleId: $moduleId, ')
+          ..write('installedAt: $installedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(packId, version, moduleId, installedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InstalledDomainPackRow &&
+          other.packId == this.packId &&
+          other.version == this.version &&
+          other.moduleId == this.moduleId &&
+          other.installedAt == this.installedAt);
+}
+
+class InstalledDomainPacksCompanion
+    extends UpdateCompanion<InstalledDomainPackRow> {
+  final Value<String> packId;
+  final Value<String> version;
+  final Value<String> moduleId;
+  final Value<DateTime> installedAt;
+  final Value<int> rowid;
+  const InstalledDomainPacksCompanion({
+    this.packId = const Value.absent(),
+    this.version = const Value.absent(),
+    this.moduleId = const Value.absent(),
+    this.installedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  InstalledDomainPacksCompanion.insert({
+    required String packId,
+    required String version,
+    required String moduleId,
+    required DateTime installedAt,
+    this.rowid = const Value.absent(),
+  }) : packId = Value(packId),
+       version = Value(version),
+       moduleId = Value(moduleId),
+       installedAt = Value(installedAt);
+  static Insertable<InstalledDomainPackRow> custom({
+    Expression<String>? packId,
+    Expression<String>? version,
+    Expression<String>? moduleId,
+    Expression<DateTime>? installedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (packId != null) 'pack_id': packId,
+      if (version != null) 'version': version,
+      if (moduleId != null) 'module_id': moduleId,
+      if (installedAt != null) 'installed_at': installedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  InstalledDomainPacksCompanion copyWith({
+    Value<String>? packId,
+    Value<String>? version,
+    Value<String>? moduleId,
+    Value<DateTime>? installedAt,
+    Value<int>? rowid,
+  }) {
+    return InstalledDomainPacksCompanion(
+      packId: packId ?? this.packId,
+      version: version ?? this.version,
+      moduleId: moduleId ?? this.moduleId,
+      installedAt: installedAt ?? this.installedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (packId.present) {
+      map['pack_id'] = Variable<String>(packId.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<String>(version.value);
+    }
+    if (moduleId.present) {
+      map['module_id'] = Variable<String>(moduleId.value);
+    }
+    if (installedAt.present) {
+      map['installed_at'] = Variable<DateTime>(installedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InstalledDomainPacksCompanion(')
+          ..write('packId: $packId, ')
+          ..write('version: $version, ')
+          ..write('moduleId: $moduleId, ')
+          ..write('installedAt: $installedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PackAttributeDefinitionsTable extends PackAttributeDefinitions
+    with TableInfo<$PackAttributeDefinitionsTable, PackAttributeDefinitionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PackAttributeDefinitionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _packIdMeta = const VerificationMeta('packId');
+  @override
+  late final GeneratedColumn<String> packId = GeneratedColumn<String>(
+    'pack_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueTypeMeta = const VerificationMeta(
+    'valueType',
+  );
+  @override
+  late final GeneratedColumn<String> valueType = GeneratedColumn<String>(
+    'value_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _assetTypeIdMeta = const VerificationMeta(
+    'assetTypeId',
+  );
+  @override
+  late final GeneratedColumn<String> assetTypeId = GeneratedColumn<String>(
+    'asset_type_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _moduleIdMeta = const VerificationMeta(
+    'moduleId',
+  );
+  @override
+  late final GeneratedColumn<String> moduleId = GeneratedColumn<String>(
+    'module_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _vocabularyKeyMeta = const VerificationMeta(
+    'vocabularyKey',
+  );
+  @override
+  late final GeneratedColumn<String> vocabularyKey = GeneratedColumn<String>(
+    'vocabulary_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isRequiredMeta = const VerificationMeta(
+    'isRequired',
+  );
+  @override
+  late final GeneratedColumn<bool> isRequired = GeneratedColumn<bool>(
+    'is_required',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_required" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    packId,
+    key,
+    valueType,
+    assetTypeId,
+    moduleId,
+    displayName,
+    unit,
+    vocabularyKey,
+    isRequired,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pack_attribute_definitions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PackAttributeDefinitionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('pack_id')) {
+      context.handle(
+        _packIdMeta,
+        packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_packIdMeta);
+    }
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value_type')) {
+      context.handle(
+        _valueTypeMeta,
+        valueType.isAcceptableOrUnknown(data['value_type']!, _valueTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueTypeMeta);
+    }
+    if (data.containsKey('asset_type_id')) {
+      context.handle(
+        _assetTypeIdMeta,
+        assetTypeId.isAcceptableOrUnknown(
+          data['asset_type_id']!,
+          _assetTypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('module_id')) {
+      context.handle(
+        _moduleIdMeta,
+        moduleId.isAcceptableOrUnknown(data['module_id']!, _moduleIdMeta),
+      );
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    }
+    if (data.containsKey('vocabulary_key')) {
+      context.handle(
+        _vocabularyKeyMeta,
+        vocabularyKey.isAcceptableOrUnknown(
+          data['vocabulary_key']!,
+          _vocabularyKeyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_required')) {
+      context.handle(
+        _isRequiredMeta,
+        isRequired.isAcceptableOrUnknown(data['is_required']!, _isRequiredMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PackAttributeDefinitionRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PackAttributeDefinitionRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      packId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_id'],
+      )!,
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      valueType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value_type'],
+      )!,
+      assetTypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}asset_type_id'],
+      ),
+      moduleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}module_id'],
+      ),
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      ),
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      ),
+      vocabularyKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}vocabulary_key'],
+      ),
+      isRequired: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_required'],
+      )!,
+    );
+  }
+
+  @override
+  $PackAttributeDefinitionsTable createAlias(String alias) {
+    return $PackAttributeDefinitionsTable(attachedDatabase, alias);
+  }
+}
+
+class PackAttributeDefinitionRow extends DataClass
+    implements Insertable<PackAttributeDefinitionRow> {
+  final String id;
+  final String packId;
+  final String key;
+  final String valueType;
+  final String? assetTypeId;
+  final String? moduleId;
+  final String? displayName;
+  final String? unit;
+  final String? vocabularyKey;
+  final bool isRequired;
+  const PackAttributeDefinitionRow({
+    required this.id,
+    required this.packId,
+    required this.key,
+    required this.valueType,
+    this.assetTypeId,
+    this.moduleId,
+    this.displayName,
+    this.unit,
+    this.vocabularyKey,
+    required this.isRequired,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['pack_id'] = Variable<String>(packId);
+    map['key'] = Variable<String>(key);
+    map['value_type'] = Variable<String>(valueType);
+    if (!nullToAbsent || assetTypeId != null) {
+      map['asset_type_id'] = Variable<String>(assetTypeId);
+    }
+    if (!nullToAbsent || moduleId != null) {
+      map['module_id'] = Variable<String>(moduleId);
+    }
+    if (!nullToAbsent || displayName != null) {
+      map['display_name'] = Variable<String>(displayName);
+    }
+    if (!nullToAbsent || unit != null) {
+      map['unit'] = Variable<String>(unit);
+    }
+    if (!nullToAbsent || vocabularyKey != null) {
+      map['vocabulary_key'] = Variable<String>(vocabularyKey);
+    }
+    map['is_required'] = Variable<bool>(isRequired);
+    return map;
+  }
+
+  PackAttributeDefinitionsCompanion toCompanion(bool nullToAbsent) {
+    return PackAttributeDefinitionsCompanion(
+      id: Value(id),
+      packId: Value(packId),
+      key: Value(key),
+      valueType: Value(valueType),
+      assetTypeId: assetTypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(assetTypeId),
+      moduleId: moduleId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(moduleId),
+      displayName: displayName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(displayName),
+      unit: unit == null && nullToAbsent ? const Value.absent() : Value(unit),
+      vocabularyKey: vocabularyKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(vocabularyKey),
+      isRequired: Value(isRequired),
+    );
+  }
+
+  factory PackAttributeDefinitionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PackAttributeDefinitionRow(
+      id: serializer.fromJson<String>(json['id']),
+      packId: serializer.fromJson<String>(json['packId']),
+      key: serializer.fromJson<String>(json['key']),
+      valueType: serializer.fromJson<String>(json['valueType']),
+      assetTypeId: serializer.fromJson<String?>(json['assetTypeId']),
+      moduleId: serializer.fromJson<String?>(json['moduleId']),
+      displayName: serializer.fromJson<String?>(json['displayName']),
+      unit: serializer.fromJson<String?>(json['unit']),
+      vocabularyKey: serializer.fromJson<String?>(json['vocabularyKey']),
+      isRequired: serializer.fromJson<bool>(json['isRequired']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'packId': serializer.toJson<String>(packId),
+      'key': serializer.toJson<String>(key),
+      'valueType': serializer.toJson<String>(valueType),
+      'assetTypeId': serializer.toJson<String?>(assetTypeId),
+      'moduleId': serializer.toJson<String?>(moduleId),
+      'displayName': serializer.toJson<String?>(displayName),
+      'unit': serializer.toJson<String?>(unit),
+      'vocabularyKey': serializer.toJson<String?>(vocabularyKey),
+      'isRequired': serializer.toJson<bool>(isRequired),
+    };
+  }
+
+  PackAttributeDefinitionRow copyWith({
+    String? id,
+    String? packId,
+    String? key,
+    String? valueType,
+    Value<String?> assetTypeId = const Value.absent(),
+    Value<String?> moduleId = const Value.absent(),
+    Value<String?> displayName = const Value.absent(),
+    Value<String?> unit = const Value.absent(),
+    Value<String?> vocabularyKey = const Value.absent(),
+    bool? isRequired,
+  }) => PackAttributeDefinitionRow(
+    id: id ?? this.id,
+    packId: packId ?? this.packId,
+    key: key ?? this.key,
+    valueType: valueType ?? this.valueType,
+    assetTypeId: assetTypeId.present ? assetTypeId.value : this.assetTypeId,
+    moduleId: moduleId.present ? moduleId.value : this.moduleId,
+    displayName: displayName.present ? displayName.value : this.displayName,
+    unit: unit.present ? unit.value : this.unit,
+    vocabularyKey: vocabularyKey.present
+        ? vocabularyKey.value
+        : this.vocabularyKey,
+    isRequired: isRequired ?? this.isRequired,
+  );
+  PackAttributeDefinitionRow copyWithCompanion(
+    PackAttributeDefinitionsCompanion data,
+  ) {
+    return PackAttributeDefinitionRow(
+      id: data.id.present ? data.id.value : this.id,
+      packId: data.packId.present ? data.packId.value : this.packId,
+      key: data.key.present ? data.key.value : this.key,
+      valueType: data.valueType.present ? data.valueType.value : this.valueType,
+      assetTypeId: data.assetTypeId.present
+          ? data.assetTypeId.value
+          : this.assetTypeId,
+      moduleId: data.moduleId.present ? data.moduleId.value : this.moduleId,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      vocabularyKey: data.vocabularyKey.present
+          ? data.vocabularyKey.value
+          : this.vocabularyKey,
+      isRequired: data.isRequired.present
+          ? data.isRequired.value
+          : this.isRequired,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PackAttributeDefinitionRow(')
+          ..write('id: $id, ')
+          ..write('packId: $packId, ')
+          ..write('key: $key, ')
+          ..write('valueType: $valueType, ')
+          ..write('assetTypeId: $assetTypeId, ')
+          ..write('moduleId: $moduleId, ')
+          ..write('displayName: $displayName, ')
+          ..write('unit: $unit, ')
+          ..write('vocabularyKey: $vocabularyKey, ')
+          ..write('isRequired: $isRequired')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    packId,
+    key,
+    valueType,
+    assetTypeId,
+    moduleId,
+    displayName,
+    unit,
+    vocabularyKey,
+    isRequired,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PackAttributeDefinitionRow &&
+          other.id == this.id &&
+          other.packId == this.packId &&
+          other.key == this.key &&
+          other.valueType == this.valueType &&
+          other.assetTypeId == this.assetTypeId &&
+          other.moduleId == this.moduleId &&
+          other.displayName == this.displayName &&
+          other.unit == this.unit &&
+          other.vocabularyKey == this.vocabularyKey &&
+          other.isRequired == this.isRequired);
+}
+
+class PackAttributeDefinitionsCompanion
+    extends UpdateCompanion<PackAttributeDefinitionRow> {
+  final Value<String> id;
+  final Value<String> packId;
+  final Value<String> key;
+  final Value<String> valueType;
+  final Value<String?> assetTypeId;
+  final Value<String?> moduleId;
+  final Value<String?> displayName;
+  final Value<String?> unit;
+  final Value<String?> vocabularyKey;
+  final Value<bool> isRequired;
+  final Value<int> rowid;
+  const PackAttributeDefinitionsCompanion({
+    this.id = const Value.absent(),
+    this.packId = const Value.absent(),
+    this.key = const Value.absent(),
+    this.valueType = const Value.absent(),
+    this.assetTypeId = const Value.absent(),
+    this.moduleId = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.vocabularyKey = const Value.absent(),
+    this.isRequired = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PackAttributeDefinitionsCompanion.insert({
+    required String id,
+    required String packId,
+    required String key,
+    required String valueType,
+    this.assetTypeId = const Value.absent(),
+    this.moduleId = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.vocabularyKey = const Value.absent(),
+    this.isRequired = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       packId = Value(packId),
+       key = Value(key),
+       valueType = Value(valueType);
+  static Insertable<PackAttributeDefinitionRow> custom({
+    Expression<String>? id,
+    Expression<String>? packId,
+    Expression<String>? key,
+    Expression<String>? valueType,
+    Expression<String>? assetTypeId,
+    Expression<String>? moduleId,
+    Expression<String>? displayName,
+    Expression<String>? unit,
+    Expression<String>? vocabularyKey,
+    Expression<bool>? isRequired,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (packId != null) 'pack_id': packId,
+      if (key != null) 'key': key,
+      if (valueType != null) 'value_type': valueType,
+      if (assetTypeId != null) 'asset_type_id': assetTypeId,
+      if (moduleId != null) 'module_id': moduleId,
+      if (displayName != null) 'display_name': displayName,
+      if (unit != null) 'unit': unit,
+      if (vocabularyKey != null) 'vocabulary_key': vocabularyKey,
+      if (isRequired != null) 'is_required': isRequired,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PackAttributeDefinitionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? packId,
+    Value<String>? key,
+    Value<String>? valueType,
+    Value<String?>? assetTypeId,
+    Value<String?>? moduleId,
+    Value<String?>? displayName,
+    Value<String?>? unit,
+    Value<String?>? vocabularyKey,
+    Value<bool>? isRequired,
+    Value<int>? rowid,
+  }) {
+    return PackAttributeDefinitionsCompanion(
+      id: id ?? this.id,
+      packId: packId ?? this.packId,
+      key: key ?? this.key,
+      valueType: valueType ?? this.valueType,
+      assetTypeId: assetTypeId ?? this.assetTypeId,
+      moduleId: moduleId ?? this.moduleId,
+      displayName: displayName ?? this.displayName,
+      unit: unit ?? this.unit,
+      vocabularyKey: vocabularyKey ?? this.vocabularyKey,
+      isRequired: isRequired ?? this.isRequired,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (packId.present) {
+      map['pack_id'] = Variable<String>(packId.value);
+    }
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (valueType.present) {
+      map['value_type'] = Variable<String>(valueType.value);
+    }
+    if (assetTypeId.present) {
+      map['asset_type_id'] = Variable<String>(assetTypeId.value);
+    }
+    if (moduleId.present) {
+      map['module_id'] = Variable<String>(moduleId.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (vocabularyKey.present) {
+      map['vocabulary_key'] = Variable<String>(vocabularyKey.value);
+    }
+    if (isRequired.present) {
+      map['is_required'] = Variable<bool>(isRequired.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PackAttributeDefinitionsCompanion(')
+          ..write('id: $id, ')
+          ..write('packId: $packId, ')
+          ..write('key: $key, ')
+          ..write('valueType: $valueType, ')
+          ..write('assetTypeId: $assetTypeId, ')
+          ..write('moduleId: $moduleId, ')
+          ..write('displayName: $displayName, ')
+          ..write('unit: $unit, ')
+          ..write('vocabularyKey: $vocabularyKey, ')
+          ..write('isRequired: $isRequired, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PackControlledValuesTable extends PackControlledValues
+    with TableInfo<$PackControlledValuesTable, PackControlledValueRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PackControlledValuesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _packIdMeta = const VerificationMeta('packId');
+  @override
+  late final GeneratedColumn<String> packId = GeneratedColumn<String>(
+    'pack_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _vocabularyKeyMeta = const VerificationMeta(
+    'vocabularyKey',
+  );
+  @override
+  late final GeneratedColumn<String> vocabularyKey = GeneratedColumn<String>(
+    'vocabulary_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _canonicalKeyMeta = const VerificationMeta(
+    'canonicalKey',
+  );
+  @override
+  late final GeneratedColumn<String> canonicalKey = GeneratedColumn<String>(
+    'canonical_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    packId,
+    vocabularyKey,
+    canonicalKey,
+    label,
+    parentId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pack_controlled_values';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PackControlledValueRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('pack_id')) {
+      context.handle(
+        _packIdMeta,
+        packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_packIdMeta);
+    }
+    if (data.containsKey('vocabulary_key')) {
+      context.handle(
+        _vocabularyKeyMeta,
+        vocabularyKey.isAcceptableOrUnknown(
+          data['vocabulary_key']!,
+          _vocabularyKeyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_vocabularyKeyMeta);
+    }
+    if (data.containsKey('canonical_key')) {
+      context.handle(
+        _canonicalKeyMeta,
+        canonicalKey.isAcceptableOrUnknown(
+          data['canonical_key']!,
+          _canonicalKeyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_canonicalKeyMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_labelMeta);
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PackControlledValueRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PackControlledValueRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      packId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_id'],
+      )!,
+      vocabularyKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}vocabulary_key'],
+      )!,
+      canonicalKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}canonical_key'],
+      )!,
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      )!,
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
+    );
+  }
+
+  @override
+  $PackControlledValuesTable createAlias(String alias) {
+    return $PackControlledValuesTable(attachedDatabase, alias);
+  }
+}
+
+class PackControlledValueRow extends DataClass
+    implements Insertable<PackControlledValueRow> {
+  final String id;
+  final String packId;
+  final String vocabularyKey;
+  final String canonicalKey;
+  final String label;
+  final String? parentId;
+  const PackControlledValueRow({
+    required this.id,
+    required this.packId,
+    required this.vocabularyKey,
+    required this.canonicalKey,
+    required this.label,
+    this.parentId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['pack_id'] = Variable<String>(packId);
+    map['vocabulary_key'] = Variable<String>(vocabularyKey);
+    map['canonical_key'] = Variable<String>(canonicalKey);
+    map['label'] = Variable<String>(label);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
+    }
+    return map;
+  }
+
+  PackControlledValuesCompanion toCompanion(bool nullToAbsent) {
+    return PackControlledValuesCompanion(
+      id: Value(id),
+      packId: Value(packId),
+      vocabularyKey: Value(vocabularyKey),
+      canonicalKey: Value(canonicalKey),
+      label: Value(label),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
+    );
+  }
+
+  factory PackControlledValueRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PackControlledValueRow(
+      id: serializer.fromJson<String>(json['id']),
+      packId: serializer.fromJson<String>(json['packId']),
+      vocabularyKey: serializer.fromJson<String>(json['vocabularyKey']),
+      canonicalKey: serializer.fromJson<String>(json['canonicalKey']),
+      label: serializer.fromJson<String>(json['label']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'packId': serializer.toJson<String>(packId),
+      'vocabularyKey': serializer.toJson<String>(vocabularyKey),
+      'canonicalKey': serializer.toJson<String>(canonicalKey),
+      'label': serializer.toJson<String>(label),
+      'parentId': serializer.toJson<String?>(parentId),
+    };
+  }
+
+  PackControlledValueRow copyWith({
+    String? id,
+    String? packId,
+    String? vocabularyKey,
+    String? canonicalKey,
+    String? label,
+    Value<String?> parentId = const Value.absent(),
+  }) => PackControlledValueRow(
+    id: id ?? this.id,
+    packId: packId ?? this.packId,
+    vocabularyKey: vocabularyKey ?? this.vocabularyKey,
+    canonicalKey: canonicalKey ?? this.canonicalKey,
+    label: label ?? this.label,
+    parentId: parentId.present ? parentId.value : this.parentId,
+  );
+  PackControlledValueRow copyWithCompanion(PackControlledValuesCompanion data) {
+    return PackControlledValueRow(
+      id: data.id.present ? data.id.value : this.id,
+      packId: data.packId.present ? data.packId.value : this.packId,
+      vocabularyKey: data.vocabularyKey.present
+          ? data.vocabularyKey.value
+          : this.vocabularyKey,
+      canonicalKey: data.canonicalKey.present
+          ? data.canonicalKey.value
+          : this.canonicalKey,
+      label: data.label.present ? data.label.value : this.label,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PackControlledValueRow(')
+          ..write('id: $id, ')
+          ..write('packId: $packId, ')
+          ..write('vocabularyKey: $vocabularyKey, ')
+          ..write('canonicalKey: $canonicalKey, ')
+          ..write('label: $label, ')
+          ..write('parentId: $parentId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, packId, vocabularyKey, canonicalKey, label, parentId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PackControlledValueRow &&
+          other.id == this.id &&
+          other.packId == this.packId &&
+          other.vocabularyKey == this.vocabularyKey &&
+          other.canonicalKey == this.canonicalKey &&
+          other.label == this.label &&
+          other.parentId == this.parentId);
+}
+
+class PackControlledValuesCompanion
+    extends UpdateCompanion<PackControlledValueRow> {
+  final Value<String> id;
+  final Value<String> packId;
+  final Value<String> vocabularyKey;
+  final Value<String> canonicalKey;
+  final Value<String> label;
+  final Value<String?> parentId;
+  final Value<int> rowid;
+  const PackControlledValuesCompanion({
+    this.id = const Value.absent(),
+    this.packId = const Value.absent(),
+    this.vocabularyKey = const Value.absent(),
+    this.canonicalKey = const Value.absent(),
+    this.label = const Value.absent(),
+    this.parentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PackControlledValuesCompanion.insert({
+    required String id,
+    required String packId,
+    required String vocabularyKey,
+    required String canonicalKey,
+    required String label,
+    this.parentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       packId = Value(packId),
+       vocabularyKey = Value(vocabularyKey),
+       canonicalKey = Value(canonicalKey),
+       label = Value(label);
+  static Insertable<PackControlledValueRow> custom({
+    Expression<String>? id,
+    Expression<String>? packId,
+    Expression<String>? vocabularyKey,
+    Expression<String>? canonicalKey,
+    Expression<String>? label,
+    Expression<String>? parentId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (packId != null) 'pack_id': packId,
+      if (vocabularyKey != null) 'vocabulary_key': vocabularyKey,
+      if (canonicalKey != null) 'canonical_key': canonicalKey,
+      if (label != null) 'label': label,
+      if (parentId != null) 'parent_id': parentId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PackControlledValuesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? packId,
+    Value<String>? vocabularyKey,
+    Value<String>? canonicalKey,
+    Value<String>? label,
+    Value<String?>? parentId,
+    Value<int>? rowid,
+  }) {
+    return PackControlledValuesCompanion(
+      id: id ?? this.id,
+      packId: packId ?? this.packId,
+      vocabularyKey: vocabularyKey ?? this.vocabularyKey,
+      canonicalKey: canonicalKey ?? this.canonicalKey,
+      label: label ?? this.label,
+      parentId: parentId ?? this.parentId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (packId.present) {
+      map['pack_id'] = Variable<String>(packId.value);
+    }
+    if (vocabularyKey.present) {
+      map['vocabulary_key'] = Variable<String>(vocabularyKey.value);
+    }
+    if (canonicalKey.present) {
+      map['canonical_key'] = Variable<String>(canonicalKey.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PackControlledValuesCompanion(')
+          ..write('id: $id, ')
+          ..write('packId: $packId, ')
+          ..write('vocabularyKey: $vocabularyKey, ')
+          ..write('canonicalKey: $canonicalKey, ')
+          ..write('label: $label, ')
+          ..write('parentId: $parentId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4816,6 +6192,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CatalogMetaTable catalogMeta = $CatalogMetaTable(this);
   late final $SyncOutboxTable syncOutbox = $SyncOutboxTable(this);
   late final $SyncStateTable syncState = $SyncStateTable(this);
+  late final $InstalledDomainPacksTable installedDomainPacks =
+      $InstalledDomainPacksTable(this);
+  late final $PackAttributeDefinitionsTable packAttributeDefinitions =
+      $PackAttributeDefinitionsTable(this);
+  late final $PackControlledValuesTable packControlledValues =
+      $PackControlledValuesTable(this);
   late final Index locationsParentIdx = Index(
     'locations_parent_idx',
     'CREATE INDEX locations_parent_idx ON locations (parent_location_id)',
@@ -4881,6 +6263,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     catalogMeta,
     syncOutbox,
     syncState,
+    installedDomainPacks,
+    packAttributeDefinitions,
+    packControlledValues,
     locationsParentIdx,
     locationsNameIdx,
     containersParentIdx,
@@ -7230,6 +8615,766 @@ typedef $$SyncStateTableProcessedTableManager =
       SyncStateRow,
       PrefetchHooks Function()
     >;
+typedef $$InstalledDomainPacksTableCreateCompanionBuilder =
+    InstalledDomainPacksCompanion Function({
+      required String packId,
+      required String version,
+      required String moduleId,
+      required DateTime installedAt,
+      Value<int> rowid,
+    });
+typedef $$InstalledDomainPacksTableUpdateCompanionBuilder =
+    InstalledDomainPacksCompanion Function({
+      Value<String> packId,
+      Value<String> version,
+      Value<String> moduleId,
+      Value<DateTime> installedAt,
+      Value<int> rowid,
+    });
+
+class $$InstalledDomainPacksTableFilterComposer
+    extends Composer<_$AppDatabase, $InstalledDomainPacksTable> {
+  $$InstalledDomainPacksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get packId => $composableBuilder(
+    column: $table.packId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get moduleId => $composableBuilder(
+    column: $table.moduleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get installedAt => $composableBuilder(
+    column: $table.installedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$InstalledDomainPacksTableOrderingComposer
+    extends Composer<_$AppDatabase, $InstalledDomainPacksTable> {
+  $$InstalledDomainPacksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get packId => $composableBuilder(
+    column: $table.packId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get moduleId => $composableBuilder(
+    column: $table.moduleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get installedAt => $composableBuilder(
+    column: $table.installedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$InstalledDomainPacksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InstalledDomainPacksTable> {
+  $$InstalledDomainPacksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get packId =>
+      $composableBuilder(column: $table.packId, builder: (column) => column);
+
+  GeneratedColumn<String> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get moduleId =>
+      $composableBuilder(column: $table.moduleId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get installedAt => $composableBuilder(
+    column: $table.installedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$InstalledDomainPacksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InstalledDomainPacksTable,
+          InstalledDomainPackRow,
+          $$InstalledDomainPacksTableFilterComposer,
+          $$InstalledDomainPacksTableOrderingComposer,
+          $$InstalledDomainPacksTableAnnotationComposer,
+          $$InstalledDomainPacksTableCreateCompanionBuilder,
+          $$InstalledDomainPacksTableUpdateCompanionBuilder,
+          (
+            InstalledDomainPackRow,
+            BaseReferences<
+              _$AppDatabase,
+              $InstalledDomainPacksTable,
+              InstalledDomainPackRow
+            >,
+          ),
+          InstalledDomainPackRow,
+          PrefetchHooks Function()
+        > {
+  $$InstalledDomainPacksTableTableManager(
+    _$AppDatabase db,
+    $InstalledDomainPacksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InstalledDomainPacksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InstalledDomainPacksTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$InstalledDomainPacksTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> packId = const Value.absent(),
+                Value<String> version = const Value.absent(),
+                Value<String> moduleId = const Value.absent(),
+                Value<DateTime> installedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InstalledDomainPacksCompanion(
+                packId: packId,
+                version: version,
+                moduleId: moduleId,
+                installedAt: installedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String packId,
+                required String version,
+                required String moduleId,
+                required DateTime installedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => InstalledDomainPacksCompanion.insert(
+                packId: packId,
+                version: version,
+                moduleId: moduleId,
+                installedAt: installedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$InstalledDomainPacksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InstalledDomainPacksTable,
+      InstalledDomainPackRow,
+      $$InstalledDomainPacksTableFilterComposer,
+      $$InstalledDomainPacksTableOrderingComposer,
+      $$InstalledDomainPacksTableAnnotationComposer,
+      $$InstalledDomainPacksTableCreateCompanionBuilder,
+      $$InstalledDomainPacksTableUpdateCompanionBuilder,
+      (
+        InstalledDomainPackRow,
+        BaseReferences<
+          _$AppDatabase,
+          $InstalledDomainPacksTable,
+          InstalledDomainPackRow
+        >,
+      ),
+      InstalledDomainPackRow,
+      PrefetchHooks Function()
+    >;
+typedef $$PackAttributeDefinitionsTableCreateCompanionBuilder =
+    PackAttributeDefinitionsCompanion Function({
+      required String id,
+      required String packId,
+      required String key,
+      required String valueType,
+      Value<String?> assetTypeId,
+      Value<String?> moduleId,
+      Value<String?> displayName,
+      Value<String?> unit,
+      Value<String?> vocabularyKey,
+      Value<bool> isRequired,
+      Value<int> rowid,
+    });
+typedef $$PackAttributeDefinitionsTableUpdateCompanionBuilder =
+    PackAttributeDefinitionsCompanion Function({
+      Value<String> id,
+      Value<String> packId,
+      Value<String> key,
+      Value<String> valueType,
+      Value<String?> assetTypeId,
+      Value<String?> moduleId,
+      Value<String?> displayName,
+      Value<String?> unit,
+      Value<String?> vocabularyKey,
+      Value<bool> isRequired,
+      Value<int> rowid,
+    });
+
+class $$PackAttributeDefinitionsTableFilterComposer
+    extends Composer<_$AppDatabase, $PackAttributeDefinitionsTable> {
+  $$PackAttributeDefinitionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get packId => $composableBuilder(
+    column: $table.packId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valueType => $composableBuilder(
+    column: $table.valueType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get assetTypeId => $composableBuilder(
+    column: $table.assetTypeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get moduleId => $composableBuilder(
+    column: $table.moduleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get vocabularyKey => $composableBuilder(
+    column: $table.vocabularyKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PackAttributeDefinitionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PackAttributeDefinitionsTable> {
+  $$PackAttributeDefinitionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get packId => $composableBuilder(
+    column: $table.packId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valueType => $composableBuilder(
+    column: $table.valueType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get assetTypeId => $composableBuilder(
+    column: $table.assetTypeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get moduleId => $composableBuilder(
+    column: $table.moduleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get vocabularyKey => $composableBuilder(
+    column: $table.vocabularyKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PackAttributeDefinitionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PackAttributeDefinitionsTable> {
+  $$PackAttributeDefinitionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get packId =>
+      $composableBuilder(column: $table.packId, builder: (column) => column);
+
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get valueType =>
+      $composableBuilder(column: $table.valueType, builder: (column) => column);
+
+  GeneratedColumn<String> get assetTypeId => $composableBuilder(
+    column: $table.assetTypeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get moduleId =>
+      $composableBuilder(column: $table.moduleId, builder: (column) => column);
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<String> get vocabularyKey => $composableBuilder(
+    column: $table.vocabularyKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => column,
+  );
+}
+
+class $$PackAttributeDefinitionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PackAttributeDefinitionsTable,
+          PackAttributeDefinitionRow,
+          $$PackAttributeDefinitionsTableFilterComposer,
+          $$PackAttributeDefinitionsTableOrderingComposer,
+          $$PackAttributeDefinitionsTableAnnotationComposer,
+          $$PackAttributeDefinitionsTableCreateCompanionBuilder,
+          $$PackAttributeDefinitionsTableUpdateCompanionBuilder,
+          (
+            PackAttributeDefinitionRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PackAttributeDefinitionsTable,
+              PackAttributeDefinitionRow
+            >,
+          ),
+          PackAttributeDefinitionRow,
+          PrefetchHooks Function()
+        > {
+  $$PackAttributeDefinitionsTableTableManager(
+    _$AppDatabase db,
+    $PackAttributeDefinitionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PackAttributeDefinitionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$PackAttributeDefinitionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PackAttributeDefinitionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> packId = const Value.absent(),
+                Value<String> key = const Value.absent(),
+                Value<String> valueType = const Value.absent(),
+                Value<String?> assetTypeId = const Value.absent(),
+                Value<String?> moduleId = const Value.absent(),
+                Value<String?> displayName = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                Value<String?> vocabularyKey = const Value.absent(),
+                Value<bool> isRequired = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PackAttributeDefinitionsCompanion(
+                id: id,
+                packId: packId,
+                key: key,
+                valueType: valueType,
+                assetTypeId: assetTypeId,
+                moduleId: moduleId,
+                displayName: displayName,
+                unit: unit,
+                vocabularyKey: vocabularyKey,
+                isRequired: isRequired,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String packId,
+                required String key,
+                required String valueType,
+                Value<String?> assetTypeId = const Value.absent(),
+                Value<String?> moduleId = const Value.absent(),
+                Value<String?> displayName = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                Value<String?> vocabularyKey = const Value.absent(),
+                Value<bool> isRequired = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PackAttributeDefinitionsCompanion.insert(
+                id: id,
+                packId: packId,
+                key: key,
+                valueType: valueType,
+                assetTypeId: assetTypeId,
+                moduleId: moduleId,
+                displayName: displayName,
+                unit: unit,
+                vocabularyKey: vocabularyKey,
+                isRequired: isRequired,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PackAttributeDefinitionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PackAttributeDefinitionsTable,
+      PackAttributeDefinitionRow,
+      $$PackAttributeDefinitionsTableFilterComposer,
+      $$PackAttributeDefinitionsTableOrderingComposer,
+      $$PackAttributeDefinitionsTableAnnotationComposer,
+      $$PackAttributeDefinitionsTableCreateCompanionBuilder,
+      $$PackAttributeDefinitionsTableUpdateCompanionBuilder,
+      (
+        PackAttributeDefinitionRow,
+        BaseReferences<
+          _$AppDatabase,
+          $PackAttributeDefinitionsTable,
+          PackAttributeDefinitionRow
+        >,
+      ),
+      PackAttributeDefinitionRow,
+      PrefetchHooks Function()
+    >;
+typedef $$PackControlledValuesTableCreateCompanionBuilder =
+    PackControlledValuesCompanion Function({
+      required String id,
+      required String packId,
+      required String vocabularyKey,
+      required String canonicalKey,
+      required String label,
+      Value<String?> parentId,
+      Value<int> rowid,
+    });
+typedef $$PackControlledValuesTableUpdateCompanionBuilder =
+    PackControlledValuesCompanion Function({
+      Value<String> id,
+      Value<String> packId,
+      Value<String> vocabularyKey,
+      Value<String> canonicalKey,
+      Value<String> label,
+      Value<String?> parentId,
+      Value<int> rowid,
+    });
+
+class $$PackControlledValuesTableFilterComposer
+    extends Composer<_$AppDatabase, $PackControlledValuesTable> {
+  $$PackControlledValuesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get packId => $composableBuilder(
+    column: $table.packId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get vocabularyKey => $composableBuilder(
+    column: $table.vocabularyKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get canonicalKey => $composableBuilder(
+    column: $table.canonicalKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PackControlledValuesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PackControlledValuesTable> {
+  $$PackControlledValuesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get packId => $composableBuilder(
+    column: $table.packId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get vocabularyKey => $composableBuilder(
+    column: $table.vocabularyKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get canonicalKey => $composableBuilder(
+    column: $table.canonicalKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PackControlledValuesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PackControlledValuesTable> {
+  $$PackControlledValuesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get packId =>
+      $composableBuilder(column: $table.packId, builder: (column) => column);
+
+  GeneratedColumn<String> get vocabularyKey => $composableBuilder(
+    column: $table.vocabularyKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get canonicalKey => $composableBuilder(
+    column: $table.canonicalKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
+}
+
+class $$PackControlledValuesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PackControlledValuesTable,
+          PackControlledValueRow,
+          $$PackControlledValuesTableFilterComposer,
+          $$PackControlledValuesTableOrderingComposer,
+          $$PackControlledValuesTableAnnotationComposer,
+          $$PackControlledValuesTableCreateCompanionBuilder,
+          $$PackControlledValuesTableUpdateCompanionBuilder,
+          (
+            PackControlledValueRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PackControlledValuesTable,
+              PackControlledValueRow
+            >,
+          ),
+          PackControlledValueRow,
+          PrefetchHooks Function()
+        > {
+  $$PackControlledValuesTableTableManager(
+    _$AppDatabase db,
+    $PackControlledValuesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PackControlledValuesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PackControlledValuesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PackControlledValuesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> packId = const Value.absent(),
+                Value<String> vocabularyKey = const Value.absent(),
+                Value<String> canonicalKey = const Value.absent(),
+                Value<String> label = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PackControlledValuesCompanion(
+                id: id,
+                packId: packId,
+                vocabularyKey: vocabularyKey,
+                canonicalKey: canonicalKey,
+                label: label,
+                parentId: parentId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String packId,
+                required String vocabularyKey,
+                required String canonicalKey,
+                required String label,
+                Value<String?> parentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PackControlledValuesCompanion.insert(
+                id: id,
+                packId: packId,
+                vocabularyKey: vocabularyKey,
+                canonicalKey: canonicalKey,
+                label: label,
+                parentId: parentId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PackControlledValuesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PackControlledValuesTable,
+      PackControlledValueRow,
+      $$PackControlledValuesTableFilterComposer,
+      $$PackControlledValuesTableOrderingComposer,
+      $$PackControlledValuesTableAnnotationComposer,
+      $$PackControlledValuesTableCreateCompanionBuilder,
+      $$PackControlledValuesTableUpdateCompanionBuilder,
+      (
+        PackControlledValueRow,
+        BaseReferences<
+          _$AppDatabase,
+          $PackControlledValuesTable,
+          PackControlledValueRow
+        >,
+      ),
+      PackControlledValueRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7250,4 +9395,13 @@ class $AppDatabaseManager {
       $$SyncOutboxTableTableManager(_db, _db.syncOutbox);
   $$SyncStateTableTableManager get syncState =>
       $$SyncStateTableTableManager(_db, _db.syncState);
+  $$InstalledDomainPacksTableTableManager get installedDomainPacks =>
+      $$InstalledDomainPacksTableTableManager(_db, _db.installedDomainPacks);
+  $$PackAttributeDefinitionsTableTableManager get packAttributeDefinitions =>
+      $$PackAttributeDefinitionsTableTableManager(
+        _db,
+        _db.packAttributeDefinitions,
+      );
+  $$PackControlledValuesTableTableManager get packControlledValues =>
+      $$PackControlledValuesTableTableManager(_db, _db.packControlledValues);
 }

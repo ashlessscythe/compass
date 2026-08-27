@@ -221,4 +221,6 @@ Do not build the entire taxonomy system in the iOS UX pass.
 | **Taxonomy** | Taxonomy model + versioning, external import, reference entities, persist attribute tables | Full Wikidata / UNSPSC mirrors |
 | **Expansion** | Domain packs (jewelry, tools, clothing, collectibles, …) | Core Asset column changes |
 
+MTG is the first domain pack. Sequence and tollgates: [domain-packs-roadmap.md](./domain-packs-roadmap.md).
+
 [roadmap.md](./roadmap.md) is the product sequence. This file is the schema contract those items must satisfy.

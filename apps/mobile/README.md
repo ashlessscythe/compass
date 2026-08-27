@@ -4,6 +4,10 @@ Offline-first asset management for iOS, Android, and desktop.
 
 **Compass** — *Know where everything is.*
 
+## Domain packs
+
+Launch flow: **Splash → Domain picker → domain home** (MTG bundled first). Each domain adds types, CSV import/export mappings, and catalog providers on the shared location graph. Pack manifests live in [`packages/domains`](../../packages/domains/) and are documented at `/docs/domains` on the website. Sequence: [docs/domain-packs-roadmap.md](../../docs/domain-packs-roadmap.md).
+
 ## Prerequisites
 
 Use the **stable** channel. This project targets Dart 3.12+ / Flutter 3.44+.

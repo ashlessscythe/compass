@@ -38,6 +38,9 @@ importers:
       '@compass/branding':
         specifier: workspace:*
         version: link:../../packages/branding
+      '@compass/domains':
+        specifier: workspace:*
+        version: link:../../packages/domains
       '@compass/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -141,6 +144,15 @@ importers:
 
   packages/branding:
     devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+
+  packages/domains:
+    devDependencies:
+      '@compass/api':
+        specifier: workspace:*
+        version: link:../api
       typescript:
         specifier: ^5.8.2
         version: 5.9.3

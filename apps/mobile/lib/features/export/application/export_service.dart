@@ -6,6 +6,8 @@ import 'package:compass/core/errors/failures.dart';
 import 'package:compass/core/utils/result.dart';
 import 'package:compass/features/assets/application/asset_service.dart';
 import 'package:compass/features/containers/application/container_service.dart';
+import 'package:compass/features/domains/application/domain_pack_registry.dart';
+import 'package:compass/features/domains/application/pack_csv_adapter.dart';
 import 'package:compass/features/export/infrastructure/csv_collection_exporter.dart';
 import 'package:compass/features/locations/application/location_service.dart';
 import 'package:compass/features/search/application/search_service.dart';
@@ -123,9 +125,14 @@ class ExportService {
 }
 
 final exportServiceProvider = Provider<ExportService>((ref) {
+  final pack = ref.watch(mtgDomainPackProvider);
+  final exporter = pack == null
+      ? CsvCollectionExporter()
+      : PackCsvAdapter(pack).createExporter();
   return ExportService(
     ref.watch(assetServiceProvider),
     ref.watch(locationServiceProvider),
     ref.watch(containerServiceProvider),
+    exporter: exporter,
   );
 });

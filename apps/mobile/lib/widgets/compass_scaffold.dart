@@ -1,11 +1,13 @@
+import 'package:compass/features/domains/application/domain_pack_registry.dart';
 import 'package:compass/routing/routes.dart';
 import 'package:compass/theme/app_spacing.dart';
 import 'package:compass/theme/theme_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Shared page shell aligned with Home: soft gradient, padded body.
-class CompassScaffold extends StatelessWidget {
+class CompassScaffold extends ConsumerWidget {
   const CompassScaffold({
     required this.title,
     required this.body,
@@ -21,8 +23,17 @@ class CompassScaffold extends StatelessWidget {
   final Widget? leading;
   final Widget? floatingActionButton;
 
+  void _goHome(BuildContext context, WidgetRef ref) {
+    final moduleId = ref.read(activeModuleIdProvider);
+    if (moduleId != null) {
+      context.go(AppRoutes.domainHomePath(moduleId));
+      return;
+    }
+    context.go(AppRoutes.domains);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     final effectiveLeading = leading ??
@@ -34,7 +45,7 @@ class CompassScaffold extends StatelessWidget {
                   IconButton(
                     tooltip: 'Home',
                     icon: const Icon(Icons.home_outlined),
-                    onPressed: () => context.go(AppRoutes.home),
+                    onPressed: () => _goHome(context, ref),
                   ),
                 ],
               )

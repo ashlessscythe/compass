@@ -1,0 +1,206 @@
+{
+  "id": "mtg",
+  "moduleId": "mtg",
+  "version": "1.0.0",
+  "displayName": "Magic: The Gathering",
+  "description": "Track MTG cards with Scryfall enrichment, Deckbox/Moxfield import, and location mapping.",
+  "defaultAssetTypeId": "mtg_card",
+  "assetTypes": [
+    {
+      "id": "mtg_card",
+      "name": "MTG Card",
+      "moduleId": "mtg",
+      "description": "A Magic: The Gathering card printing"
+    }
+  ],
+  "attributeDefinitions": [
+    {
+      "id": "mtg-attr-set",
+      "key": "set",
+      "valueType": "string",
+      "assetTypeId": "mtg_card",
+      "moduleId": "mtg",
+      "displayName": "Set code"
+    },
+    {
+      "id": "mtg-attr-collector-number",
+      "key": "collectorNumber",
+      "valueType": "string",
+      "assetTypeId": "mtg_card",
+      "moduleId": "mtg",
+      "displayName": "Collector number"
+    },
+    {
+      "id": "mtg-attr-finish",
+      "key": "finish",
+      "valueType": "enum",
+      "assetTypeId": "mtg_card",
+      "moduleId": "mtg",
+      "displayName": "Finish",
+      "vocabularyKey": "mtg.finish"
+    },
+    {
+      "id": "mtg-attr-condition",
+      "key": "condition",
+      "valueType": "enum",
+      "assetTypeId": "mtg_card",
+      "moduleId": "mtg",
+      "displayName": "Condition",
+      "vocabularyKey": "mtg.condition"
+    },
+    {
+      "id": "mtg-attr-layout",
+      "key": "layout",
+      "valueType": "string",
+      "assetTypeId": "mtg_card",
+      "moduleId": "mtg",
+      "displayName": "Layout"
+    },
+    {
+      "id": "mtg-attr-scryfall-id",
+      "key": "scryfall.card_id",
+      "valueType": "identifier",
+      "assetTypeId": "mtg_card",
+      "moduleId": "mtg",
+      "displayName": "Scryfall ID"
+    }
+  ],
+  "controlledValues": [
+    {
+      "id": "mtg-finish-foil",
+      "vocabularyKey": "mtg.finish",
+      "canonicalKey": "mtg.finish.foil",
+      "label": "Foil"
+    },
+    {
+      "id": "mtg-finish-nonfoil",
+      "vocabularyKey": "mtg.finish",
+      "canonicalKey": "mtg.finish.nonfoil",
+      "label": "Nonfoil"
+    },
+    {
+      "id": "mtg-condition-nm",
+      "vocabularyKey": "mtg.condition",
+      "canonicalKey": "mtg.condition.nm",
+      "label": "Near Mint"
+    },
+    {
+      "id": "mtg-condition-lp",
+      "vocabularyKey": "mtg.condition",
+      "canonicalKey": "mtg.condition.lp",
+      "label": "Lightly Played"
+    },
+    {
+      "id": "mtg-condition-mp",
+      "vocabularyKey": "mtg.condition",
+      "canonicalKey": "mtg.condition.mp",
+      "label": "Moderately Played"
+    },
+    {
+      "id": "mtg-condition-hp",
+      "vocabularyKey": "mtg.condition",
+      "canonicalKey": "mtg.condition.hp",
+      "label": "Heavily Played"
+    },
+    {
+      "id": "mtg-condition-dmg",
+      "vocabularyKey": "mtg.condition",
+      "canonicalKey": "mtg.condition.dmg",
+      "label": "Damaged"
+    }
+  ],
+  "csvImport": {
+    "fields": [
+      {
+        "key": "name",
+        "required": true,
+        "headerAliases": ["name", "simple name", "card", "card name"]
+      },
+      {
+        "key": "quantity",
+        "headerAliases": ["count", "quantity", "qty", "amount"]
+      },
+      {
+        "key": "set",
+        "attributeKey": "set",
+        "headerAliases": [
+          "edition",
+          "set",
+          "set code",
+          "edition code",
+          "set id",
+          "set name",
+          "set_hint",
+          "set hint"
+        ]
+      },
+      {
+        "key": "collectorNumber",
+        "attributeKey": "collectorNumber",
+        "headerAliases": ["card number", "collector number", "collector #"]
+      },
+      {
+        "key": "finish",
+        "attributeKey": "finish",
+        "headerAliases": ["foil", "printing", "finish", "premium"]
+      },
+      {
+        "key": "scryfallId",
+        "attributeKey": "scryfall.card_id",
+        "headerAliases": ["scryfall id", "scryfallid"]
+      },
+      {
+        "key": "layout",
+        "attributeKey": "layout",
+        "headerAliases": ["card_form", "card form", "layout", "card layout"]
+      },
+      {
+        "key": "condition",
+        "attributeKey": "condition",
+        "headerAliases": ["condition", "cond"]
+      },
+      {
+        "key": "path",
+        "headerAliases": ["path"]
+      }
+    ],
+    "dialects": [
+      {
+        "id": "compass",
+        "detectHeaders": ["path"]
+      },
+      {
+        "id": "deckbox",
+        "detectHeaders": ["tradelist count", "card number", "edition"]
+      },
+      {
+        "id": "moxfield",
+        "detectHeaders": ["collector number", "edition"]
+      },
+      {
+        "id": "generic",
+        "detectHeaders": []
+      }
+    ]
+  },
+  "csvExport": {
+    "columns": [
+      { "header": "Name", "source": "asset.name" },
+      { "header": "Quantity", "source": "asset.quantity" },
+      { "header": "Set", "attributeKey": "set" },
+      { "header": "Collector Number", "attributeKey": "collectorNumber" },
+      { "header": "Finish", "attributeKey": "finish" },
+      { "header": "Condition", "attributeKey": "condition" },
+      { "header": "Scryfall ID", "attributeKey": "scryfall.card_id" },
+      { "header": "Layout", "attributeKey": "layout" },
+      { "header": "Notes", "source": "asset.notes" },
+      { "header": "Path", "source": "asset.path" }
+    ]
+  },
+  "providers": {
+    "catalog": {
+      "id": "scryfall",
+      "matchKeys": ["scryfall.card_id", "set+collectorNumber", "name"]
+    }
+  }
+}

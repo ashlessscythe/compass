@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@compass/api": "workspace:*",
+    "@compass/domains": "workspace:*",
     "@compass/branding": "workspace:*",
     "@compass/ui": "workspace:*",
     "@prisma/client": "^6.16.2",

@@ -16,6 +16,9 @@ export function SiteFooter() {
           <span className="text-sm text-muted-foreground">{siteCopy.brand.tagline}</span>
         </div>
         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+          <Link href="/docs/domains" className="transition-colors hover:text-foreground">
+            Domains
+          </Link>
           <Link href="/privacy" className="transition-colors hover:text-foreground">
             Privacy
           </Link>

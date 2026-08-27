@@ -41,6 +41,7 @@ class AssetService {
     int quantity = 1,
     String? notes,
     Metadata metadata = Metadata.empty,
+    String? assetTypeId,
   }) async {
     final trimmed = name.trim();
     if (trimmed.isEmpty) {
@@ -59,7 +60,7 @@ class AssetService {
       final asset = Asset(
         id: IdGenerator.v4(),
         name: trimmed,
-        assetTypeId: AppConstants.defaultAssetTypeId,
+        assetTypeId: assetTypeId ?? AppConstants.defaultAssetTypeId,
         createdAt: now,
         updatedAt: now,
         quantity: quantity,

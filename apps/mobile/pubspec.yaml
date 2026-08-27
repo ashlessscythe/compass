@@ -1,7 +1,7 @@
 name: compass
 description: Compass — offline-first asset management. Know where everything is.
 publish_to: 'none'
-version: 0.3.2+16
+version: 0.4.0+17
 
 environment:
   sdk: ^3.12.0
@@ -30,6 +30,7 @@ dependencies:
   shared_preferences: ^2.5.5
   sign_in_with_apple: ^7.0.1
   sqlite3_flutter_libs: ^0.5.39
+  url_launcher: ^6.3.2
   uuid: ^4.5.1
 
 dev_dependencies:
@@ -46,3 +47,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/domains/mtg/v1.json

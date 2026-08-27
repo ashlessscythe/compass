@@ -25,6 +25,7 @@ compass/
 │   └── mobile/              # Flutter app (on-device location graph)
 ├── packages/
 │   ├── api/                 # Shared types + API client
+│   ├── domains/             # Versioned domain pack JSON (MTG first)
 │   ├── branding/            # Brand tokens & copy
 │   └── ui/                  # Shared UI primitives
 ├── docs/                    # Vision, architecture, roadmap, branding
