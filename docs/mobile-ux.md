@@ -2,7 +2,7 @@
 
 How we sequence Compass iOS UI/UX. Product features (NFC, import, Scryfall) stay in [roadmap.md](./roadmap.md). This file is the **order of work** and the **exit criteria**.
 
-**Current milestone:** Later platform work (CSV export next — see [roadmap.md](./roadmap.md)). Store product cutover is in: Pro lifetime + Sync monthly/yearly; legacy `compass` still grants Pro. Offline-first sync v0 is in place ([sync-protocol.md](./sync-protocol.md)). Feature entitlements (Free / Pro / Sync); Themes / bulk refetch gate on Pro; Sync gates cloud push/pull.
+**Current milestone:** Later platform work (CSV export shipped — see [roadmap.md](./roadmap.md)). Store product cutover is in: Pro lifetime + Sync monthly/yearly; legacy `compass` still grants Pro. Offline-first sync v0 is in place ([sync-protocol.md](./sync-protocol.md)). Feature entitlements (Free / Pro / Sync); Themes / bulk refetch gate on Pro; Sync gates cloud push/pull.
 
 Do not start the next milestone until the current tollgate is met on iPhone 17 Pro. Branch from `dev`. Stay on Material 3 / the existing theme — no Cupertino rewrite.
 

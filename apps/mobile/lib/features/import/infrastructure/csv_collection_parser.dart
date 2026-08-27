@@ -148,6 +148,10 @@ class CsvCollectionParser {
   /// Public for unit tests.
   CsvDialect detectDialect(List<String> normalizedHeaders) {
     final set = normalizedHeaders.toSet();
+    // Compass export fingerprint: Path column (checked before other dialects).
+    if (set.contains('path')) {
+      return CsvDialect.compass;
+    }
     final hasTradelist = set.contains('tradelist count');
     final hasCollectorNumber = set.contains('collector number');
     final hasCardNumber = set.contains('card number');

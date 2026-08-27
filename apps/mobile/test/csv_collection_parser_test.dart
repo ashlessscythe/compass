@@ -57,6 +57,18 @@ void main() {
     expect(result.rows[1].quantity, 4);
   });
 
+  test('detects Compass dialect from Path column', () {
+    const content = 'Name,Quantity,Set,Collector Number,Path\n'
+        'Lightning Bolt,1,m10,146,Office / Binder / Lightning Bolt\n';
+    final result = parser.parse(content);
+
+    expect(result.dialect, CsvDialect.compass);
+    expect(result.rows.first.name, 'Lightning Bolt');
+    expect(result.rows.first.setValue, 'm10');
+    expect(result.rows.first.collectorNumber, '146');
+    expect(result.rows.first.dialect.metadataSource, 'compass');
+  });
+
   test('rejects CSV without a name column', () {
     expect(
       () => parser.parse('Count,Edition\n1,m10\n'),

@@ -79,10 +79,20 @@ class SettingsPage extends ConsumerWidget {
             leading: const Icon(Icons.upload_file_outlined),
             title: const Text('Import CSV'),
             subtitle: const Text(
-              'Deckbox, Moxfield, or generic collection export',
+              'Deckbox, Moxfield, Compass, or generic collection CSV',
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(AppRoutes.importCsv),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.download_outlined),
+            title: const Text('Export CSV'),
+            subtitle: const Text(
+              'Plain CSV of your collection (Path marks Compass)',
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(AppRoutes.exportCsv),
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(

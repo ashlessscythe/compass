@@ -75,7 +75,7 @@ Catalog work (alternate prints, colors, costs, pricing providers) is unrestricte
 
 ## Free forever (no check)
 
-Full location graph, NFC, CSV import, search, Dark / Light / Gray, per-card Match / Rematch.
+Full location graph, NFC, CSV import / CSV export, search, Dark / Light / Gray, per-card Match / Rematch.
 
 ## Pro (gated)
 

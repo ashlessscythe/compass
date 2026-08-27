@@ -65,8 +65,10 @@ class AssetDetailPage extends ConsumerWidget {
       containerById,
     );
     final scryfallId = MtgMetadataKeys.scryfallIdOf(asset.metadata.values);
-    final setCode =
-        MtgMetadataKeys.stringOf(asset.metadata.values, MtgMetadataKeys.setCode);
+    final setCode = MtgMetadataKeys.stringOf(
+      asset.metadata.values,
+      MtgMetadataKeys.setCode,
+    );
     final collector = MtgMetadataKeys.stringOf(
       asset.metadata.values,
       MtgMetadataKeys.collectorNumber,
@@ -130,41 +132,26 @@ class AssetDetailPage extends ConsumerWidget {
           ],
         ),
       ],
-      body: ListView(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (scryfallId != null)
-            _MatchedCardPanel(
-              asset: asset,
-              scryfallId: scryfallId,
-              catalogEnabled: catalogEnabled,
-              onMatch: () => runSingleCardMatch(context, ref, asset!),
-            )
-          else
-            _CardArtBlock(
-              asset: asset,
-              scryfallId: null,
-              catalogEnabled: catalogEnabled,
-              onMatch: () => runSingleCardMatch(context, ref, asset!),
-            ),
-          if (scryfallId == null && (setCode != null || collector != null)) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              [
-                if (setCode != null) setCode.toUpperCase(),
-                if (collector != null) '#$collector',
-              ].join(' · '),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-          const SizedBox(height: AppSpacing.xl),
-          Text(
-            'Where',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
           PathBreadcrumbs(crumbs: crumbs),
+          const SizedBox(height: AppSpacing.md),
+          Expanded(
+            child: scryfallId != null
+                ? _MatchedCardPanel(
+                    asset: asset,
+                    scryfallId: scryfallId,
+                    catalogEnabled: catalogEnabled,
+                    onMatch: () => runSingleCardMatch(context, ref, asset!),
+                  )
+                : _UnmatchedCardBody(
+                    catalogEnabled: catalogEnabled,
+                    onMatch: () => runSingleCardMatch(context, ref, asset!),
+                    setCode: setCode,
+                    collector: collector,
+                  ),
+          ),
         ],
       ),
     );
@@ -256,55 +243,121 @@ class AssetDetailPage extends ConsumerWidget {
 
 enum _AssetMenuAction { rematch, clearMatch, delete }
 
-class _CardArtBlock extends StatelessWidget {
-  const _CardArtBlock({
-    required this.asset,
-    required this.scryfallId,
+class _UnmatchedCardBody extends StatelessWidget {
+  const _UnmatchedCardBody({
+    required this.catalogEnabled,
+    required this.onMatch,
+    required this.setCode,
+    required this.collector,
+  });
+
+  final bool catalogEnabled;
+  final VoidCallback onMatch;
+  final String? setCode;
+  final String? collector;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _StickyCardArt(
+          child: _CardArtPlaceholder(
+            catalogEnabled: catalogEnabled,
+            onMatch: onMatch,
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.only(top: AppSpacing.md),
+            children: [
+              if (setCode != null || collector != null)
+                Text(
+                  [
+                    if (setCode != null) setCode!.toUpperCase(),
+                    if (collector != null) '#$collector',
+                  ].join(' · '),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CardArtPlaceholder extends StatelessWidget {
+  const _CardArtPlaceholder({
     required this.catalogEnabled,
     required this.onMatch,
   });
 
-  final Asset asset;
-  final String? scryfallId;
   final bool catalogEnabled;
   final VoidCallback onMatch;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return AspectRatio(
-      aspectRatio: 5 / 7,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.outlineVariant,
-            width: 1.5,
-          ),
-          color: theme.colorScheme.surfaceContainerHighest
-              .withValues(alpha: 0.4),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 1.5,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.style_outlined,
-              size: 48,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'No catalog match',
-              style: theme.textTheme.titleSmall,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            FilledButton.tonal(
-              onPressed: catalogEnabled ? onMatch : null,
-              child: const Text('Match with Scryfall'),
-            ),
-          ],
-        ),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
       ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.style_outlined,
+            size: 48,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'No catalog match',
+            style: theme.textTheme.titleSmall,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          FilledButton.tonal(
+            onPressed: catalogEnabled ? onMatch : null,
+            child: const Text('Match with Scryfall'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Caps card art height so sticky header leaves room for scroll content.
+class _StickyCardArt extends StatelessWidget {
+  const _StickyCardArt({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxArtHeight = MediaQuery.sizeOf(context).height * 0.45;
+        final width = constraints.maxWidth;
+        var artHeight = width * 7 / 5;
+        var artWidth = width;
+        if (artHeight > maxArtHeight) {
+          artHeight = maxArtHeight;
+          artWidth = artHeight * 5 / 7;
+        }
+        return Center(
+          child: SizedBox(
+            width: artWidth,
+            height: artHeight,
+            child: child,
+          ),
+        );
+      },
     );
   }
 }
@@ -375,21 +428,27 @@ class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
       future: _bundle,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return AspectRatio(
-            aspectRatio: 5 / 7,
-            child: Center(
-              child: FilledButton.tonal(
-                onPressed: widget.catalogEnabled ? widget.onMatch : null,
-                child: const Text('Retry match'),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _StickyCardArt(
+                child: Center(
+                  child: FilledButton.tonal(
+                    onPressed: widget.catalogEnabled ? widget.onMatch : null,
+                    child: const Text('Retry match'),
+                  ),
+                ),
               ),
-            ),
+              const Spacer(),
+            ],
           );
         }
         final bundle = snapshot.data;
         if (bundle == null) {
-          return const AspectRatio(
-            aspectRatio: 5 / 7,
-            child: Center(child: CircularProgressIndicator()),
+          return const Column(
+            children: [
+              Expanded(child: Center(child: CircularProgressIndicator())),
+            ],
           );
         }
 
@@ -411,23 +470,23 @@ class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
             if (files[i] != null)
               Image.file(
                 files[i]!,
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.cover,
                 width: double.infinity,
+                height: double.infinity,
               )
             else
-              const AspectRatio(
-                aspectRatio: 5 / 7,
-                child: Center(child: Icon(Icons.broken_image_outlined)),
-              ),
+              const Center(child: Icon(Icons.broken_image_outlined)),
         ];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            FlippingCardArt(
-              faceIndex: safeIndex,
-              faces: artFaces,
-              onTap: multi ? () => _flip(faces.length) : null,
+            _StickyCardArt(
+              child: FlippingCardArt(
+                faceIndex: safeIndex,
+                faces: artFaces,
+                onTap: multi ? () => _flip(faces.length) : null,
+              ),
             ),
             if (multi) ...[
               const SizedBox(height: AppSpacing.sm),
@@ -450,61 +509,9 @@ class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
                 ],
               ),
             ],
-            const SizedBox(height: AppSpacing.md),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 280),
-              child: Column(
-                key: ValueKey(safeIndex),
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (faceName != null && faceName.isNotEmpty)
-                    Text(faceName, style: theme.textTheme.titleMedium),
-                  if (typeLine != null)
-                    Text(typeLine, style: theme.textTheme.bodyLarge),
-                  const SizedBox(height: AppSpacing.xs),
-                  _ManaAndColorRow(
-                    manaCost: manaCost,
-                    cmc: printing.cmc,
-                    colors: (face != null && face.colors.isNotEmpty)
-                        ? face.colors
-                        : printing.colors,
-                    colorIdentity: printing.colorIdentity,
-                  ),
-                  if (oracleText != null && oracleText.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(oracleText, style: theme.textTheme.bodyMedium),
-                  ],
-                  if (combat != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(combat, style: theme.textTheme.titleMedium),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              [
-                if (printing.setName != null && printing.setName!.isNotEmpty)
-                  printing.setName!
-                else
-                  printing.setCode.toUpperCase(),
-                '#${printing.collectorNumber}',
-                if (printing.rarity != null && printing.rarity!.isNotEmpty)
-                  titleCase(printing.rarity!),
-              ].join(' · '),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            if (printing.artist != null && printing.artist!.isNotEmpty)
-              Text(
-                printing.artist!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
+              alignment: WrapAlignment.center,
               spacing: AppSpacing.sm,
               children: [
                 TextButton(
@@ -515,8 +522,7 @@ class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
                   ),
                   child: const Text('Details'),
                 ),
-                if (printing.oracleId != null &&
-                    printing.oracleId!.isNotEmpty)
+                if (printing.oracleId != null && printing.oracleId!.isNotEmpty)
                   TextButton(
                     onPressed: () => showCardPrintingsSheet(
                       context,
@@ -528,6 +534,67 @@ class _MatchedCardPanelState extends ConsumerState<_MatchedCardPanel> {
                     child: const Text('Other printings'),
                   ),
               ],
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(top: AppSpacing.md),
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 280),
+                    child: Column(
+                      key: ValueKey(safeIndex),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (faceName != null && faceName.isNotEmpty)
+                          Text(faceName, style: theme.textTheme.titleMedium),
+                        if (typeLine != null)
+                          Text(typeLine, style: theme.textTheme.bodyLarge),
+                        const SizedBox(height: AppSpacing.xs),
+                        _ManaAndColorRow(
+                          manaCost: manaCost,
+                          cmc: printing.cmc,
+                          colors: (face != null && face.colors.isNotEmpty)
+                              ? face.colors
+                              : printing.colors,
+                          colorIdentity: printing.colorIdentity,
+                        ),
+                        if (oracleText != null && oracleText.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(oracleText, style: theme.textTheme.bodyMedium),
+                        ],
+                        if (combat != null) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(combat, style: theme.textTheme.titleMedium),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    [
+                      if (printing.setName != null &&
+                          printing.setName!.isNotEmpty)
+                        printing.setName!
+                      else
+                        printing.setCode.toUpperCase(),
+                      '#${printing.collectorNumber}',
+                      if (printing.rarity != null &&
+                          printing.rarity!.isNotEmpty)
+                        titleCase(printing.rarity!),
+                    ].join(' · '),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  if (printing.artist != null && printing.artist!.isNotEmpty)
+                    Text(
+                      printing.artist!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ],
         );

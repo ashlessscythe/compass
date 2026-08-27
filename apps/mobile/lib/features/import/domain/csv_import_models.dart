@@ -1,5 +1,6 @@
 /// Detected collection CSV dialect from headers.
 enum CsvDialect {
+  compass,
   deckbox,
   moxfield,
   generic,
@@ -7,12 +8,14 @@ enum CsvDialect {
 
 extension CsvDialectLabel on CsvDialect {
   String get label => switch (this) {
+        CsvDialect.compass => 'Compass',
         CsvDialect.deckbox => 'Deckbox',
         CsvDialect.moxfield => 'Moxfield',
         CsvDialect.generic => 'Generic',
       };
 
   String get metadataSource => switch (this) {
+        CsvDialect.compass => 'compass',
         CsvDialect.deckbox => 'deckbox',
         CsvDialect.moxfield => 'moxfield',
         CsvDialect.generic => 'generic',

@@ -29,7 +29,7 @@ Include:
 - Unlimited local assets, containers, locations
 - NFC, search, filtering, basic history
 - Offline operation
-- CSV import / CSV export (export when shipped)
+- CSV import / CSV export
 - Individual metadata refresh / individual price refresh
 - Local backup / export
 - Basic themes (Dark, Light, Gray)

@@ -40,8 +40,8 @@ class ImportPage extends HookConsumerWidget {
       body: ListView(
         children: [
           Text(
-            'Import a Deckbox, Moxfield, or generic collection CSV into a '
-            'container. Cards become searchable with that path.',
+            'Import a Deckbox, Moxfield, Compass, or generic collection CSV '
+            'into a container. Cards become searchable with that path.',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.xl),

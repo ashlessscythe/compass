@@ -40,7 +40,7 @@ Manual TestFlight uploads are in progress (bundle id `app.compass.mobile`). Home
 Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add domain columns to core Asset.
 
 - [x] Store product cutover — `compass_pro_lifetime`, `compass_sync_monthly` / yearly (replace transitional `compass_monthly`)
-- [ ] CSV export (free; data ownership)
+- [x] CSV export (free; data ownership)
 - [ ] Monetization analytics events (paywall / purchase / restore; no inventory contents)
 - [ ] Sync Plus tier (shared collections, advanced cloud history) — only when needed
 - [ ] MTG schema + Scryfall / importers / pricing providers (persist attributes when catalog needs them)
