@@ -52,6 +52,9 @@ class CsvCollectionParser {
     'condition',
     'cond',
   };
+  static const _pathHeaders = {
+    'path',
+  };
 
   /// Parse UTF-8 CSV [content]. Throws [CsvParseException] on bad input.
   CsvParseResult parse(String content) {
@@ -91,6 +94,7 @@ class CsvCollectionParser {
     final scryfallIndex = _firstIndex(headers, _scryfallHeaders);
     final cardFormIndex = _firstIndex(headers, _cardFormHeaders);
     final conditionIndex = _firstIndex(headers, _conditionHeaders);
+    final pathIndex = _firstIndex(headers, _pathHeaders);
     final dialect = detectDialect(headers);
 
     final rows = <ImportRow>[];
@@ -118,6 +122,7 @@ class CsvCollectionParser {
       final scryfallId = _nullIfEmpty(cell(scryfallIndex));
       final cardForm = _normalizeCardForm(cell(cardFormIndex));
       final condition = _nullIfEmpty(cell(conditionIndex));
+      final path = _nullIfEmpty(cell(pathIndex));
 
       rows.add(
         ImportRow(
@@ -130,6 +135,7 @@ class CsvCollectionParser {
           scryfallId: scryfallId,
           cardForm: cardForm,
           condition: condition,
+          path: path,
         ),
       );
     }

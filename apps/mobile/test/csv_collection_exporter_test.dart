@@ -81,6 +81,7 @@ void main() {
     expect(result.rows.first.collectorNumber, '65');
     expect(result.rows.first.condition, 'SP');
     expect(result.rows.first.scryfallId, 'sf-1');
+    expect(result.rows.first.path, 'Home / Box / Opt');
     expect(result.rows.first.dialect, CsvDialect.compass);
     expect(result.rows.first.dialect.metadataSource, 'compass');
   });

@@ -70,4 +70,57 @@ void main() {
     expect(hits.first.name, 'Lightning Bolt');
     expect(hits.first.path, 'Office / Binder / Lightning Bolt');
   });
+
+  test('Compass CSV restores places and containers from Path', () async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+      ],
+    );
+    addTearDown(() async {
+      container.dispose();
+      await database.close();
+    });
+    await database.customSelect('SELECT 1').get();
+
+    const csv = 'Name,Quantity,Set,Collector Number,Path\n'
+        'Lightning Bolt,1,m10,146,Office / Binder / Lightning Bolt\n'
+        'Sol Ring,2,c21,1,Office / Binder / Sol Ring\n'
+        'Opt,4,znr,65,Home / Box / Opt\n';
+
+    final result = await container.read(importServiceProvider).importCsv(
+          content: csv,
+        );
+
+    expect(result.isSuccess, isTrue);
+    final summary = result.valueOrNull!;
+    expect(summary.dialect, CsvDialect.compass);
+    expect(summary.createdCount, 3);
+    expect(summary.destinationLabel, 'CSV paths');
+    expect(summary.createdAssetIds, hasLength(3));
+
+    final locations =
+        (await container.read(locationServiceProvider).listLocations())
+            .valueOrNull!;
+    expect(locations.map((item) => item.name), containsAll(['Office', 'Home']));
+
+    final containers =
+        (await container.read(containerServiceProvider).listContainers())
+            .valueOrNull!;
+    expect(containers.map((item) => item.name), containsAll(['Binder', 'Box']));
+
+    final assets = (await container.read(assetServiceProvider).listAssets())
+        .valueOrNull!;
+    final bolt = assets.firstWhere((item) => item.name == 'Lightning Bolt');
+    expect(bolt.metadata['import.source'], 'compass');
+    expect(bolt.metadata['set'], 'm10');
+
+    final hits = await container.read(searchServiceProvider).query('Lightning');
+    expect(hits, isNotEmpty);
+    expect(hits.first.path, 'Office / Binder / Lightning Bolt');
+
+    final optHits = await container.read(searchServiceProvider).query('Opt');
+    expect(optHits.first.path, 'Home / Box / Opt');
+  });
 }

@@ -66,6 +66,7 @@ void main() {
     expect(result.rows.first.name, 'Lightning Bolt');
     expect(result.rows.first.setValue, 'm10');
     expect(result.rows.first.collectorNumber, '146');
+    expect(result.rows.first.path, 'Office / Binder / Lightning Bolt');
     expect(result.rows.first.dialect.metadataSource, 'compass');
   });
 

@@ -34,14 +34,22 @@ class ImportPage extends HookConsumerWidget {
     final importing = useState(false);
     final containers = ref.watch(containersListProvider);
     final locations = ref.watch(locationsListProvider);
+    final isCompass = parseResult.value?.dialect == CsvDialect.compass;
+    final canImport = parseResult.value != null &&
+        (isCompass || selectedContainer.value != null) &&
+        !importing.value;
 
     return CompassScaffold(
       title: 'Import CSV',
       body: ListView(
         children: [
           Text(
-            'Import a Deckbox, Moxfield, Compass, or generic collection CSV '
-            'into a container. Cards become searchable with that path.',
+            isCompass
+                ? 'Compass CSV detected — places and containers come from '
+                    'each row’s Path. No destination container needed.'
+                : 'Import a Deckbox, Moxfield, Compass, or generic collection '
+                    'CSV into a container. Cards become searchable with that '
+                    'path.',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -56,6 +64,7 @@ class ImportPage extends HookConsumerWidget {
                       fileName: fileName,
                       parseResult: parseResult,
                       parseError: parseError,
+                      selectedContainer: selectedContainer,
                     ),
             icon: const Icon(Icons.upload_file_outlined),
             label: Text(fileName.value ?? 'Choose CSV'),
@@ -87,53 +96,53 @@ class ImportPage extends HookConsumerWidget {
                 ),
               ),
           ],
-          const SizedBox(height: AppSpacing.xl),
-          Text('Destination', style: theme.textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.sm),
-          OutlinedButton.icon(
-            onPressed: importing.value
-                ? null
-                : () => _pickContainer(
-                      context,
-                      containers: containers.valueOrNull ?? const [],
-                      locations: locations.valueOrNull ?? const [],
-                      selected: selectedContainer,
-                    ),
-            icon: const Icon(Icons.inventory_2_outlined),
-            label: Text(
-              selectedContainer.value?.name ?? 'Choose container',
-            ),
-          ),
-          if (selectedContainer.value != null) ...[
+          if (!isCompass) ...[
+            const SizedBox(height: AppSpacing.xl),
+            Text('Destination', style: theme.textTheme.titleMedium),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              containerPath(
-                selectedContainer.value!,
-                {
-                  for (final item
-                      in locations.valueOrNull ?? const <Location>[])
-                    item.id: item,
-                },
-                {
-                  for (final item
-                      in containers.valueOrNull ?? const <graph.Container>[])
-                    item.id: item,
-                },
+            OutlinedButton.icon(
+              onPressed: importing.value || parseResult.value == null
+                  ? null
+                  : () => _pickContainer(
+                        context,
+                        containers: containers.valueOrNull ?? const [],
+                        locations: locations.valueOrNull ?? const [],
+                        selected: selectedContainer,
+                      ),
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: Text(
+                selectedContainer.value?.name ?? 'Choose container',
               ),
-              style: theme.textTheme.bodySmall,
             ),
+            if (selectedContainer.value != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                containerPath(
+                  selectedContainer.value!,
+                  {
+                    for (final item
+                        in locations.valueOrNull ?? const <Location>[])
+                      item.id: item,
+                  },
+                  {
+                    for (final item
+                        in containers.valueOrNull ?? const <graph.Container>[])
+                      item.id: item,
+                  },
+                ),
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
           ],
           const SizedBox(height: AppSpacing.xl),
           FilledButton(
-            onPressed: importing.value ||
-                    parseResult.value == null ||
-                    selectedContainer.value == null
+            onPressed: !canImport
                 ? null
                 : () => _runImport(
                       context,
                       ref,
                       parsed: parseResult.value!,
-                      container: selectedContainer.value!,
+                      container: selectedContainer.value,
                       importing: importing,
                     ),
             child: importing.value
@@ -155,6 +164,7 @@ class ImportPage extends HookConsumerWidget {
     required ValueNotifier<String?> fileName,
     required ValueNotifier<CsvParseResult?> parseResult,
     required ValueNotifier<String?> parseError,
+    required ValueNotifier<graph.Container?> selectedContainer,
   }) async {
     final picked = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -185,6 +195,9 @@ class ImportPage extends HookConsumerWidget {
     parseError.value = null;
     parseResult.value = result.valueOrNull;
     fileName.value = file.name;
+    if (result.valueOrNull?.dialect == CsvDialect.compass) {
+      selectedContainer.value = null;
+    }
   }
 
   Future<void> _pickContainer(
@@ -220,14 +233,17 @@ class ImportPage extends HookConsumerWidget {
     BuildContext context,
     WidgetRef ref, {
     required CsvParseResult parsed,
-    required graph.Container container,
+    required graph.Container? container,
     required ValueNotifier<bool> importing,
   }) async {
     importing.value = true;
-    final result = await ref.read(importServiceProvider).importIntoContainer(
-          parsed: parsed,
-          containerId: container.id,
-        );
+    final service = ref.read(importServiceProvider);
+    final result = parsed.dialect == CsvDialect.compass
+        ? await service.importCompassPaths(parsed: parsed)
+        : await service.importIntoContainer(
+            parsed: parsed,
+            containerId: container!.id,
+          );
     importing.value = false;
     if (!context.mounted) {
       return;
@@ -243,8 +259,10 @@ class ImportPage extends HookConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Imported ${summary.createdCount} cards into '
-          '${summary.containerName}',
+          parsed.dialect == CsvDialect.compass
+              ? 'Imported ${summary.createdCount} cards from CSV paths'
+              : 'Imported ${summary.createdCount} cards into '
+                  '${summary.destinationLabel}',
         ),
       ),
     );
@@ -274,10 +292,11 @@ class ImportPage extends HookConsumerWidget {
     }
 
     final assets = ref.read(assetsListProvider).valueOrNull ?? const [];
-    final inContainer = assets
-        .where((item) => item.containerId == container.id)
+    final idSet = summary.createdAssetIds.toSet();
+    final created = assets
+        .where((item) => idSet.contains(item.id))
         .toList(growable: false);
-    await runCardMatchForAssets(context, ref, assets: inContainer);
+    await runCardMatchForAssets(context, ref, assets: created);
   }
 }
 

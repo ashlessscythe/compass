@@ -34,6 +34,7 @@ class ImportRow {
     this.scryfallId,
     this.cardForm,
     this.condition,
+    this.path,
   });
 
   final String name;
@@ -48,6 +49,10 @@ class ImportRow {
   final String? cardForm;
 
   final String? condition;
+
+  /// Compass display path (`Place / … / Container / Name`). Ignored for
+  /// non-Compass dialects.
+  final String? path;
 }
 
 /// Result of parsing a collection CSV.
