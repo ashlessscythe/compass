@@ -12,20 +12,25 @@ class DomainPackSeeder {
     final existing = await (_db.select(_db.installedDomainPacks)
           ..where((t) => t.packId.equals(pack.id)))
         .getSingleOrNull();
-    if (existing != null && existing.version == pack.version) {
-      return;
-    }
+    final versionMatches =
+        existing != null && existing.version == pack.version;
 
+    // Always ensure types/attrs/values. Registry initialize may call
+    // [DomainPackManifestRepository.backfillBundledIfMissing] first, which
+    // inserts the installed row at the same version — an early return here
+    // would skip asset types on a fresh install and break "Add asset".
     final now = DateTime.now().toUtc();
     await _db.transaction(() async {
-      await _db.into(_db.installedDomainPacks).insertOnConflictUpdate(
-            InstalledDomainPacksCompanion.insert(
-              packId: pack.id,
-              version: pack.version,
-              moduleId: pack.moduleId,
-              installedAt: now,
-            ),
-          );
+      if (!versionMatches) {
+        await _db.into(_db.installedDomainPacks).insertOnConflictUpdate(
+              InstalledDomainPacksCompanion.insert(
+                packId: pack.id,
+                version: pack.version,
+                moduleId: pack.moduleId,
+                installedAt: now,
+              ),
+            );
+      }
 
       for (final type in pack.assetTypes) {
         final typeExisting = await (_db.select(_db.assetTypes)

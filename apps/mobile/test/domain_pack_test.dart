@@ -2,6 +2,7 @@ import 'package:compass/database/app_database.dart';
 import 'package:compass/features/domains/application/pack_csv_adapter.dart';
 import 'package:compass/features/domains/domain/domain_pack.dart';
 import 'package:compass/features/domains/infrastructure/domain_pack_loader.dart';
+import 'package:compass/features/domains/infrastructure/domain_pack_manifest_repository.dart';
 import 'package:compass/features/domains/infrastructure/domain_pack_seeder.dart';
 import 'package:compass/features/export/infrastructure/csv_collection_exporter.dart';
 import 'package:compass/features/import/infrastructure/csv_collection_parser.dart';
@@ -76,6 +77,30 @@ void main() {
 
       final defs = await db.select(db.packAttributeDefinitions).get();
       expect(defs.length, greaterThanOrEqualTo(20));
+    });
+
+    test('seeder still installs types after manifest backfill', () async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      final loader = DomainPackLoader();
+      final repo = DomainPackManifestRepository(db);
+      final seeder = DomainPackSeeder(db);
+      final pack = await loader.loadBundled('mtg');
+      final raw = await loader.loadBundledRaw('mtg');
+
+      // Same order as DomainPackRegistry.initialize: backfill row, then seed.
+      await repo.backfillBundledIfMissing(
+        pack: pack,
+        sourceUrl: loader.sourceUrlForPackId('mtg'),
+        manifestJson: raw,
+      );
+      await seeder.seedIfNeeded(pack);
+
+      final types = await db.select(db.assetTypes).get();
+      expect(types.any((t) => t.id == 'mtg_card'), isTrue);
+      final defs = await db.select(db.packAttributeDefinitions).get();
+      expect(defs, isNotEmpty);
     });
   });
 }

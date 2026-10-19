@@ -123,11 +123,18 @@ Module-specific data (MTG, jewelry, tools, …) belongs in attribute values (or 
 ```bash
 flutter analyze
 flutter test
+# Graph UI on a booted simulator (full launch: splash → domain picker → MTG home):
 flutter test integration_test/location_graph_test.dart -d "iPhone 17 Pro"
 
 # Recapture docs stills (iPhone 17 Pro simulator):
 ./tool/capture_ux_stills.sh
 ```
+
+Widget/UI tests use `test/helpers/compass_test_harness.dart` so they follow the
+same launch path as the app (`splash` → domain picker → domain home). Prefer
+that harness over asserting `AppConstants.appName` on the inventory screen —
+domain home shows the pack display name (e.g. Magic: The Gathering). NFC
+hardware still needs a physical iPhone; pairing/UID unit tests run on any host.
 
 ## Notes
 
