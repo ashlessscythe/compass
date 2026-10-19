@@ -66,10 +66,12 @@ Pack definitions live as **versioned JSON in git** (`packages/domains/packs/`). 
 
 **Tollgate**
 
-- [ ] Jewelry asset detail shows all pack attributes with Edit / Save
-- [ ] Saved values persist and export in CSV
-- [ ] Jewelry container list has no Match button; MTG unchanged
-- [ ] MTG assets still resolve Scryfall catalog UI
+- [x] Jewelry asset detail shows all pack attributes with Edit / Save
+- [x] Saved values persist and export in CSV
+- [x] Jewelry container list has no Match button; MTG unchanged
+- [x] MTG assets still resolve Scryfall catalog UI
+
+Shipped in `0.5.2+20` (`56e8a2b`). Flutter unit tests cover catalog gating and attribute applicability; Edit/Save and Match omission are confirmed in UI code (no widget E2E in CI).
 
 **After DP-5.1:** tools pack, create-time schema forms (DP-6), remote pack install (DP-5.2).
 
@@ -92,12 +94,23 @@ Pack definitions live as **versioned JSON in git** (`packages/domains/packs/`). 
 
 **Tollgate**
 
-- [ ] `/docs/domains/{pack}` shows Copy URL callout
-- [ ] Settings → Domain packs installs from Compass API URL
-- [ ] Update re-fetches manifest and re-seeds when version increases
-- [ ] Cached pack loads offline after first install
+- [x] `/docs/domains/{pack}` shows Copy URL callout
+- [x] Settings → Domain packs installs from Compass API URL
+- [x] Update re-fetches manifest and re-seeds when version increases
+- [x] Cached pack loads offline after first install
+
+Shipped in `0.5.3+21` (`a40bd6e`). Unit tests cover URL accept/reject, semver, and cached-over-bundled merge; no mocked HTTP install/update E2E in CI.
 
 **After DP-5.2:** tools pack, schema-driven create forms (DP-6).
+
+---
+
+## Backlog — near packs
+
+Collection and location features that sit next to domain packs, not new pack phases:
+
+- [ ] Artist and element filters — filter the collection by artist and by element/color
+- [ ] GPS / location capture — tag items with captured location
 
 ---
 

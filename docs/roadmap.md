@@ -45,6 +45,10 @@ Schema contract for every vertical: [taxonomy.md](./taxonomy.md). Do not add dom
 - [ ] Sync Plus tier (shared collections, advanced cloud history) — only when needed
 - [x] **Domain packs (MTG first)** — see [domain-packs-roadmap.md](./domain-packs-roadmap.md) (pack JSON, domain picker, pack-driven import/export/display)
 - [x] **Domain packs — jewelry (DP-5)** — second bundled pack, taxonomy-aligned types, spreadsheet CSV
+- [x] **Domain packs — pack attribute editing (DP-5.1)** — jewelry Edit/Save; catalog UI scoped to owning pack
+- [x] **Domain packs — remote install (DP-5.2)** — Compass URL install from Settings; offline cache
+- [ ] Artist and element filters — filter the collection by artist and by element/color
+- [ ] GPS / location capture — tag items with captured location
 - [ ] Taxonomy model, versioning, external taxonomy import, reference entities (after MTG pack gate)
 - [ ] Domain packs expansion (tools, clothing, collectibles, …)
 - [ ] Cross-module search
