@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:integration_test/integration_test.dart';
 
+import '../test/helpers/compass_test_harness.dart';
+
 /// Walks the graph UI and emits `<<<STILL:name>>>` markers for
 /// `tool/capture_ux_stills.sh` (host takes `simctl` screenshots).
 ///
@@ -28,8 +30,8 @@ void main() {
         child: const CompassApp(),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 1600));
-    await tester.pumpAndSettle();
+    await settlePastSplash(tester);
+    await openDomainHome(tester);
 
     await _captureStill('01-empty-home');
 

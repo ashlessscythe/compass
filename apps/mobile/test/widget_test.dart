@@ -1,36 +1,36 @@
-import 'package:compass/app.dart';
 import 'package:compass/core/constants/app_constants.dart';
-import 'package:compass/database/app_database.dart';
-import 'package:compass/shared/providers/database_provider.dart';
 import 'package:compass/widgets/name_prompt.dart';
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'helpers/compass_test_harness.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  setUp(setUpCompassWidgetTest);
 
-  testWidgets('empty home teaches add place, not dashboard', (tester) async {
-    final database = AppDatabase.forTesting(NativeDatabase.memory());
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          appDatabaseProvider.overrideWithValue(database),
-        ],
-        child: const CompassApp(),
-      ),
-    );
+  testWidgets('splash lands on domain picker before any home', (tester) async {
+    final database = await pumpCompassApp(tester);
 
     expect(find.text(AppConstants.appName), findsOneWidget);
     expect(find.text(AppConstants.tagline), findsOneWidget);
 
-    await tester.pump(const Duration(milliseconds: 1600));
-    await tester.pumpAndSettle();
+    await settlePastSplash(tester);
 
-    expect(find.text(AppConstants.appName), findsWidgets);
-    expect(find.text(AppConstants.tagline), findsWidgets);
+    expect(find.text('Select your domain'), findsOneWidget);
+    expect(find.text(CompassTestDomains.mtgDisplayName), findsOneWidget);
+    expect(find.text(CompassTestDomains.jewelryDisplayName), findsOneWidget);
+    expect(find.text('Add place'), findsNothing);
+    expect(find.text('Dashboard'), findsNothing);
+
+    await disposeCompassApp(tester, database);
+  });
+
+  testWidgets('empty domain home teaches add place, not dashboard',
+      (tester) async {
+    final database = await pumpCompassAtDomainHome(tester);
+
+    expect(find.text(CompassTestDomains.mtgDisplayName), findsWidgets);
+    expect(find.text(CompassTestDomains.mtgHomeTagline), findsWidgets);
     expect(
       find.text('Add a place to start mapping where things live.'),
       findsOneWidget,
@@ -41,24 +41,11 @@ void main() {
     expect(find.text('Nothing here yet.'), findsNothing);
     expect(find.byType(MaterialApp), findsOneWidget);
 
-    await database.close();
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    await disposeCompassApp(tester, database);
   });
 
   testWidgets('dashboard appears after the first place', (tester) async {
-    final database = AppDatabase.forTesting(NativeDatabase.memory());
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          appDatabaseProvider.overrideWithValue(database),
-        ],
-        child: const CompassApp(),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 1600));
-    await tester.pumpAndSettle();
+    final database = await pumpCompassAtDomainHome(tester);
 
     await tester.tap(find.text('Add place'));
     await tester.pumpAndSettle();
@@ -91,8 +78,6 @@ void main() {
     expect(find.text('Add container'), findsOneWidget);
     expect(find.text('No nested places yet.'), findsNothing);
 
-    await database.close();
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    await disposeCompassApp(tester, database);
   });
 }
