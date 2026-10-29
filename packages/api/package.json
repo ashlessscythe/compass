@@ -12,6 +12,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "echo \"No lint configured for @compass/api\"",
+    "test": "echo \"No unit tests configured for @compass/api yet\"",
     "clean": "rm -rf dist .turbo"
   },
   "devDependencies": {

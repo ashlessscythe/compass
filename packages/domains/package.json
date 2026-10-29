@@ -12,6 +12,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "echo \"No lint configured for @compass/domains\"",
+    "test": "echo \"No unit tests configured for @compass/domains yet\"",
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {

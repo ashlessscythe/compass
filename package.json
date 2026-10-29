@@ -15,6 +15,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,css}\"",
     "icons": "node scripts/generate-icons.mjs",
     "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "audit": "pnpm audit --audit-level=critical",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
@@ -29,7 +31,12 @@
       "deepmerge-ts": "^8.0.0",
       "nanoid": "^3.3.18",
       "postcss": ">=8.5.23",
-      "sharp": "^0.35.0"
+      "sharp": "^0.35.5",
+      "js-yaml": "^4.3.2",
+      "brace-expansion@<2": "1.1.21",
+      "brace-expansion@>=4": "5.0.12",
+      "source-map-js": "^1.2.2",
+      "postcss-selector-parser": "^6.1.5"
     },
     "onlyBuiltDependencies": [
       "sharp",
