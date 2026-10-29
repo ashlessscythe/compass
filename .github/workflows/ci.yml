@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint, typecheck, build
+    name: Lint, typecheck, test, build, audit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,9 +38,15 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Test
+        run: pnpm test
+
       - name: Build
         run: pnpm build
         env:
           NEXT_PUBLIC_SITE_URL: https://getcompass.space
           DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
           DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+
+      - name: Audit (critical)
+        run: pnpm audit --audit-level=critical
